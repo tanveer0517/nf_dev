@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="ouc_crm_meeting_tree" model="ir.ui.view">
+            <field name="name">CRM Meeting</field>
+			<field name="model">crm.phonecall</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+            	<tree string="Meeting" create="false">
+                    <field name="state" invisible="1"/>
+                    <field name="date"/>
+                    <field name="opportunity_id"/>
+                    <button name="open_lead_opportunity" type="object" string="Click to open related Lead/Opp" class="oe_highlight"/>
+                    <field name="user_id"/>
+                    <field name="sp_id_rel"/>
+                    <field name="lc_id_rel"/>
+                    <field name="c_meeting_type"/>
+                    <field name="c_demo_type"/>
+                    <field name="c_contact_status"/>
+                    <field name="c_meeting_status"/>
+                    <field name="meeting_done"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="ouc_crm_meeting_action" model="ir.actions.act_window">
+            <field name="name">CRM Meetings</field>
+            <field name="res_model">crm.phonecall</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="ouc_crm_meeting_tree"/>
+        </record>
+
+        <menuitem id="menu_crm_meeting"
+                  name="Meetings"
+                  action="ouc_crm_meeting_action"
+                  sequence="17"
+                  parent ="sales_team.menu_sales"/>
+
+        <record id="crm_bm_meeting_form" model="ir.ui.view">
+            <field name="name">BM Meetings</field>
+            <field name="model">crm.phonecall</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Meeting" create="false" edit="false">
+                    <header>
+                        <button name="comment_update" string="Update your Comment" type="object" class="oe_highlight" groups="nf_dincharya.group_dincharya" attrs="{'invisible':[('bm_comment','!=',False)]}"/>
+                    </header>
+                    <sheet>
+                        <div align="center" style="color:orange;" attrs="{'invisible':[('bm_update','=','Done')]}">
+                            <p>Please update your comment.</p>
+                        </div>
+                        <div align="center" style="color:orange;" attrs="{'invisible':[('bm_update','!=','Done')]}">
+                            <p>Thanks for updating your comment.</p>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="state" invisible="1"/>
+                                <field name="date"/>
+                                <field name="opportunity_id"/>
+                                <field name="user_id"/>
+                                <field name="sp_id_rel"/>
+                                <field name="lc_id_rel"/>
+                                <field name="comment_date"/>
+                                <field name="bm_empl_id" invisible="1"/>
+                                <field name="bm_update" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="c_meeting_type"/>
+                                <field name="c_demo_type"/>
+                                <field name="c_contact_status"/>
+                                <field name="c_meeting_status"/>
+                                <field name="meeting_done"/>
+                                <field name="bm_user_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                            <field name="bm_comment"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="crm_bm_meeting_tree" model="ir.ui.view">
+            <field name="name">BM Meetings</field>
+            <field name="model">crm.phonecall</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Meeting" create="false" colors="red:bm_update=='Pending';green:bm_update=='Done'">
+                    <field name="state" invisible="1"/>
+                    <field name="date"/>
+                    <field name="opportunity_id"/>
+                    <field name="user_id"/>
+                    <field name="sp_id_rel"/>
+                    <field name="lc_id_rel"/>
+                    <field name="c_meeting_type"/>
+                    <field name="c_demo_type"/>
+                    <field name="c_contact_status"/>
+                    <field name="c_meeting_status"/>
+                    <field name="meeting_done"/>
+                    <field name="bm_update" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="crm_bm_meeting_action" model="ir.actions.act_window">
+            <field name="name">BM Meetings</field>
+            <field name="res_model">crm.phonecall</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="crm_bm_meeting_tree"/>
+            <field name="domain">[('meeting_done','=','Yes')]</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="bm_meeting_form_action_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="crm_bm_meeting_form"/>
+            <field name="act_window_id" ref="crm_bm_meeting_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="bm_meeting_tree_action_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="crm_bm_meeting_tree"/>
+            <field name="act_window_id" ref="crm_bm_meeting_action"/>
+        </record>
+
+        <menuitem id="menu_bm_meetings"
+                  name="BM Meetings"
+                  action="crm_bm_meeting_action"
+                  sequence="20"
+                  parent ="sales_team.menu_sales" groups="nf_dincharya.group_dincharya"/>
+
+    </data>
+</openerp>

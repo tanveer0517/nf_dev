@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="payroll_components_approve_view" model="ir.ui.view">
+            <field name="name">Approve (Payroll) </field>
+            <field name="model">payroll.components.approve</field>
+            <field name="arch" type="xml">
+                <form string="Approve Payroll Components">
+                    <label string="Are you sure you want to approve all the payroll components for the selected employees?"/>
+                    <footer>
+                        <button string="Approve Payroll Components" name="bulk_approve_by_payroll" type="object" default_focus="1" class="btn-primary" groups="hr_payroll.group_hr_payroll_manager" />
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_payroll_components_approve" model="ir.actions.act_window">
+            <field name="name">Approve (By Payroll) </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">payroll.components.approve</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="payroll_components_approve_view"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+            <field name="help">This wizard will Approve all the selected Payroll Components.</field>
+        </record>
+
+        <record model="ir.values" id="payroll_components_approve_values">
+            <field name="model_id" ref="hr_tds_saving.model_nf_payslip_components" />
+            <field name="name">Approve (Payroll)</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_payroll_components_approve'))" />
+            <field name="key">action</field>
+            <field name="model">nf.payslip.components</field>
+        </record>
+
+    </data>
+</odoo>

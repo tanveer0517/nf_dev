@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+    <record id="employee_transfer_access_rule_id" model="ir.rule">
+            <field name="name">Employee Transfer User</field>
+            <field name="model_id" ref="model_employee_transfer"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+             <field name="domain_force">
+                ['|','|',('employee_id.user_id','=',user.id),('manager_id.user_id','=',user.id),('new_manager_id.user_id','=',user.id)]
+            </field>
+        </record>
+        
+        
+    <record id="employee_transfer_hr_access_rule_id" model="ir.rule">
+            <field name="name">Employee Transfer HR</field>
+            <field name="model_id" ref="model_employee_transfer"/>
+            <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">
+                [(1,'=',1)]
+            </field>
+        </record>        
+    
+        
+</data>             
+</openerp>
+       

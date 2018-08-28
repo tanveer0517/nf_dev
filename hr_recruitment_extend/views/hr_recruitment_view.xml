@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+   	<data>
+   	
+   	
+   	<!-- ============================ HR Application Standard ========================= -->
+   	
+   	<record model="ir.ui.view" id="hr_recruitment.crm_case_form_view_job">
+        <field name="name">Jobs - Recruitment Form</field>
+        <field name="model">hr.applicant</field>
+        <field name="arch" type="xml">
+          <form string="Jobs - Recruitment Form">
+            <header>
+                <button string="Create Employee" name="create_employee_from_applicant" type="object"
+                        class="oe_highlight" attrs="{'invisible': ['|','|',('emp_id', '!=', False),('active', '=', False),('stage_id','!=',9)]}"/>
+                <button string="Refuse" name="archive_applicant" type="object" attrs="{'invisible': [('active', '=', False)]}"/>
+                <button string="Reopen Application" name="reset_applicant" type="object" attrs="{'invisible': [('active', '=', True)]}"/>
+                <field name="stage_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}" attrs="{'invisible': [('active', '=', False),('emp_id', '=', False)]}" groups="hr_recruitment.group_hr_recruitment_user"/>
+            </header>
+            <sheet>
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_makeMeeting" class="oe_stat_button" icon="fa-calendar" type="object"
+                         help="Schedule interview with this applicant">
+                        <div class="o_form_field o_stat_info">
+                            <span class="o_stat_text">Meetings</span>
+                         </div>
+                    </button>
+                    <button name="action_get_attachment_tree_view"
+                        class="oe_stat_button"
+                        icon="fa-book"
+                        type="object">
+                        <field name="attachment_number" widget="statinfo" string="Documents"/>
+                    </button>
+                    <button name="action_get_created_employee"
+                        class="oe_stat_button"
+                        icon="fa-user"
+                        type="object"
+                        attrs="{'invisible': [('emp_id', '=', False)]}">
+                        <field name="employee_name" widget="statinfo" string="Employee"/>
+                    </button>
+                    <button name="toggle_active" type="object"
+                            class="oe_stat_button" icon="fa-archive"
+                            attrs="{'invisible': [('active', '=', True)]}">
+                        <field name="active" widget="boolean_button"
+                            options='{"terminology": "archive"}'/>
+                    </button>
+                </div>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1><field name="name"/></h1>
+                    <h2 class="o_row">
+                        <div>
+                            <label for="partner_name" class="oe_edit_only"/>
+                            <field name="partner_name"/>
+                        </div>
+                        <div>
+                            <label for="categ_ids" class="oe_edit_only"/>
+                            <field name="categ_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                        </div>
+                    </h2>
+                </div>
+                <group>
+                    <group>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="email_from" widget="email" required="1"/>
+                        <field name="partner_phone" invisible="1"/>
+                        <label for="partner_mobile"/>
+                        <div name="partner_mobile" class="o_row">
+    				      <field name="country_code_id" options="{'no_create': True}" required="1" placeholder="e.g. +91..."/>
+    				      <field name="partner_mobile" required="1"/>
+                        </div>  
+                        <field name="type_id" placeholder="Degree"/>
+                        <field name="source_id" attrs="{'invisible':[('stage_id', 'not in',[3,4,5,12])]}"/>
+                        <field name="reference" invisible="1" string="Reference"/>
+                        <field name="refferal_id" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="user_id"/>
+                        <label for="title_action" invisible="1"/>
+                        <div>
+                            <field name="date_action" invisible="1"/>
+                            <field name="title_action" invisible="1" class="oe_inline" placeholder="e.g. Call for interview"/>
+                        </div>
+                        <field name="priority" widget="priority" readonly="1"/>
+                        <field name="medium_id" groups="base.group_no_one" attrs="{'invisible':[('stage_id', 'not in',[3,4,5,12])]}"/>
+                    </group>
+                    <group string="Job" groups="hr_recruitment.group_hr_recruitment_user">
+                        <field name="job_id" groups="hr_recruitment.group_hr_recruitment_user"/>
+                        <field name="department_id" groups="hr_recruitment.group_hr_recruitment_user"/>
+                        <field name="company_id" groups="base.group_multi_company" options='{"no_open":True}' />
+                    </group>
+                    <group string="Contract">
+						<!-- manually added this field "c_current_annual_ctc"-->
+						<label for="c_current_annual_ctc" string="Current Annual CTC" />
+						<div>
+                            <field name="c_current_annual_ctc" class="oe_inline"/>
+                            <span class="oe_inline" attrs="{'invisible':[('c_current_annual_extra','=',False)]}"> + </span>
+                            <field name="c_current_annual_extra" class="oe_inline" placeholder="Extra advantages..."/>
+                        </div>
+                        <label for="salary_expected" string="Expected Annual CTC" />
+                        <div>
+                            <field name="salary_expected" class="oe_inline"/>
+                            <span class="oe_inline" attrs="{'invisible':[('salary_expected_extra','=',False)]}"> + </span>
+                            <field name="salary_expected_extra" class="oe_inline" placeholder="Extra advantages..."/>
+                        </div>
+                        <label for="salary_proposed" string="Proposed Annual CTC" groups="hr_recruitment.group_hr_recruitment_user"/>
+                        <div groups="hr_recruitment.group_hr_recruitment_user">
+                            <field name="salary_proposed" class="oe_inline" />
+                            <span class="oe_inline" attrs="{'invisible':[('salary_proposed_extra','=',False)]}"> + </span>
+                            <field name="salary_proposed_extra" class="oe_inline" placeholder="Extra advantages..."/>
+                        </div>
+                        <field name="availability"/>
+                        <field name="emp_id" invisible="1"/>
+                    </group>
+                </group>
+                <separator string="Summary"/>
+                <field name="description" required="1" placeholder="short summary about the applicant.."/>
+            </sheet>
+            <div class="oe_chatter">
+                <field name="message_follower_ids" widget="mail_followers"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+        </field>
+    </record>
+   	
+   	
+   	<!-- ============================ HR Application Standard ========================= -->
+   	
+   	
+   	
+   	
+   		<record model="ir.ui.view" id="hr_applicant_view_form">
+	        <field name="name">Applicant Form</field>
+	        <field name="model">hr.applicant</field>
+	        <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
+	        <field name="arch" type="xml">
+	        	<xpath expr="//button[@name='create_employee_from_applicant']" position="before">
+	        		<button string="Assign Interviewer" name="%(action_interview_form)d" type="action" class="btn-primary" invisible="1"/>
+	        	    <button string="Interview Feedback" name="%(action_applicant_selection_note)d" type="action" class="btn-primary" attrs="{'invisible':[('select_note','=',False)]}"/>
+	        	    <button name="review_email" type="object" string="Send for review" class="btn-primary" attrs="{'invisible':[('stage_id','!=',13)]}"/>
+	        	</xpath>
+	        	
+	        	<xpath expr="//button[@name='create_employee_from_applicant']" position="attributes">
+					<attribute name="groups">hr_recruitment.group_hr_recruitment_manager</attribute>
+	        	</xpath>
+	        		        	
+	        	<xpath expr="//field[@name='user_id']" position="after">
+	        		<field name="interviewer_id"/>
+	        		<field name="interview_time"/>
+	        		<field name="interview_type" attrs="{'required':[('interview_time','!=',False)]}"/>
+	        		<button name="email_to_applicant" type="object" string="Email to applicant" attrs="{'invisible':[('stage_id', 'not in',[3,4,5,12])]}"/>
+	        	    <button name="email_to_interviewer" type="object" string="Email to interviewer" attrs="{'invisible':[('stage_id', 'not in',[3,4,5,12])]}"/>
+	        		<field name="allocat_hr" invisible="1"/>
+	        		<field name="refferal_date"/>
+	        		<field name="doj"/>
+	        		<field name="coach_id"/>
+	        		<field name="start_interview" invisible="1"/>
+	        		<field name="select_note" invisible="1"/>
+	        	</xpath>
+	        	
+	        	<xpath expr="//field[@name='type_id']" position="after">
+	        		<label for="tax_idcard_no"/>
+                     <div name="tax_idcard_no" class="o_row">
+    				  <field name="tax_idcard_no" />
+    				  <field name="tax_idcard_id" options="{'no_create': True}" attrs="{'required':[('tax_idcard_no','!=',False)]}" placeholder="e.g. PAN Card..."/>
+    				</div>
+    	           <label for="idcard_no"/>
+                      <div name="idcard_no" class="o_row">
+    				   <field name="idcard_no" />
+    				   <field name="idcard_type_id" options="{'no_create': True}" attrs="{'required':[('idcard_no','!=',False)]}" placeholder="e.g. Adhaar Card..."/>
+    				</div>
+	        	</xpath>
+	        
+	        <xpath expr="//field[@name='department_id']" position="attributes">
+	        	<attribute name="domain">[('parent_id','!=',False)]</attribute>
+	        </xpath>
+	        
+	        <xpath expr="//field[@name='department_id']" position="attributes">
+	        	<attribute name="options">{'no_create': True}</attribute>
+	        </xpath>
+	        
+	        <xpath expr="//field[@name='department_id']" position="attributes">
+	        	<attribute name="string">Division</attribute>
+	        </xpath>	
+	        
+	        <xpath expr="//field[@name='user_id']" position="attributes">
+	        	<attribute name="invisible">1</attribute>
+	        </xpath>
+	        <xpath expr="//field[@name='description']" position="after">
+	        		<group col="4">
+	        		    <field name="attach_doc" filename="filename"/>
+	        		    <field name="filename" invisible="1"/>
+		        		<field name="survey_id" invisible="1"/>
+		        		<field name="survey_id1" invisible="1"/>
+		        		<field name="response_id1" invisible="1"/>
+	        		</group>
+	        		<field name="index_content"/>
+	        		<notebook groups="hr.group_hr_manager">
+	        			<page string="Interview History" name="Interview History">
+			        		<field name="interviewer_hist_line" context="{'sequence':interviewer_hist_line}" invisible="0">
+			        			<form>
+							     <group string="Feedback">
+						          <group>
+							          <field name="interview_type"/>
+				        			  <field name="user_id"/>
+				        			  <field name="date_action"/>
+				    				  
+				    				  <field name="communication_skill" widget="priority"/>
+				    				  <field name="communication_remark" placeholder="Remark..."/>
+
+				    				  <field name="resume_validation" widget="priority" />
+				    				  <field name="resume_remark" placeholder="Remark..."/>
+				    				
+				    				  <field name="jd_fitment" widget="priority" />
+				    				  <field name="jd_fitment_remark" placeholder="Remark..."/>
+				    				
+				    				  <field name="tech_competency" widget="priority" />
+				    				  <field name="tech_remark" placeholder="Remark..."/>
+							          
+							          <field name="attitude" widget="priority" />
+    				                  <field name="attitude_remark" placeholder="Remark..."/> 
+    				                  
+    				                  <field name="level" widget="radio"/> 
+		                              <field name="fitc" widget="radio"/>
+							          
+							       </group>  
+						           <group>
+						              <field name="stage_id"/>
+						              <field name="rating" widget="priority"/>
+						              <field name="stage_result"/>
+						           </group>
+						          </group>
+						          <separator string="Summary"/>
+					              <newline/>
+						          <field name="title_action" placeholder="Summary..."/>
+			        			</form>
+			        			<tree>
+				        			<field name="name" invisible="1"/>
+				        			<field name="stage_id"/>
+				        			<field name="user_id"/>
+				        			<field name="date_action"/>
+				        			<field name="stage_result"/>
+				        			<field name="rating"/>
+				        			<field name="title_action"/>
+				        			<!-- <button name="action_start_survey" string="To View Form" type="object" class="btn-primary" icon="fa-th-large"/> -->
+			        			</tree>
+			        		</field>
+		        		</page>
+	        		</notebook>
+	        	</xpath>
+	        	
+	       <xpath expr="//field[@name='job_id']" position="attributes">
+			  <attribute name="domain">[('parent','=',False)]</attribute>
+			  <attribute name="string">Requisition</attribute>
+			  <attribute name="options">{'no_create': True}</attribute>
+	       </xpath>
+	       
+	       <xpath expr="//field[@name='job_id']" position="after">
+			  <field name="parent_job_id" groups="hr_recruitment.group_hr_recruitment_user"/>
+			  <field name="branch_id" options="{'no_create': True}" groups="hr_recruitment.group_hr_recruitment_user"/>
+	       </xpath> 	
+	        	
+	        </field>
+	    </record>
+	    
+	    
+	    
+	    <!-- ============== HR JOB STANDARD INHERITED VIEW====================== -->
+	    
+	    
+	    <record id="hr_recruitment.hr_job_survey" model="ir.ui.view">
+        <field name="name">hr.job.form1</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_form"/>
+        <field name="arch" type="xml">
+            <group name="employee_data" position="inside">
+                <group>
+                    <field name="address_id" context="{'show_address': 1}" domain= "[('is_company', '=', True )]" options="{'always_reload': True}" invisible="1"/>
+                </group>
+            </group>
+            <xpath expr="//field[@name='department_id']" position="after">
+                <label for="alias_name" string="Specific Email Address" attrs="{'invisible': [('alias_domain', '=', False)]}" help="Define a specific contact address for this job position. If you keep it empty, the default email address will be used which is in human resources settings"/>
+                <div name="alias_def" attrs="{'invisible': [('alias_domain', '=', False)]}">
+                    <field name="alias_id" class="oe_read_only" string="Email Alias" required="0"/>
+                    <div class="oe_edit_only" name="edit_alias">
+                        <field name="alias_name" class="oe_inline"/>@<field name="alias_domain" class="oe_inline" readonly="1"/>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="user_id"/>
+            </xpath>
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button"
+                    icon="fa-file-o"
+                    name="%(hr_recruitment.action_hr_job_applications)d"
+                    context="{'default_user_id': user_id}"
+                    type="action">
+                    <field name="application_count" widget="statinfo" string="Applications"/>
+                </button>
+                <button class="oe_stat_button"
+                    icon="fa-users"
+                    name="%(hr_recruitment.action_hr_job_no_employee)d"
+                    type="action" invisible="1">
+                    <field name="no_of_employee" widget="statinfo" string="Employees"/>
+                </button>
+                <button class="oe_stat_button"
+                    icon="fa-book"
+                    name="action_get_attachment_tree_view"
+                    type="object" invisible="1">
+                    <field name="documents_count" widget="statinfo" string="Documents"/>
+                </button>
+                <button class="oe_stat_button" type="action"
+                    name="%(hr_recruitment.action_hr_job_sources)d" icon="fa-share"
+                    context="{'default_job_id': active_id}" invisible="1">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">Trackers</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+    
+    
+    <!-- =============================================================================== -->
+	    
+	    
+	    
+	    
+	    
+	    
+		<record model="ir.actions.act_window" id="hr_recruitment.crm_case_categ0_act_job">
+	        <field name="name">Applications</field>
+	        <field name="res_model">hr.applicant</field>
+	        <field name="view_mode">kanban,tree,form,graph,calendar</field>
+	        <field name="view_id" eval="False"/>
+	        <field name="search_view_id" ref="hr_recruitment.view_crm_case_jobs_filter"/>
+	        <field name="domain">[]</field>
+	        <field name="context">{}</field>
+	        <field name="help" type="html">
+	          <p>
+	            Odoo helps you track applicants in the recruitment
+	            process and follow up all operations: meetings, interviews, etc.
+	          </p><p>
+	            Applicants and their attached CV are created automatically when an email is sent.
+	            If you install the document management modules, all resumes are indexed automatically, 
+	            so that you can easily search through their content.
+	          </p>
+	        </field>
+	    </record>
+	    
+	    <record model="ir.actions.act_window" id="hr_recruitment.action_hr_job_applications">
+        <field name="name">Applications</field>
+        <field name="res_model">hr.applicant</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">['|','|','|',('interviewer_id','=',uid),('user_id','=',uid),('allocat_hr','=',uid),('create_uid','=',uid)]</field>
+        <field name="context">{'search_default_job_id': [active_id], 'default_job_id': active_id}</field>
+        <field name="help" type="html">
+              <p>
+                Odoo helps you track applicants in the recruitment
+                process and follow up all operations: meetings, interviews, etc.
+              </p><p>
+                Applicants and their attached CV are created automatically when an email is sent.
+                If you install the document management modules, all resumes are indexed automatically,
+                so that you can easily search through their content.
+              </p>
+         </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="crm_case_categ0_act_job_to_create_employee">
+	        <field name="name">Applications</field>
+	        <field name="res_model">hr.applicant</field>
+	        <field name="view_mode">tree,form,kanban,pivot,graph,calendar</field>
+	        <field name="view_id" eval="False"/>
+	        <field name="search_view_id" ref="hr_recruitment.view_crm_case_jobs_filter"/>
+	        <field name="domain">[('stage_id','=',9),('emp_id','=',False)]</field>
+	        <field name="context">{}</field>
+	        <field name="help" type="html">
+	          <p>
+	            Odoo helps you track applicants in the recruitment
+	            process and follow up all operations: meetings, interviews, etc.
+	          </p><p>
+	            Applicants and their attached CV are created automatically when an email is sent.
+	            If you install the document management modules, all resumes are indexed automatically, 
+	            so that you can easily search through their content.
+	          </p>
+	        </field>
+	    </record>
+    
+	    <record model="ir.ui.view" id="hr_task_subject_form">
+	        <field name="name">Task Subject</field>
+	        <field name="model">task.subject</field>
+	        <field name="arch" type="xml">
+	        	<form>
+	        		<sheet>
+	        			<group>
+	        			<group>
+	        				<field name="name"/>
+	        				<field name="alert_days"/>
+	        			</group>
+	        			<group>
+	        				<field name="description"/>
+	        			</group>
+	        			</group>
+	        		</sheet>
+	        	</form>
+	        </field>
+	    </record>
+	    
+	    <record id="action_task_subject" model="ir.actions.act_window">
+            <field name="name">Task</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">task.subject</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="hr_task_subject_form"/>
+    	</record>
+    	
+        <record model="ir.ui.view" id="hr_recruitment_stage_form_inherit">
+        <field name="name">hr.recruitment.stage.form</field>
+        <field name="model">hr.recruitment.stage</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_recruitment_stage_form"/>
+        <field name="arch" type="xml">
+         <xpath expr="//field[@name='job_id']" position="attributes">
+          <attribute name="required">0</attribute>
+         </xpath>
+		<xpath expr="//field[@name='name']" position="attributes">
+          <attribute name="readonly">1</attribute>
+         </xpath>
+         
+         <xpath expr="//field[@name='job_id']" position="attributes">
+          <attribute name="domain">[('parent','=',True)]</attribute>
+         </xpath>
+
+         <xpath expr="//field[@name='template_id']" position="after">
+          <field name="interview"/>
+         </xpath>
+        </field>
+    </record>
+   
+	   <menuitem
+	        sequence="11"
+	        id="menu_task_subject"
+	        name="Task Details"
+	        action="action_task_subject"
+			groups="base.group_erp_manager"
+	        parent="hr_recruitment.menu_hr_recruitment_configuration"/>
+	        
+	        
+  <menuitem name="Reports" id="hr_recruitment.report_hr_recruitment" parent="hr_recruitment.menu_hr_recruitment_root" 
+    sequence="99" />
+    
+    <menuitem name="Recruitment Analysis" id="report_hr_recruitment_menu" parent="hr_recruitment.report_hr_recruitment" 
+     action="hr_recruitment.action_hr_recruitment_report_all"/>
+     
+     <record model="ir.ui.view" id="hr_job_position_view_tree">
+	        <field name="name">Job Position View</field>
+	        <field name="model">job.position.view</field>
+	        <field name="arch" type="xml">
+	        	<tree create="false">
+	        	 <field name="name" string="Job Position"/>
+	        	 <field name="department"/>
+	        	 <field name="budgeted_headcount" sum="total"/>
+	        	 <field name="current_headcount" sum="total"/>
+	        	 <field name="open_headcount" sum="total"/>
+	        	 <field name="recruitment_pipeline" sum="total"/>
+	        	 <field name="application_pipeline" sum="total"/>
+	        	</tree>
+	        </field>
+	    </record>
+	    
+	    <record model="ir.ui.view" id="hr_job_position_view_search">
+	        <field name="name">Job Position View</field>
+	        <field name="model">job.position.view</field>
+	        <field name="arch" type="xml">
+	        	<search>
+	        	 <field name="name" string="Job Position"/>
+	        	 <field name="department"/>
+	        	</search>
+	        </field>
+	    </record>
+	    
+	    <record id="action_hr_job_position_view" model="ir.actions.act_window">
+            <field name="name">Job Position View</field>
+            <field name="res_model">job.position.view</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="hr_job_position_view_tree"/>
+            <field name="search_view_id" ref="hr_job_position_view_search"/>
+    	</record>
+    	
+    <menuitem name="Job Position Analysis" id="hr_job_position_view_menu" parent="hr_recruitment.report_hr_recruitment" 
+     action="action_hr_job_position_view"/>
+<!--inherited to Dempartments menu in recruitment -->
+		<menuitem id="hr_recruitment.menu_hr_department" name="Departments"
+            parent="hr_recruitment.menu_hr_recruitment_configuration" action="hr_recruitment.action_hr_department" groups="base.group_erp_manager"/>
+<!--inherited to Degree menu in recruitment -->
+		<menuitem id="hr_recruitment.menu_hr_recruitment_degree" name="Degrees" parent="hr_recruitment.menu_hr_recruitment_configuration" action="hr_recruitment.hr_recruitment_degree_action" sequence="5" groups="base.group_erp_manager"/>
+<!--inherited to Application menu in recruitment -->
+		<menuitem
+        name="Applications"
+        parent="hr_recruitment.menu_hr_recruitment_root"
+        id="hr_recruitment.menu_crm_case_categ0_act_job" action="hr_recruitment.crm_case_categ0_act_job" sequence="2"/>
+
+
+		<menuitem
+        id="hr_recruitment.menu_hr_recruitment_source"
+        parent="hr_recruitment.menu_hr_recruitment_configuration"
+        action="hr_recruitment.hr_recruitment_source_action"
+        groups="base.group_erp_manager"
+        sequence="10"/>
+
+         <record model="ir.ui.view" id="nf_joining_candidate_view_form">
+            <field name="name">Candidate Joining</field>
+            <field name="model">nf.joining.candidate</field>
+            <field name="arch" type="xml">
+                <form string="Candidate Joining">
+                    <header>
+                        <button name="candidate_joined" string="Joined" type="object" states='Recruiter Submit' class="oe_highlight" groups="hr.group_hr_manager"/>
+                        <button name="recruiter_submit" string="Recruiter Submit" type="object" states='Draft' class="oe_highlight"/>
+                        <button name="doc_reject" string="Reject Docs" type="object" attrs="{'invisible':[('doc_status', '!=', 'Submitted')]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+                        <button name="doc_approve" string="Approve Docs" type="object" attrs="{'invisible':[('doc_status', '!=', 'Submitted')]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+                        <button name="candidate_not_joined" string="Not Joined" type="object" states='Draft,Recruiter Submit' class="oe_highlight" groups="hr.group_hr_manager"/>
+                        <button name="create_employee" string="Create Employee" type="object" attrs="{'invisible':['|',('employee_id','!=',False),('state','not in',['Joined'])]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div style="margin-left:700pt; color:red;" attrs="{'invisible':[('doc_status', '!=', 'Rejected')]}">
+                            <p>Documents Rejected</p>
+                        </div>
+                        <div style="margin-left:700pt; color:green;" attrs="{'invisible':[('doc_status', '!=', 'Submitted')]}">
+                            <p>Documents Submitted</p>
+                        </div>
+                        <div style="margin-left:700pt; color:orange;" attrs="{'invisible':[('doc_status', '!=', 'Approved')]}">
+                            <p>Documents Approved</p>
+                        </div>
+                        <group>
+                            <group string="Personal Details">
+                                <field name="doc_status" invisible="1"/>
+                                <field name="name" readonly="1"/>
+                                <field name="full_name" readonly="1"/>
+                                <field name="gender" readonly="1"/>
+                                <field name="birth_date" readonly="1"/>
+                                <field name="religion" readonly="1"/>
+                                <field name="other_religion" readonly="1" attrs="{'invisible':[('religion','!=','Other')]}"/>
+                                <field name="disability" readonly="1"/>
+                                <field name="blood_group" readonly="1"/>
+                                <field name="marital_status" readonly="1"/>
+                                <field name="anniversary_date" readonly="1" attrs="{'invisible':[('marital_status','!=','married')]}"/>
+                                <field name="father_name" readonly="1"/>
+                            </group>
+                            <group string="Citizenship">
+                                <field name="nationality" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="aadhar_no" readonly="1"/>
+                                <field name="pan_no" readonly="1"/>
+                                <field name="voter_id" readonly="1"/>
+                                <field name="passport_no" readonly="1"/>
+                                <field name="driving_license_no" readonly="1"/>
+                                <field name="previous_uan" readonly="1"/>
+                                <field name="previous_pf" readonly="1"/>
+                            </group>
+                            <group string="Contact Information">
+                                <field name="contact_no" readonly="1"/>
+                                <field name="personal_email" readonly="1"/>
+                                <label for="current_street1" string="Current Address*"/>
+                                <div class="o_address_format">
+                                    <field name="current_street1" placeholder="Street..." class="o_address_street" readonly="1"/>
+                                    <field name="current_street2" placeholder="Street 2..." class="o_address_street" readonly="1"/>
+                                     <div>
+                                    <field name="current_city" placeholder="City" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                                </div>
+                                <div>
+                                    <field name="current_state" placeholder="State" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                     <span attrs="{'invisible':[('current_city','=',False)]}">, </span>
+                                     <field name="current_country"  placeholder="Country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                </div>
+                                    <field name="current_zip" placeholder="ZIP" readonly="1"/>
+                                </div>
+
+                                <field name="is_address_same" readonly="1"/>
+                            </group>
+                            <group string="Permanent Address">           
+                                <label for="permanent_street1" string="Permanent Address*"/>
+                                <div class="o_address_format">
+                                    <field name="permanent_street1" placeholder="Street..." class="o_address_street" readonly="1"/>
+                                    <field name="permanent_street2" placeholder="Street 2..." class="o_address_street" readonly="1"/>
+                                    <div>
+                                    <field name="permanent_city" placeholder="City" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                                </div>
+                                <div>
+                                    <field name="permanent_state" placeholder="State" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                     <span attrs="{'invisible':[('permanent_city','=',False)]}">, </span>
+                                     <field name="permanent_country"  placeholder="Country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                </div>
+                                 <field name="permanent_zip" placeholder="ZIP" readonly="1"/>
+                               </div>
+                            </group>
+                            <group string="Emergency Contact Information">
+                                <field name="emegency_person_name" string="Name*" readonly="1"/>
+                                <field name="emergency_contact_no" string="Contact Number*" readonly="1"/>
+                                <field name="emergency_contact_relation" string="Relation*" readonly="1"/>
+                            </group>
+                            <group string="Bank Account Details">
+                                <field name="bank_account_available" readonly="1"/>
+                                <field name="account_holder_name" readonly="1"/>
+                                <field name="account_number" readonly="1"/>
+                                <field name="bank_name" readonly="1"/>
+                                <field name="bank_branch_name" readonly="1"/>
+                                <field name="bank_ifsc_code" readonly="1"/>
+                            </group>
+                        </group>
+                        <separator string="Family Details*"/>
+                        <field name="family_details" nolabel="1" readonly="1">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="dob"/>
+                                <field name="relation"/>
+                                <field name="gender"/>
+                                <field name="contact_number"/>
+                            </tree>
+                            <form>
+                                <field name="name"/>
+                                <field name="dob"/>
+                                <field name="relation"/>
+                                <field name="gender"/>
+                                <field name="contact_number"/>
+                            </form>
+                        </field>
+                        <group>
+                            <group string="Education Details">
+                                <field name="highest_education" readonly="1"/>
+                                <field name="degree_id" readonly="1"/>
+                                <field name="other_degree" readonly="1" attrs="{'invisible':[('degree_id','!=',71)]}"/>
+                                <field name="college_name" readonly="1"/>
+                                <field name="university_name" readonly="1"/>
+                                <field name="unviversity_city" readonly="1"/>
+                                <field name="graduation_year" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Previous Employment Details(starting with the latest)">
+                            <label for="total_experience_years" string="Total Experience"/>
+                            <div name="total_experience_years" class="o_row">
+                                <field name="total_experience_years" placeholder="Years" readonly="1"/>year(s) 
+                                <field name="total_experience_months" placeholder="Months" readonly="1"/>month(s)
+                            </div>
+                            <label for="relevant_experience_years" string="Relevant Experience"/>
+                            <div name="relevant_experience" class="o_row">
+                                <field name="relevant_experience_years" placeholder="Years" readonly="1"/>year(s) 
+                                <field name="relevant_experience_months" placeholder="Months" readonly="1"/>month(s)
+                            </div>
+                            <field name="previous_employment" readonly="1">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="designation"/>
+                                    <field name="doj"/>
+                                    <field name="currently_working"/>
+                                    <field name="dol"/>
+                                    <field name="ctc"/>
+                                    <field name="reason_leaving"/>
+                                </tree>
+                                <form>
+                                    <field name="name"/>
+                                    <field name="designation"/>
+                                    <field name="doj"/>
+                                    <field name="currently_working"/>
+                                    <field name="dol"/>
+                                    <field name="ctc"/>
+                                    <field name="reason_leaving"/>
+                                </form>
+                            </field>
+                        </group>
+                        <group string="Documents">
+                            <field name="resume" readonly="1" widget="url"/>
+                            <field name="education_certificate" readonly="1" widget="url"/>
+                            <field name="pan_card" readonly="1" widget="url"/>
+                            <field name="aadhar_card" readonly="1" widget="url"/>
+                            <field name="cancel_cheque" readonly="1" widget="url"/>
+                            <field name="salary_slip" readonly="1" widget="url"/>
+                            <field name="salary_slip1" readonly="1" widget="url"/>
+                            <field name="salary_slip2" readonly="1" widget="url"/>
+                            <field name="resignation_acceptance" readonly="1" widget="url"/>
+                        </group>
+                        <group string='Recruiter/HR Section'>
+                            <group>
+                                <field name="onboarding_id" readonly="1"/>
+                                <field name="date_join" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="emp_id" attrs="{'readonly':[('employee_id','!=',False)]}" groups="hr.group_hr_manager"/>
+                                <field name="office_email" attrs="{'readonly':[('employee_id','!=',False)]}" groups="hr.group_hr_manager"/>
+                                <field name="external_designation" options="{'no_create_edit':True,'no_create': True}" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="internal_designation" attrs="{'readonly':[('employee_id','!=',False)]}" groups="hr.group_hr_manager"/>
+                                <field name="division" options="{'no_create_edit':True,'no_create': True}" required="1" attrs="{'readonly':[('employee_id','!=',False)]}" domain="[('parent_id','!=',False)]"/>
+                                <field name="branch_id" options="{'no_create_edit':True,'no_create': True}" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="virtual_branch_id" options="{'no_create_edit':True,'no_create': True}" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="office_location" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="recruiter_name" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="reporting_manager" options="{'no_create_edit':True,'no_create': True}" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="department_manager" options="{'no_create_edit':True,'no_create': True}" attrs="{'readonly':[('employee_id','!=',False)]}" groups="hr.group_hr_manager"/>
+                                <field name="c_empl_type" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="hire_status" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="source" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="source_name" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="hike" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="esic_entitlement" required="1" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="level" attrs="{'readonly':[('employee_id','!=',False)]}"/>
+                                <field name="employee_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="remarks" readonly="1" attrs="{'invisible':[('doc_status','!=','Rejected')]}"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+         <record model="ir.ui.view" id="nf_joining_candidate_view_tree">
+            <field name="name">Candidate Joining</field>
+            <field name="model">nf.joining.candidate</field>
+            <field name="arch" type="xml">
+                <tree string="Candidate Joining">
+                    <field name="name"/>
+                    <field name="contact_no"/>
+                    <field name="personal_email"/>
+                    <field name="doc_status" groups="hr.group_hr_manager"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="nf_joining_candidate_view_search">
+            <field name="name">Candidate Joining</field>
+            <field name="model">nf.joining.candidate</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="contact_no"/>
+                    <field name="personal_email"/>
+                    <field name="internal_designation"/>
+                    <field name="recruiter_name"/>
+                    <field name="date_join"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+        
+        <record id="action_nf_joining_candidate_view" model="ir.actions.act_window">
+            <field name="name">Candidate Joining</field>
+            <field name="res_model">nf.joining.candidate</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_joining_candidate_view_tree"/>
+            <field name="search_view_id" ref="nf_joining_candidate_view_search"/>
+        </record>
+        
+    <menuitem name="Candidate Joining" id="nf_joining_candidate_view_menu1" parent="hr_recruitment.menu_hr_recruitment_root" 
+     action="action_nf_joining_candidate_view" sequence="4"/>
+
+      <record model="ir.ui.view" id="nf_candidate_onboarding_view_form">
+            <field name="name">Candidate Onboarding</field>
+            <field name="model">nf.candidate.onboarding</field>
+            <field name="arch" type="xml">
+                <form string="Candidate Onboarding">
+                    <sheet>
+                        <header>
+                            <field name="state" widget="statusbar"/>
+                        </header>
+                        <group>
+                            <group string="Personal Details">
+                                <field name="name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="full_name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="gender" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="birth_date" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="religion" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="other_religion" attrs="{'invisible':[('religion','!=','Other')], 'required':[('religion','=','Other')],'readonly':[('state','!=','Draft')]}"/>
+                                <field name="disability" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="blood_group" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="marital_status" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="anniversary_date" attrs="{'invisible':[('marital_status','!=','married')], 'required':[('marital_status','=','married')],'readonly':[('state','!=','Draft')]}"/>
+                                <field name="father_name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                            </group>
+                            <group string="Citizenship">
+                                <field name="nationality" required="1" attrs="{'readonly':[('state','!=','Draft')]}" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="aadhar_available" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="aadhar_no" attrs="{'readonly':[('state','!=','Draft')], 'required':[('aadhar_available','=',True)], 'invisible':[('aadhar_available','!=',True)]}"/>
+                                <field name="pan_available" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="pan_no" attrs="{'readonly':[('state','!=','Draft')], 'required':[('pan_available','=',True)], 'invisible':[('pan_available','!=',True)]}"/>
+                                <field name="voter_id" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="passport_no" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="driving_license_no" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="previous_uan" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="previous_pf" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                            </group>
+                            <group string="Contact Information">
+                                <field name="contact_no" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="personal_email" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <label for="current_street1" string="Current Address*"/>
+                                <div class="o_address_format">
+                                    <field name="current_street1" placeholder="Street..." class="o_address_street" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                    <field name="current_street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                     <div>
+                                    <field name="current_city" placeholder="City" options="{'no_create': True, 'no_open': True}" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                </div>
+                                <div>
+                                    <field name="current_state" placeholder="State" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                     <span attrs="{'invisible':[('current_city','=',False)]}">, </span>
+                                     <field name="current_country"  placeholder="Country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                </div>
+                                    <field name="current_zip" placeholder="ZIP" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                </div>
+
+                                <field name="is_address_same" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                            </group>
+                            <group string="Permanent Address">           
+                                <label for="permanent_street1" string="Permanent Address*"/>
+                                <div class="o_address_format">
+                                    <field name="permanent_street1" placeholder="Street..." class="o_address_street" required="1" attrs="{'readonly':['|',('state','!=','Draft'),('is_address_same','=',True)]}"/>
+                                    <field name="permanent_street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly':['|',('state','!=','Draft'),('is_address_same','=',True)]}"/>
+                                    <div>
+                                    <field name="permanent_city" placeholder="City" options="{'no_create': True, 'no_open': True}" required="1" attrs="{'readonly':['|',('state','!=','Draft'),('is_address_same','=',True)]}"/>
+                                </div>
+                                <div>
+                                    <field name="permanent_state" placeholder="State" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                     <span attrs="{'invisible':[('permanent_city','=',False)]}">, </span>
+                                     <field name="permanent_country"  placeholder="Country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                </div>
+                                 <field name="permanent_zip" placeholder="ZIP" required="1" attrs="{'readonly':['|',('state','!=','Draft'),('is_address_same','=',True)]}"/>
+                               </div>
+                            </group>
+                            <group string="Emergency Contact Information">
+                                <field name="emegency_person_name" string="Name*" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="emergency_contact_no" string="Contact Number*" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="emergency_contact_relation" string="Relation*" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                            </group>
+                            <group string="Bank Account Details">
+                                <field name="bank_account_available" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="account_holder_name" attrs="{'required':[('bank_account_available','=',True)], 'readonly':[('state','!=','Draft')]}"/>
+                                <field name="account_number" attrs="{'required':[('bank_account_available','=',True)], 'readonly':[('state','!=','Draft')]}"/>
+                                <field name="bank_name" attrs="{'required':[('bank_account_available','=',True)], 'readonly':[('state','!=','Draft')]}"/>
+                                <field name="bank_branch_name" attrs="{'required':[('bank_account_available','=',True)], 'readonly':[('state','!=','Draft')]}"/>
+                                <field name="bank_ifsc_code" attrs="{'required':[('bank_account_available','=',True)], 'readonly':[('state','!=','Draft')]}"/>
+                            </group>
+                        </group>
+                        <separator string="Family Details*"/>
+                        <field name="family_details" nolabel="1" attrs="{'readonly':[('state','!=','Draft')]}">
+                            <tree editable="bottom">
+                                <field name="name" required="1"/>
+                                <field name="dob"/>
+                                <field name="relation" required="1"/>
+                                <field name="gender" required="1"/>
+                                <field name="contact_number"/>
+                            </tree>
+                            <form>
+                                <field name="name"/>
+                                <field name="dob"/>
+                                <field name="relation"/>
+                                <field name="gender"/>
+                                <field name="contact_number"/>
+                            </form>
+                        </field>
+                        <group>
+                            <group string="Education Details">
+                                <field name="highest_education" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="degree_id" required="1" attrs="{'readonly':[('state','!=','Draft')]}" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="other_degree" attrs="{'invisible':[('degree_id','!=',71)], 'required':[('degree_id','=',71)]}"/>
+                                <field name="college_name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="university_name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="unviversity_city" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="graduation_year" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                            </group>
+                        </group>
+                        <group string="Previous Employment Details(starting with the latest)">
+                            <label for="total_experience_years" string="Total Experience"/>
+                            <div name="total_experience_years" class="o_row">
+                                <field name="total_experience_years" placeholder="Years" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>year(s) 
+                                <field name="total_experience_months" placeholder="Months" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>month(s)
+                            </div>
+                            <label for="relevant_experience_years" string="Relevant Experience"/>
+                            <div name="relevant_experience" class="o_row">
+                                <field name="relevant_experience_years" placeholder="Years" attrs="{'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')], 'readonly':[('state','!=','Draft')]}"/>year(s) 
+                                <field name="relevant_experience_months" placeholder="Months" attrs="{'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')], 'readonly':[('state','!=','Draft')]}"/>month(s)
+                            </div>
+                            <field name="previous_employment" attrs="{'readonly':[('state','!=','Draft')]}">
+                                <tree editable="bottom">
+                                    <field name="name" required="1"/>
+                                    <field name="designation" required="1"/>
+                                    <field name="doj" required="1"/>
+                                    <field name="currently_working" required="1"/>
+                                    <field name="dol" attrs="{'invisible':[('currently_working','=',True)],'required':[('currently_working','!=',True)],'readonly':[('currently_working','=',True)]}"/>
+                                    <field name="ctc" required="1"/>
+                                    <field name="reason_leaving" required="1"/>
+                                </tree>
+                                <form>
+                                    <field name="name"/>
+                                    <field name="designation"/>
+                                    <field name="doj"/>
+                                    <field name="currently_working"/>
+                                    <field name="dol"/>
+                                    <field name="ctc"/>
+                                    <field name="reason_leaving"/>
+                                </form>
+                            </field>
+                        </group>
+                        <group string="Documents (Accepted file formats: jpeg, png, pdf)">
+                            <group>
+                                <field name="resume_filename" invisible="1"/>
+                                <field name="resume" filename="resume_filename" required="1" attrs="{'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="education_certificate_filename" invisible="1"/>
+                                <field name="education_certificate" filename="education_certificate_filename" required="1" attrs="{'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="pan_card_filename" invisible="1"/>
+                                <field name="pan_card" filename="pan_card_filename" attrs="{'required':[('pan_available','=',True)],'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="aadhar_card_filename" invisible="1"/>
+                                <field name="aadhar_card" filename="aadhar_card_filename" attrs="{'required':[('aadhar_available','=',True)],'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="cancel_cheque_filename" invisible="1"/>
+                                <field name="cancel_cheque" filename="cancel_cheque_filename" attrs="{'required':[('bank_account_available','=',True)], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                            </group>
+                            <group>
+                                <field name="salary_slip_filename" invisible="1"/>
+                                <field name="salary_slip" filename="salary_slip_filename" attrs="{'invisible':[('total_experience_months','=','0'),('total_experience_years','=','0')],'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="salary_slip_filename1" invisible="1"/>
+                                <field name="salary_slip1" filename="salary_slip_filename1" attrs="{'invisible':[('total_experience_months','=','0'),('total_experience_years','=','0')],'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="salary_slip_filename2" invisible="1"/>
+                                <field name="salary_slip2" filename="salary_slip_filename2" attrs="{'invisible':[('total_experience_months','=','0'),('total_experience_years','=','0')],'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="resignation_acceptance_filename" invisible="1"/>
+                                <field name="resignation_acceptance" filename="resignation_acceptance_filename" attrs="{'invisible':[('total_experience_months','=','0'),('total_experience_years','=','0')],'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                            </group>
+                        </group>
+                        <separator string="Declaration"/>
+                        <p><b>I declare that the information given, herein above, is true &amp; correct to the best of my knowledge &amp; belief &amp; nothing material has been concealed. I understand that the above information if found false or incorrect, at any time during the course of my employment, my services will be terminated forthwith without any notice or compensation.</b></p>
+                        <group>
+                            <group>
+                                <field name="accept" required="1" attrs="{'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="date" attrs="{'required':[('accept','=',True)], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="place" attrs="{'required':[('accept','=',True)], 'readonly':[('state','not in',['Draft','Rejected'])]}"/>
+                                <field name="recruiter_email" attrs="{'required':[('accept','=',True)], 'readonly':[('state','!=','Draft')]}"/>
+                                <field name="recruiter_id" invisible="1"/>
+                                <field name="user_id" invisible="1"/>
+                                <field name="candidate_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <button name="sumit_details" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|',('state','!=','Draft'),('accept','!=',True)]}"/>
+                        <button name="update_docs" string="Update" type="object" class="oe_highlight" attrs="{'invisible':[('state','!=','Rejected')]}"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+         <record model="ir.ui.view" id="nf_candidate_onboarding_view_tree">
+            <field name="name">Candidate Onboarding</field>
+            <field name="model">nf.candidate.onboarding</field>
+            <field name="arch" type="xml">
+                <tree string="Candidate Onboarding">
+                    <field name="full_name"/>
+                    <field name="contact_no"/>
+                    <field name="personal_email"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="nf_candidate_onboarding_view_search">
+            <field name="name">Candidate Onboarding</field>
+            <field name="model">nf.candidate.onboarding</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="full_name"/>
+                    <field name="contact_no"/>
+                    <field name="personal_email"/>
+                </search>
+            </field>
+        </record>
+        
+        <record id="action_nf_candidate_onboarding_view" model="ir.actions.act_window">
+            <field name="name">Candidate Onboarding</field>
+            <field name="res_model">nf.candidate.onboarding</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_candidate_onboarding_view_tree"/>
+            <field name="search_view_id" ref="nf_candidate_onboarding_view_search"/>
+        </record>
+
+    <menuitem name="Candidate Onboarding" id="menu_nf_candidate_onboarding" sequence="180" web_icon="hr_recruitment_extend,static/image/onoarding.jpg"/>
+        
+    <menuitem name="Candidate Onboarding" id="nf_candidate_onboarding_view_menu" parent="menu_nf_candidate_onboarding" 
+     action="action_nf_candidate_onboarding_view" sequence="1"/>
+
+	</data>
+</openerp>
+   	

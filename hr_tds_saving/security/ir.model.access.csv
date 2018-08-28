@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_employee_saving,employee.saving,model_employee_saving,,1,1,1,0
+access_saving_line,saving.line,model_saving_line,,1,1,1,0
+access_medical_bill_line,medical.bill.line,model_medical_bill_line,,1,1,1,0
+access_hra_receipt_line,hra.receipt.line,model_hra_receipt_line,,1,1,1,0
+access_other_source_income,other.source.income,model_other_source_income,,1,1,1,0
+access_employee_internal_saving,employee.internal.saving,model_employee_internal_saving,,1,1,1,0
+access_saving_category,saving_category,model_saving_category,,1,1,1,1
+access_income_house_property,income.house.property,model_income_house_property,,1,1,1,0
+access_deduction_section,deduction.section,model_deduction_section,,1,1,1,0

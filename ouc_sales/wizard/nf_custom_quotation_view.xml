@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+
+        <report
+            id="custom_quotation_report"
+            model="nf.custom.quotation"
+            string="Custom Quotation"
+            report_type="qweb-pdf"
+            name="ouc_sales.report_quotation"
+            file="account.report_quotation"
+            attachment_use="True"
+            attachment="(object.name)+'.pdf'"
+        />
+
+        <record id="nf_custom_quotation_form" model="ir.ui.view">
+            <field name="name">Quotation</field>
+            <field name="model">nf.custom.quotation</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Quotation" create="false">
+                    <header>
+                        <button name="%(custom_quotation_report)d" string="Print" type="action" class="oe_highlight"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" class="oe_highlight"/> 
+                    </header>
+                    <sheet>
+                        <group col="4">
+                            <field name="name" readonly="1"/>
+                            <field name="company_name" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="team_id" options="{'no_create': True,'no_edit': True}"/>
+                            <field name="contract_template" required="1" options="{'no_create': True,'no_edit': True}" domain="[('single_store','=',True)]"/>
+                            <field name="sales_person_id" readonly="1"/>
+                            <field name="date_order" readonly="1"/>
+                            <field name="currency_id" readonly="1"/>
+                            <field name="opportunity_id" readonly="1"/>
+                            <field name="pricelist_id" readonly="1"/>
+                            <field name="fiscal_position_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="discount_coupon_code" readonly="1"/>
+                            <field name="dicsount_coupon_validity" readonly="1"/>
+                            <field name="disc_approval_status" readonly="1"/>
+                        </group>
+                        <separator string = 'Quotation Line'/>
+                        <field name="quote_line" mode="tree,kanban">
+                            <form string="Quotation Lines">
+                                <group>
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="discount"/>
+                                        <field name="default_discount"/>
+                                        <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                                        <field name="price_unit"/>
+                                        <field name="price_subtotal"/>
+                                        <field name="price_tax"/>
+                                        <field name="price_total"/>
+                                    </group>
+                                </group>
+                            </form>
+                            <tree string="Quotation Lines" editable="bottom" create="false">
+                                <field name="product_id" readonly="1"/>
+                                <field name="name" readonly="1"/>
+                                <field name="quantity" readonly="1"/>
+                                <field name="price_unit" readonly="1"/>
+                                <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]" readonly="1"/>
+                                <field name="discount"/>
+                                <field name="price_subtotal" readonly="1"/>
+                                <field name="price_total" readonly="1"/>
+                            </tree>      
+                        </field>
+                        <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                            <field name="amount_untaxed" readonly="1"/>
+                            <field name="amount_tax" readonly="1"/>
+                            <field name="amount_total" class="oe_subtotal_footer_separator" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="nf_custom_quotation_tree" model="ir.ui.view">
+            <field name="name">Quotation</field>
+            <field name="model">nf.custom.quotation</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Quotation" create="false">
+                    <field name="partner_id"/>
+                    <field name="date_order"/>
+                    <field name="sales_person_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_nf_custom_quotation" model="ir.actions.act_window">
+            <field name="name">Quotation</field>
+            <field name="res_model">nf.custom.quotation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_custom_quotation_tree"/>
+        </record>
+
+        <menuitem id="menu_nf_custom_quotation"
+                  name="Custom Quotation"
+                  action="action_nf_custom_quotation"
+                  sequence="20"
+                  parent ="sales_team.menu_sales"/>
+
+
+        <record id="nf_custom_quotation_form_view" model="ir.ui.view">
+            <field name="name">Quotation</field>
+            <field name="model">nf.custom.quotation</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Quotation" create="false">
+                    <header>
+                        <button name="%(custom_quotation_report)d" string="Print" type="action" class="oe_highlight"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" class="oe_highlight"/> 
+                    </header>
+                    <sheet>
+                        <group col="4">
+                            <field name="name" readonly="1"/>
+                            <field name="company_name" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="team_id" options="{'no_create': True,'no_edit': True}"/>
+                            <field name="contract_template" required="1" options="{'no_create': True,'no_edit': True}" domain="[('single_store','=',True)]"/>
+                            <field name="sales_person_id" readonly="1"/>
+                            <field name="date_order" readonly="1"/>
+                            <field name="currency_id" readonly="1"/>
+                            <field name="opportunity_id" readonly="1"/>
+                            <field name="pricelist_id" readonly="1"/>
+                            <field name="fiscal_position_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="discount_coupon_code" readonly="1"/>
+                            <field name="dicsount_coupon_validity" readonly="1"/>
+                            <field name="disc_approval_status" readonly="1"/>
+                        </group>
+                        <separator string = 'Quotation Line'/>
+                        <field name="quote_line" mode="tree,kanban">
+                            <form string="Quotation Lines">
+                                <group>
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="discount"/>
+                                        <field name="default_discount"/>
+                                        <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]"/>
+                                        <field name="price_unit"/>
+                                        <field name="price_subtotal"/>
+                                        <field name="price_tax"/>
+                                        <field name="price_total"/>
+                                    </group>
+                                </group>
+                            </form>
+                            <tree string="Quotation Lines" editable="bottom" create="false">
+                                <field name="product_id" readonly="1"/>
+                                <field name="name" readonly="1"/>
+                                <field name="quantity" readonly="1"/>
+                                <field name="price_unit" readonly="1"/>
+                                <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]" readonly="1"/>
+                                <field name="discount"/>
+                                <field name="price_subtotal" readonly="1"/>
+                                <field name="price_total" readonly="1"/>
+                            </tree>      
+                        </field>
+                        <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                            <field name="amount_untaxed" readonly="1"/>
+                            <field name="amount_tax" readonly="1"/>
+                            <field name="amount_total" class="oe_subtotal_footer_separator" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</openerp>

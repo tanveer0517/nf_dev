@@ -1,0 +1,33 @@
+<openerp>
+
+<data noupdate="1">
+
+	<record model="ir.sequence" id="cost_center_seq">
+		<field name="name">Analytic Account Sequence</field>
+		<field name="code">account.analytic.account</field>
+		<field name="active">TRUE</field>
+		<field name="prefix">CC</field>
+		<field name="padding">3</field>
+		<field name="number_increment">1</field>
+	</record>
+	
+	<record model="ir.sequence" id="employee_no_seq">
+		<field name="name">Employee No. Sequence</field>
+		<field name="code">hr.employee_no</field>
+		<field name="active">TRUE</field>
+		<field name="prefix"></field>
+		<field name="padding">5</field>
+		<field name="number_increment">1</field>
+	</record>
+
+	<record id="seq_for_employee" model="ir.sequence">
+		<field name="name">employee number</field>
+		<field name="code">emp_num_seq</field>
+		<field name="prefix">NFX-</field>
+		<field name="padding">4</field>
+		<field name="number_increment">1</field>
+	</record>
+
+</data>
+
+</openerp>

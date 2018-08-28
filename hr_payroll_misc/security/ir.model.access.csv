@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_misc_payment,hr.misc.payment,model_hr_misc_payment,,1,1,1,0
+access_hr_misc_payment_employee,hr.misc.payment.employee,model_hr_misc_payment_employee,,1,1,1,0
+access_hr_misc_payment_head,hr.misc.payment.head,model_hr_misc_payment_head,,1,1,1,0

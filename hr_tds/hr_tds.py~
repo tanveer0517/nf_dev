@@ -1,0 +1,116 @@
+import math
+import time
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from dateutil import relativedelta
+import os
+from openerp import api, tools
+from openerp.osv import fields, osv
+from openerp.tools.translate import _
+import openerp.addons.decimal_precision as dp
+
+from openerp.tools.safe_eval import safe_eval as eval
+
+class employee_tds(osv.Model):
+    _name = 'employee.tds'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'tds_run_id':fields.many2one('employee.tds.run','Run Id',copy=False),
+                'tds_basic_amount':fields.float('Basic Amount'),
+                'tds_allowance_amount':fields.float('Allowance Amount'),
+                'tds_gross_amount':fields.float('Gross Amount'),
+                'tds_deduction_amount':fields.float('Deduction Amount'),
+                'tds_rebate_amount':fields.float('Rebate Amount'),
+                'tds_net_salary_taxable':fields.float('Net Taxable Amount'),
+                'net_tds_amount':fields.float('Net Income Tax Amount'),
+                'net_tds_paid':fields.float('Income Tax Amount Paid'),
+                'professional_tax_paid':fields.float('Professional Tax Paid'),
+                'cpf_paid':fields.float('CPF Paid'),
+                'gis_paid':fields.float('GIS Paid'),
+                'eps_paid':fields.float('EPS Paid'),
+                'lic_paid':fields.float('LIC Paid'),
+                'vpf_paid':fields.float('VPF Paid'),
+                'company_id':fields.many2one('res.company','Zone'),
+                'tds_line_ids':fields.one2many('employee.tds.line','employee_tds_id','Income Tax Lines'),
+                'date_from':fields.date('Date From'),
+                'date_to':fields.date('Date To'),
+                'professional_tax_monthly':fields.float('Professional Tax Monthly'),
+                'cpf_monthly':fields.float('CPF Monthly'),
+                'gis_monthly':fields.float('GIS Monthly'),
+                'lic_monthly':fields.float('LIC Monthly'),
+                'vpf_monthly':fields.float('VPF Monthly'),
+                'medical_expense_monthly':fields.float('Medical Expense Monthly'),
+                'medical_expense_paid':fields.float('Medical Expense Paid'),
+                'total_taxable_amount':fields.float('Total Taxable Amount'),
+                
+                'state': fields.selection([
+                ('draft', 'Draft'),
+                ('done', 'Done'),
+                 ], 'Status', select=True, readonly=True, copy=False),
+                }
+class employee_tds_line(osv.Model):
+    _name = 'employee.tds.line'
+    
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_tds_id':fields.many2one('employee.tds','Employee Income Tax',ondelete='cascade'),
+                'total_amount':fields.float('Total Amount'),
+                'exempted_amount':fields.float('Exempted Amount'),
+                'taxable_amount':fields.float('Taxable Amount'),
+                
+                }
+class employee_tds_run(osv.Model):
+    _name = 'employee.tds.run'
+    
+    def create(self, cr, uid, vals, context=None):
+        if 'date_from' in vals and vals['date_from']:
+            date_from = vals['date_from']
+        if 'company_id' in vals and vals['company_id']:
+            company_id = vals['company_id']
+            employee = self.pool.get('employee.tds.run').search(cr, uid, [('company_id', '=', company_id),('date_from', '=', date_from)], context=context)
+            if employee:
+                raise osv.except_osv(_('Warning'), _('Employee Income Tax Batch record already exists! Please update Or Delete the existing record.'))
+        return super(employee_tds_run, self).create(cr, uid, vals, context=context)
+    
+    def compute_tax(self, cr, uid, ids, context=None):
+        for tds in self.browse(cr,uid,ids,context=context):
+            a = int(tds.company_id)
+            date_from = "'"+ tds.date_from +"'"
+            date_to = "'"+ tds.date_to +"'"
+            #cr.execute("SELECT(c_tds(%s,%s,%s,%s,%s))",(date_from,date_to,a,'',2));
+            #res = cr.fetchall()
+            self.write(cr, uid, ids , {'message': 'Income Tax computed successfully!'}, context=context)
+        return res
+    
+    _columns = {
+                'name':fields.char('Name',required='True'),
+                'tds_ids':fields.one2many('employee.tds','tds_run_id','Income Tax'),
+                'state': fields.selection([
+                ('draft', 'Draft'),
+                ('done', 'Done'),
+                 ], 'Status', select=True, readonly=True, copy=False),
+                'date_from':fields.date('Date From',required='True'),
+                'date_to':fields.date('Date To',required='True'),
+                'company_id':fields.many2one('res.company','Zone'),
+                'message':fields.char('Message',readonly='True'),
+                }
+    _defaults = {
+                'state': 'draft',
+        'date_from': lambda *a: time.strftime('%Y-%m-01'),
+        'date_to': lambda *a: str(datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10],
+                 }
+    def confirm_sheet(self, cr, uid, ids, context=None):
+        for tds in self.browse(cr,uid,ids,context=context):
+            if not tds.message:
+                raise osv.except_osv(_('Invalid Action!'), _('Please Compute Income Tax First'))
+        return self.write(cr, uid, ids, {'state': 'done'}, context=context)
+    def unlink(self, cr, uid, ids, context=None):
+        for tds_run in self.browse(cr, uid, ids, context=context):
+            if tds_run.state not in  ['draft']:
+                raise osv.except_osv(_('Warning!'),_('You cannot delete a income tax batch which is not draft!'))
+        return super(employee_tds_run, self).unlink(cr, uid, ids, context)  
+

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!-- Res Partner inherited Form view   -->
+        <record id="adding_fields_sale_customer_form_id" model="ir.ui.view">
+            <field name="name">res.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='email']" position="after">
+                    <!--<field name="c_gstn_num"/>-->
+                    <field name="c_is_partner" readonly="1"/>
+                    <field name="c_alliance_id"/>
+                </xpath>
+                <xpath expr="//field[@name='category_id']" position="after">
+                	<div>
+                		<h3>Partner's Other details</h3>
+                		<hr/>
+                	</div>
+                	<div>
+                	</div>
+	                	<field name="c_company_desc" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_company_type" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_existing_customers" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_account_no" string="Account Number" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_bank_name" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_branch_address" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_cin_number" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_ifsc_code" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_micr_code" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_pan_number"/>
+                        <field name="c_gstn_registered" widget="radio"/>
+	                    <field name="c_payee_name" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_service_tax_no" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_tan_number" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_int_lead_ref_id" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_licenses" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_package_id" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_tds_in_percentage" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                    <field name="c_yearly_subscription" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+                         <field name="slab_id" attrs="{'invisible':[('c_is_partner','=',False)]}" options="{'no_create_edit':True, 'no_open':True}"/>
+	            </xpath>
+                <xpath expr="//notebook" position="before">
+                	<div>
+	                	<button string="Create Partner On Dashboard" name="redirect_to_support_dashboard" type="object" class="oe_right oe_highlight" attrs="{'invisible':[('c_is_partner','=',False)]}"/>
+	                </div>
+                </xpath>
+
+                <xpath expr="//page[3]" position="after">
+                	<page string="Bank Details">
+                        <field name="bank_ids" nolabel="1">
+                            <tree>
+                                <field name="bank_name"/>
+                                <field name="acc_number"/>
+                                <field name="bank_bic"/>
+
+                            </tree>
+                        </field>
+                    </page>
+
+                </xpath>
+
+                <xpath expr="//field[@name='country_id']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='zip']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='city']" position="replace">
+                    <field name="city" invisible="1"/>
+                    <field name="c_city_id" placeholder="City" options="{'no_create': True, 'no_open': True}"/>
+                </xpath>
+                <xpath expr="//field[@name='state_id']" position="replace">
+                    <div>
+                        <field name="state_id" placeholder="state" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                        <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                        <field name="country_id"  placeholder="country" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                    </div>
+                    <field name="zip" placeholder="Zip"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--    Partners view filter       -->
+        <record id="view_is_partner_filter" model="ir.ui.view">
+            <field name="name">res.partner.select.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <filter name="customer" position="after">
+                    <filter string="Partners" name="c_is_partner" domain="[('c_is_partner','=',1)]"/>
+                </filter>
+            </field>
+        </record>
+
+        <!-- res.bank  inherited Form view-->
+        <record id="adding_fields_sale_customer_form_id3" model="ir.ui.view">
+             <field name="name">res.bank</field>
+             <field name="model">res.bank</field>
+             <field name="inherit_id" ref="base.view_res_bank_form"/>
+             <field name="arch" type="xml">
+                 <xpath expr="//field[@name='country']" position="replace">
+                 </xpath>
+                 <xpath expr="//field[@name='zip']"  position="replace">
+                 </xpath>
+                 <xpath expr="//field[@name='city']" position="replace">
+                     <field name="city" invisible="1"/>
+                     <field name="c_city_id" placeholder="City" options="{'no_create': True, 'no_open': True}"/>
+                 </xpath>
+                 <xpath expr="//field[@name='state']" position="replace">
+                    <div>
+                        <field name="state_id" placeholder="state" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                        <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                        <field name="country_id"  placeholder="country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                    </div>
+                    <field name="zip" placeholder="Zip"/>
+                 </xpath>
+             </field>
+        </record>
+
+        <!--        Partners kanban view action           -->
+        <record id="action_partner_form_inherited" model="ir.actions.act_window">
+            <field name="name">Partners</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_id" ref="base.view_partner_tree"/>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="search_view_id" ref="view_is_partner_filter"/>
+            <field name="context">{"search_default_c_is_partner":1,'default_c_is_partner':1,'default_customer':1,'default_supplier':1}</field>
+            <field name="domain">[]</field>
+            <field name="filter" eval="True"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to
+                    a customer: discussions, history of business opportunities,
+                    documents, etc.
+                </p>
+            </field>
+        </record>
+
+        <!-- <record id="adding_fields_gst_form_id" model="ir.ui.view">
+            <field name="name">res.partner.gst</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_in_gst.l10n_in_view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='x_gstin']" position="attributes">
+                    <attribute name="attrs">{'required': [('c_gstn_registered', '=', 'Yes')]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_account_position_id']" position="after">
+                    <field name="c_composition_taxable" widget="radio"/>
+                 </xpath>
+            </field>
+        </record>
+ -->
+
+
+        <!--     Partner Kanban View Action -->
+        <record id="action_partner_form_view1" model="ir.actions.act_window.view">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="base.res_partner_kanban_view"/>
+            <field name="act_window_id" ref="action_partner_form_inherited"/>
+        </record>
+
+        <!--   Partners Menuitem    -->
+        <menuitem
+                id="ouc_menu_partners"
+                name="Partners"
+                parent="sale.menu_sales_config"
+                action="ouc_sales.action_partner_form_inherited" />
+    </data>
+</openerp>

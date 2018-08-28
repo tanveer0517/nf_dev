@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+   	<data>
+		
+		<record model="ir.ui.view" id="hr_division_view_form">
+	        <field name="name">HR Division Form</field>
+	        <field name="model">hr.division</field>
+	        <field name="arch" type="xml">
+	        	<form string="HR Division Form">
+	        		<sheet>
+		        		<group>
+			        		<field name="name"/>
+			        		<field name="dept_id"/>
+			        	</group>
+	        		</sheet>
+	        	</form>
+	        </field>
+	    </record>
+		
+		 <record id="hr_division_tree" model="ir.ui.view">
+	        <field name="name">HR Division Tree</field>
+	        <field name="model">hr.division</field>
+	        <field name="arch" type="xml">
+	        	<tree string="HR Division Tree">
+		        	<field name="name"/>
+		        	<field name="dept_id"/>
+	        	</tree>
+	        </field>
+	    </record>
+	    
+				  
+	    <record id="hr_division_action" model="ir.actions.act_window">
+	        <field name="name">Division Forms</field>
+	        <field name="res_model">hr.division</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new HR division Data. 
+	          </p>
+	        </field>
+	    </record>
+	    
+    <!-- <menuitem
+        sequence="0"
+        id="menu_hr_division_form"
+        name="Division"
+        parent="hr.menu_human_resources_configuration"
+        action="hr_division_action"
+        /> -->
+       
+   
+        <!-- HR Branch -->
+        
+        
+       <record model="ir.ui.view" id="hr_branch_view_form">
+	        <field name="name">HR Branch Form</field>
+	        <field name="model">hr.branch</field>
+	        <field name="arch" type="xml">
+	        	<form string="HR Branch Form">
+	        		<sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name" />
+                        </h1>
+                    </div>
+                    <group>
+                      <group>
+                            <label for="street" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" placeholder="Street..." class="o_address_street" />
+                                <field name="street2" placeholder="Street 2..." class="o_address_street" />
+
+                             <div>
+                                <field name="c_city_id" placeholder="City" options="{'no_create': True, 'no_open': True}"/>
+                            </div>
+                            <div>
+                                <field name="state_id" placeholder="state" readonly="1"  class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                 <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                                <field name="country_id"  placeholder="country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                            </div>
+                             <field name="zip" placeholder="ZIP"  />
+                           </div>
+
+
+
+                            <field name="website" widget="url" placeholder="e.g. www.nowfloats.com"/>
+                        </group>
+                        <group>
+                            <field name="phone" widget="phone"/>
+                            <field name="fax"/>
+                            <field name="email" widget="email" />
+                            <field name="branch_hr_id"/>
+                            <field name="manager_id"/>
+							<field name="rm_id"/>
+                            <field name="tl_manager_id"/>
+			    <field name="active_branch_id"/>
+				<field name="server_branch_id" readonly="1"/>
+				<field name="virtual_branch_id"/>
+                        </group>
+                    </group>
+                    </sheet>
+	        	</form>
+	        </field>
+	    </record>
+		
+		 <record model="ir.ui.view" id="hr_branch_view_tree">
+	        <field name="name">HR Branch Tree</field>
+	        <field name="model">hr.branch</field>
+	        <field name="arch" type="xml">
+	        	<tree string="HR Branch Tree">
+	        		<field name="name"/>
+	        		<field name="c_city_id"/>
+	        		<field name="country_id"/>
+	        		<field name="state_id"/>
+	        		<field name="zip"/>
+	        	</tree>
+	        </field>
+	    </record>
+	    
+				  
+	    <record id="hr_branch_action" model="ir.actions.act_window">
+	        <field name="name">HR Branch</field>
+	        <field name="res_model">hr.branch</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new HR division Data. 
+	          </p>
+	        </field>
+	    </record>
+	    
+     <menuitem
+        sequence="0"
+        id="menu_hr_branch_form"
+        name="Branch"
+        parent="hr.menu_human_resources_configuration"
+        action="hr_branch_action"
+         />
+         
+         
+         
+         
+         
+         
+         <record model="ir.ui.view" id="country_code_form_view">
+	        <field name="name">Country Code</field>
+	        <field name="model">country.code</field>
+	        <field name="arch" type="xml">
+	        	<form string="Country Code">
+	        		<sheet>
+                    <group col="4">
+                     <field name="country_id"/>
+                     <field name="name"/>                     
+                    </group>
+                    </sheet>
+	        	</form>
+	        </field>
+	    </record>
+		
+		 <record model="ir.ui.view" id="country_code_tree_view">
+	        <field name="name">Country Code</field>
+	        <field name="model">country.code</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Country Code">
+                     <field name="country_id"/>
+                     <field name="name"/>                     
+	        	</tree>
+	        </field>
+	    </record>
+	    
+				  
+	    <record id="action_country_code" model="ir.actions.act_window">
+	        <field name="name">Country Code</field>
+	        <field name="res_model">country.code</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to create country code... 
+	          </p>
+	        </field>
+	    </record>
+	    
+     <menuitem
+        sequence="0"
+        id="menu_country_code"
+        name="Country Code"
+        parent="hr.menu_human_resources_configuration"
+        action="action_country_code"
+         />
+         
+</data>
+</openerp>
+        
+        

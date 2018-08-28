@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+    <data>
+               <!-- tree view for lead -->
+        <record id="oppo_lead_id1" model="ir.ui.view">
+            <field name="name">oppo_lead</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+            <field name="arch" type="xml">
+            <xpath expr="//field[@name='city']" position="replace">
+                <field name="c_city_id"/>
+                <field name="write_date"/>
+            </xpath>
+                <xpath expr="//field[@name='phone']" position="after">
+                    <field name="c_contact_mobile"/>
+                </xpath>
+                <xpath expr="//field[@name='phone']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='team_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+              <!-- form view for lead   -->
+        <record id="ouc_oppo_lead_id" model="ir.ui.view">
+            <field name="name">oppo_lead</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <!-- customised buttons -->
+
+       <header>
+
+           <button name="crm.crm_lead_lost_action" string="Mark Lost" type="action" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('c_quotation_created', '=', True)]}"/>
+           <button name="req_for_approval" string="Req For Approval" type="object" class="oe_highlight" attrs="{'invisible':['|',('is_la_lead','=',False),('is_la_req_state','in',['request','approve','reject'])]}"/>
+         	<button name="action_approval" string="Approve" type="object" class="oe_highlight" attrs="{'invisible':['|',('is_la_lead','=',False),('is_la_req_state','in',['draft','approve','reject'])]}"/>
+           <button name="action_reject" string="Reject" type="object" class="oe_highlight" attrs="{'invisible':['|','|',('is_la_lead','=',False),('is_la_req_state','in',['draft','approve']),('active','=',False)]}"/>
+            <field name="c_state" widget="statusbar"/>
+
+       </header>
+
+                <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="replace">
+                   		<button name="convert_to_opportunity" type="object" string="CONVERT TO HOTPROSPECTS" class="oe_highlight"
+                                attrs="{'invisible':['|',('active', '=' ,False),'&amp;',('is_la_lead','=',True),('is_la_req_state','!=','approve')]}"/>
+                <button name="update_lc" type="object" string="UPDATE LC" class="oe_highlight" attrs="{'invisible': [('fp_date_validation', '!=', True)]}"/>
+                </xpath>
+                <xpath expr="//button[@name='toggle_active']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('active', '!=', False)]}</attribute>
+                </xpath>
+                 <div class="oe_button_box" name="button_box">
+	                <button class="oe_stat_button" type="object" string="Log a Meeting"
+	                        context="{}" help="Face to Face Meeting" title="Face to Face Meeting"
+	                        name="action_schedule_meeting" icon="fa-calendar">
+	                        <div class="o_statinfo" align="center">
+	                            <field name="meeting_count" class="o_stat_value"/>
+	                        </div>
+	                </button>
+                     <button name="crm.crm_activity_log_action" string="Log a Call/Email" type="action" class="oe_stat_button" icon="fa-archive" attrs="{'invisible': [('active', '=', False)]}"/>
+                </div>
+
+                <!-- fields which positions are replaced -->
+                <label for ="name" position="attributes">
+                   <attribute name="invisible">1</attribute>
+               </label>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="required">0</attribute>
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='title']"  position="replace">
+                </xpath>
+                <xpath expr="//label[@for='contact_name']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='contact_name']"  position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='partner_name']"  position="replace">
+                </xpath>
+                <xpath expr="//label[@for='street']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='street']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='street2']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='city']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='state_id']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='zip']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='country_id']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='fax']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='priority']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']"  position="replace">
+                </xpath>
+                <xpath expr="//field[@name='team_id']"  position="replace">
+                </xpath>
+
+                <!-- customised  lead  view-->
+                <xpath expr="//field[@name='partner_id']"  position="replace">
+
+                	<label for="c_customer_fname" string="Contact Name"/>
+                	<div class="o_row">
+                		<field name="title" class="oe_inline"  placeholder="Title" options="{'no_create': True}"/>
+                		<field name="c_customer_fname" class="oe_inline" placeholder="First Name" required="1" />
+                      	<field name="c_customer_lname" class="oe_inline" placeholder="Last Name" required="1"/>
+                	</div>
+                      <field name="c_contact_email" required="1"/>
+                    <label for="c_contact_mobile"/>
+                    <div class="o_row">
+                    	<span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_1" style="width:70px" options="{'no_create': True}"/></span>
+                    	<span class="oe_inline" style="width:20%">+<field name="c_country_code_1" readonly="1"/></span>
+                    	<field name="c_contact_mobile" class="oe_inline" required="1"/>
+                    </div>
+                    <field name="c_vis_card_front_name" invisible="1"/>
+                    <field name="c_visiting_card_front" filename="c_vis_card_front_name"/>
+                    <field name="c_vis_card_back" invisible="1"/>
+                    <field name="c_visiting_card_back" filename="c_vis_card_back"/>
+                    <field name="c_quotation_created" invisible="1"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='email_from']"  position="before">
+                    <field name="partner_name" required="1" string="Company Name"/>
+                    <field name="contact_name" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='email_from']"  position="replace">
+                    <field name="email_from" string="Company Email"/>
+                </xpath>
+                <xpath expr="//field[@name='mobile']"  position="replace">
+                    <label for="street" string="Address"/>
+                        <div class="o_address_format">
+                            <field name="street" placeholder="Street1" required="1" class="o_address_street"/>
+                            <div>
+                                <field name="street2"  placeholder="Street 2" required="1"/>
+                                <span attrs="{'invisible':[('name','=',False)]}">,  </span>
+                                <field  name="c_addr_landmark" placeholder="Landmark"/>
+                            </div>
+                            <div>
+                                <field name="c_city_id" placeholder="City" required="1" options="{'no_create_edit':True, 'no_open': True}"/>
+                            </div>
+                            <div>
+                                <field name="state_id" placeholder="state" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                 <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                                <field name="country_id"  placeholder="country" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                            </div>
+                            <field name="zip" placeholder="Zip/Pincode" required="1"/>
+                        </div>
+                </xpath>
+                <xpath expr="//field[@name='function']"  position="replace">
+                 <label for="mobile" string="Company Mobile"/>
+                 <div class="o_row">
+                    	<span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_2" style="width:70px" options="{'no_create': True}"/></span>
+                    	<span class="oe_inline" style="width:20%">+<field name="c_country_code_2" readonly="1"/></span>
+                    	<field name="mobile" string="Company Mobile" required="1"/>
+                 </div>
+                </xpath>
+                <xpath expr="//field[@name='phone']"  position="replace">
+                   <!-- <field name="phone" string="Company Landline #"/> -->
+                    <label for="phone" string="Company Landline #"/>
+                    <div class="o_row">
+                    	<span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_3" style="width:70px" options="{'no_create': True}"/></span>
+                    	<span class="oe_inline" style="width:20%">+<field name="c_country_code_3" readonly="1"/></span>
+                    	<field name="phone" class="oe_inline"/>
+                    </div>
+
+                </xpath>
+
+                  <!-- lead related information fields  -->
+
+                <xpath expr="//field[@name='user_id']" position="replace">
+                    <group col="4" colspan="4">
+                        <div>
+                            <hr/>
+                        </div>
+                    </group>
+                    <group colspan="2" string="Lead Related Information">
+                        <field name="c_lead_creator_emp" invisible="1"/>
+                        <field name="c_lead_creator_id" readonly="1"/>
+                        <field name="c_lc_division_id" readonly="1"  domain="[('parent_id', '!=', False)]"/>
+                        <field name="c_lead_source_id" required="1" options="{'no_create': True}"/>
+                        <field name="user_id" required="1" options="{'no_create': True}"/>
+                        <field name="c_cost_center" options="{'no_create': True}" readonly="1"/>
+                        <field name="c_sp_emp" invisible="1"/>
+                        <field name="c_sales_support_id" attrs="{'readonly':[('c_state','in', ('cancel','progress','manual','done'))]}" modifiers="{'readonly': [['c_state', 'in', ['cancel', 'progress', 'manual', 'done']]]}" options="{'no_create': True}"/>
+                        <field name="tag_ids" string="Category*" widget="many2many_tags" options="{'no_create_edit': True}" required="1"/>
+                        <field name="is_mlc" required="1" string="Is MLC Lead?*"/>
+                        <field name="fp_date_validation" invisible="1"/>
+                        <field name="fpv_crr" invisible="1"/>
+                        <field name="c_request_approval" readonly="1" modifiers="{'readonly': true}" invisible="1"/>
+                        <field name="c_approval_status" readonly="1" modifiers="{'readonly': true}" invisible="1"/>
+                        <field name="c_partner_ref_id" attrs="{'readonly':[('c_state','!=','draft')]}" modifiers="{'readonly':[['c_state','!=','draft']]}" invisible="1"/>
+                        <field name="lost_reason" attrs="{'invisible': [('active', '!=', False)]}"/>
+                        <field name="c_lost_description" attrs="{'invisible': [('active', '!=', False)]}"/>
+                        <field name="is_la_lead" invisible="1"/>
+                        <field name="is_la_req_state" invisible="1"/>
+                        <field name="c_managers_hierarchy" invisible="1"/>
+                        <field name="c_tc_manager_hierarchy" invisible="1"/>
+                        <field name="c_dept_manager" invisible="1"/>
+
+                    </group>
+                </xpath>
+                <xpath expr="/form/sheet/notebook/page[2]" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="/form/sheet/notebook/page[1]" position="replace">
+                    <page string="FPTAG" autofocus="True">
+                        <field name="c_fptags_ids" nolabel="1" colspan="4">
+                            <tree editable="top" >
+                                <field name="name" required="1" />
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="OTHER INFO">
+                        <group>
+                            <label for="next_activity_id"/>
+                            <div>
+                                <div class="o_row mr16">
+                                    <field name="next_activity_id" options="{'no_create': True}" />
+                                    <span class="oe_form_field" attrs="{'invisible': ['|', ('next_activity_id', '=', False), ('date_action', '=', False)]}"> on </span>
+                                    <field name="date_action" attrs="{'invisible': [('next_activity_id', '=', False)]}" placeholder="Choose a date..."/>
+                                </div>
+                                <div>
+                                    <field name="title_action" placeholder="e.g. Discuss proposal" attrs="{'invisible': [('next_activity_id', '=', False)]}"/>
+                                </div>
+                            </div>
+                            <field name="date_deadline" string="Next Activity Date"/>
+                            <field name="write_date"/>
+                            <field name="c_last_updated_in_month"/>
+                        </group>
+                        <group>
+                            <field name="priority" widget="priority"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+
+        </record>
+
+             <!--  Opportunity view    -->
+		
+         <record id="oppo_lead_id" model="ir.ui.view">
+            <field name="name">oppo_lead</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+				<xpath expr="//button[@name='%(crm.crm_activity_log_action)d']" position="replace">
+                </xpath>
+				<xpath expr="//button[@name='action_schedule_meeting']" position="replace">
+                </xpath>
+                <xpath expr="//button[@name='%(sale_crm.sale_action_quotations_new)d']" position="replace">
+                	<button string="Create Quotation" name="action_new_quotation" type="object" class="oe_highlight"
+                        context="{'search_default_partner_id': partner_id,
+                                  'default_partner_id': partner_id,
+                                  'default_team_id': team_id}" attrs="{'invisible':['|','|', ('c_quotation_created', '=', True), ('is_la_lead', '=', True),('is_mlc','!=','Yes')]}"/>
+
+                    <button string="Create Quotation" name="create_custom_quotation" type="object" class="oe_highlight" attrs="{'invisible':['|',('quotation_created', '=', True),('is_mlc','!=','No')]}"/>
+
+                    <button string="Create Partner On Dashboard" name="redirect_to_support_dashboard" type="object" class="oe_highlight"
+                         attrs="{'invisible':[('is_la_lead', '!=', True)]}"/>
+                	<!-- <button string="Create Quotation" name="%(sale_crm.sale_action_quotations_new)d" type="action" class="oe_highlight"
+                        context="{'search_default_partner_id': partner_id,
+                                  'default_partner_id': partner_id,
+                                  'default_team_id': team_id}" attrs="{'invisible':['|', '|', ('c_created_from_lead','=',False), ('is_la_lead', '=', True) ,('c_quotation_created', '=', True)]}"/> -->
+                </xpath>
+                <xpath expr="//button[@name='action_set_won']" position="attributes">
+					<attribute name="attrs">{'invisible' : True}</attribute>
+                </xpath>
+                <xpath expr="//button[@name='%(crm.crm_lead_lost_action)d']" position="attributes">
+					<attribute name="attrs">{'invisible' : [('c_quotation_created', '=', True)]}</attribute>
+                </xpath>
+                <div class="oe_button_box" name="button_box">
+                    <button name="%(crm.crm_activity_log_action)d" string="Log a Call/Email" type="action" class="oe_stat_button" icon="fa-archive" attrs="{'invisible': [('active', '=', False)]}"/>
+	                <button class="oe_stat_button" type="object" string="Log a Meeting"
+	                        context="{}" help="Face to Face Meeting" title="Face to Face Meeting"
+	                        name="action_schedule_meeting" icon="fa-calendar">
+	                        <div class="o_statinfo" align="center">
+	                            <field name="meeting_count" class="o_stat_value"/>
+	                        </div>
+	                </button>
+                    <button name="open_custom_quotation" string="View Quotation" type="object" class="oe_stat_button" icon="fa-archive" attrs="{'invisible':['|',('quotation_created', '=', False),('is_mlc','!=','No')]}"/>
+                </div>
+
+                <label for ="name" position="attributes">
+                   <attribute name="invisible">1</attribute>
+               </label>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="required">0</attribute>
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='team_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='stage_id']" position="attributes">
+					<attribute name="readonly">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="c_created_from_lead" readonly="1" invisible="1" />
+                    <field name="is_la_lead" readonly="1" invisible="1" />
+                    <field name="quotation_created" readonly="1" invisible="1" />
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                	<label for="partner_id" string="Customer Name"/>
+                	<div class="o_row">
+                		<field name="partner_id" required="1" class="oe_inline" attrs="{'readonly':[('c_created_from_lead','=',True)]}"  options="{'no_create': True}">
+                			<filter domain="[('c_alliance_id', '!=', False)]"/>
+                		</field>
+                		<span>  </span>
+	                    <field name="c_subscribed_customer" class="oe_inline oe_edit_only" attrs="{'invisible':[('c_created_from_lead','=',True)]}"/>
+	                    <label for="c_subscribed_customer"  class="oe_inline oe_edit_only" attrs="{'invisible':[('c_created_from_lead','=',True)]}"/>
+	                    <field name="fax" invisible="1"/>
+                	</div>
+                </xpath>
+				<xpath expr="//field[@name='partner_id']" position="attributes">
+					<attribute name="domain">[('is_company', '=', True)]</attribute>
+                </xpath>
+				
+                <xpath expr="//field[@name='phone']" position="after">
+                    <field name="c_lead_creator_id" readonly="1" options='{"no_create_edit":True}'/>
+                    <field name="c_lc_division_id" readonly="1" domain="[('parent_id', '!=', False)]"/>
+                    <field name="c_lead_creator_emp" invisible="1"/>
+                    <field name="c_lead_source_id" invisible="1" attrs="{'readonly':[('c_created_from_lead','=',True)],'invisible': [('c_created_from_lead','=',False)]}" options='{"no_create_edit":True}'/>
+                    <field name="c_partner_ref_id" invisible="1" options='{"no_create_edit":True}' domain="[('c_is_partner','=',True)]"/>
+                    <field name="user_id" attrs="{'readonly':[('c_created_from_lead','=',True)]}" options='{"no_create_edit":True}'/>
+                    <field name="c_cost_center" readonly="1"/>
+                    <field name="c_sp_emp" invisible="1"/>
+                    <field name="is_claim" invisible="1"/>
+                    <field name="c_sales_support_id" options='{"no_create_edit":True}'/>
+                    <field name="is_mlc" string="Add-ons/ Combos/ MLC* ?" required="1" attrs="{'readonly':[('is_claim','=',True)]}"/>
+                    <field name="receipt_pic" attrs="{'invisible': [('is_mlc', '!=', 'No')], 'readonly': [('is_claim', '=', True)]}" filename="receipt_file_name"/>
+                    <field name="receipt_file_name" invisible="1"/>
+                    <label for = "claim_id" attrs="{'invisible': [('is_mlc', '!=', 'No')]}"/>
+                    <div class="o_row">
+                      <field name="claim_id" attrs="{'invisible': [('is_mlc', '=', 'Yes')], 'readonly':[('is_claim','=',True)]}"/>
+                      <button name="claim_order" type="object" string="Claim Sale" class="oe_highlight" attrs="{'invisible':['|', ('is_claim','=',True), ('is_mlc', '!=', 'No')]}"/>
+                    </div>
+                    <div class="o_row">
+                      
+                    </div>
+                    <div style="color:blue;" attrs="{'invisible':[('is_claim','!=',True)]}" class="o_row">
+                        <p>Claimed Successfully</p>
+                    </div>
+                    <field name="c_quotation_created" invisible="1"/>
+                    <field name="c_tc_manager_hierarchy" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//field[@name='team_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+				</xpath>
+                <xpath expr="//field[@name='email_from']" position="replace">
+				</xpath>
+                <xpath expr="//field[@name='phone']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='mobile']" position="after">
+                    <field name="email_from"/>
+                    <field name="phone"/>
+                </xpath>
+				
+				<!-- fields  which positions are replaced -->
+                <xpath expr="//field[@name='fax']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="replace">
+                </xpath>
+                <xpath expr="//label[@for='next_activity_id']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='next_activity_id']" position="replace">
+                </xpath>
+                <span class="oe_form_field" attrs="{'invisible': ['|', ('next_activity_id', '=', False), ('date_action', '=', False)]}" position="replace"> on </span>
+                 <xpath expr="//field[@name='date_action']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='title_action']" position="replace">
+               </xpath>
+                <xpath expr="//field[@name='date_deadline']" position="replace">
+                </xpath>
+
+				<xpath expr="//page[1]" position="replace">
+					<page string="FPTAGs" attrs="{'invisible': [('is_la_lead', '=', True)]}">
+                            <field name="c_fptags_ids" nolabel="1" required="1" colspan="4"  attrs="{'readonly':[('c_created_from_lead','=',True)]}">
+                               <tree editable="top" >
+                                    <field name="name" required="1" context="{'partner_id': parent.partner_id}"/>
+                                </tree>
+                            </field>
+                    </page>
+                </xpath>
+                <xpath expr="//page[2]"  position="after">
+                    <page string="OTHER INFO">
+                        	<group>
+                	 			<label for="next_activity_id"/>
+                                <div>
+                                    <div class="o_row mr16">
+                                        <field name="next_activity_id" options="{'no_create': True}" />
+                                        <span class="oe_form_field" attrs="{'invisible': ['|', ('next_activity_id', '=', False), ('date_action', '=', False)]}"> on </span>
+                                        <field name="date_action" attrs="{'invisible': [('next_activity_id', '=', False)]}" placeholder="Choose a date..."/>
+                                    </div>
+                                    <div>
+                                        <field name="title_action" placeholder="e.g. Discuss proposal" attrs="{'invisible': [('next_activity_id', '=', False)]}"/>
+                                    </div>
+                                </div>
+                                <field name="date_deadline" string="Next Activity Date"/>
+                            	<field name="priority" widget="priority"/>
+                            	<field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                                <field name="custom_quotation" invisible="1"/>
+                        	</group>
+                        </page>
+                 </xpath>
+
+                         <!-- contact information -->
+                <xpath expr="//page[@name='lead']" position="replace">
+                 <page name="lead" string="Contact Information">
+                            <group>
+                                <group>
+                                    <field name="partner_name" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                    <label for="street" string="Address"/>
+                                    <div class="o_address_format">
+                                        <field name="street" placeholder="Street..." class="o_address_street" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                        <field name="street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                        <field name="c_city_id" options="{'no_create': True, 'no_open': True}" placeholder="City" class="o_address_city" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                        <div>
+                                            <field name="state_id" placeholder="state" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                            <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                                            <field name="country_id"  placeholder="country" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                        </div>
+                                             <field name="zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                    </div>
+                                </group>
+                                <group>
+                                    <label for="contact_name" />
+                                    <div class="o_row">
+                                        <field name="contact_name" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                        <field name="title" placeholder="Title" domain="[]" options='{"no_create": True}' attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+                                    </div>
+                                    <field name="function"/>
+                                
+                                	<label for="c_contact_mobile" string="Company Mobile"/>
+									<div class="o_row">
+					                    	<span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_1" attrs="{'invisible':[('c_created_from_lead','=',True)]}" style="width:70px" options="{'no_create': True}"/></span>
+					                    	<span class="oe_inline" style="width:20%">+<field name="c_country_code_1" readonly="1"/></span>
+					                    	<field name="c_contact_mobile" string="Company Mobile" attrs="{'readonly':[('c_created_from_lead','=',True)]}"/>
+					                </div>
+					            
+					                <field name="opt_out" invisible="1"/>
+                                </group>
+                                <group string="Marketing">
+                                    <field name="campaign_id" options='{"no_create_edit":True}'/>
+                                    <field name="medium_id" options='{"no_create_edit":True}'/>
+                                    <field name="source_id" options='{"no_create_edit":True}'/>
+
+                                </group>
+                                <group string="Misc" name="Misc">
+                                    <field name="day_open" groups="base.group_no_one"/>
+                                    <field name="day_close" groups="base.group_no_one"/>
+                                    <field name="referred"/>
+                                    <field name="type" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        </xpath>
+            </field>
+         </record>
+		
+		<record id="view_oppo_lead_id" model="ir.ui.view">
+		    <field name="name">oppo_lead_partner</field>
+		    <field name="model">crm.lead</field>
+		    <field name="inherit_id" ref="ouc_sales.oppo_lead_id"/>
+		    <field name="groups_id" eval="[(6, 0, [ref('ouc_sales.group_edit_customer_oppo') ])]"/>
+		    <field name="arch" type="xml">
+		        <xpath expr="//field[@name='partner_id']" position="replace">
+		        	<field name="partner_id" required="1" class="oe_inline"  options="{'no_create': True}">
+                			<filter domain="[('c_alliance_id', '=', False)]"/>
+                	</field>
+		        </xpath>
+		    </field>
+		</record>
+		
+
+
+ 		        <!-- lead2opportunity -->
+
+		<record id="ouc_lead2opportunity_form_id" model="ir.ui.view">
+            <field name="name">crm.lead2opportunity.partner.form</field>
+            <field name="model">crm.lead2opportunity.partner</field>
+            <field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/group[2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='action']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_apply']" position="before">
+                	<field name="c_allow_to_create" invisible="1"/>
+                	<field name="c_matched_customers" invisible="1"/>
+                	<field name="c_mismatch" invisible="1"/>
+                	<button name="action_new_customer" string="Create Opportunity with new Customer" type="object" attrs="{'invisible':[('c_allow_to_create', '=', False)]}" class="btn-primary">
+                	</button>
+                </xpath>
+                <xpath expr="//button[@name='action_apply']" position="attributes">
+                	<attribute name="attrs">{'invisible':['|',('partner_id','=', False),'|',('c_matched_customers','=', False),('c_mismatch','=',True)]}</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_apply']" position="after">
+                	<button name="action_apply" string="Create Opportunity" type="object" class="btn-primary" attrs="{'invisible':['|',('partner_id','=', False),'|',('c_matched_customers', '=', False),('c_mismatch','=',False)]}" confirm="Customer name is not matching!! It will change the customer name in opportunity, Are you sure want to proceed?"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="attrs">{'required':[('c_allow_to_create', '=', False)], 'invisible':[('c_matched_customers','=', False)]}</attribute>
+                    <!-- <attribute name="options">{'no_create_edit':True, 'no_create':True, 'no_open': True}</attribute> -->
+                </xpath>
+
+                <xpath expr="//footer" position="before">
+                	<label attrs="{'invisible':[('c_matched_customers','=', True)]}" string="No Customer suggestion!! Create opportunity with new Customer"/>
+                	<group cols="6" attrs="{'invisible':[('partner_id','=',False)]}">
+						<field name="c_company_name" readonly="1"/>
+						<field name="c_company_mobile" readonly="1"/>
+						<field name="c_company_email" readonly="1"/>
+						<field name="c_company_city" readonly="1"/>
+                	</group>
+                	<group attrs="{'invisible':[('partner_id','=',False)]}" >
+		                <field nolabel="1" name="c_mismatch_message" attrs="{'invisible':[('c_mismatch','=',False)]}" widget="html" readonly="1"/>
+		            </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- lost  information -->
+		<record id="ouc_crm_lead_lost_view_form" model="ir.ui.view">
+            <field name="name">crm.lead.lost.form</field>
+            <field name="model">crm.lead.lost</field>
+            <field name="inherit_id" ref="crm.crm_lead_lost_view_form"/>
+            <field name="arch" type="xml">
+                    <xpath expr="//field[@name='lost_reason_id']" position="replace">
+                        <field name="lost_reason_id" required="1"/>
+                        <field name="c_lost_description" required="1"/>
+                    </xpath>
+            </field>
+        </record>
+
+        <!-- creating meeting button in leads -->
+        <record id="oppo_lead_id2s" model="ir.ui.view">
+          <field name="name">calender_event</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="before">
+		        	<div class="oe_right" name="buttons">
+			            <button name="%(ouc_meeting_wizard_action)d" string="Click here to log meeting" type="action" attrs="{'invisible':[('c_is_meeting_done', '=', True)]}" class="oe_highlight" />
+		            </div>
+                </xpath>
+                <xpath expr="//field[@name='allday']" position="after">
+                    <field name="c_demo_type" readonly="1"/>
+                    <field name="c_demo_status" invisible="1"/>
+                	<field name="c_meeting_type" readonly="1"/>
+                    <field name="c_contact_status" readonly="1"/>
+                    <field name="c_is_meeting_done" string="Is Meeting Done?" readonly="1"/>
+                    <field name="c_meeting_status" readonly="1"/>
+                    <field name="meeting_done" readonly="1"/>
+                    <field name="c_follow_date" attrs="{'invisible':[('c_meeting_status','!=','Follow up required')]}" readonly="1"/>
+                    <field name="c_fptag" readonly="1"/>
+                    <field name="c_customer_count" invisible="1"/>
+                    <field name="c_meetingdate" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='description']" position="replace">
+                	<field name="description" readonly="1" string="Meeting Log"/>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_ids']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='start_datetime']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='duration']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='allday']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='categ_ids']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='alarm_ids']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='location']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='recurrency']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='privacy']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='show_as']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//page/field[@name='attendee_ids']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('c_is_meeting_done', '=', True)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+                                <!--    Meeting    -->
+    <!-- i have changed the standerd file web_calendar.js aproved by aryan sir as per a requiredment -->
+        <!-- odoo_v10/addons/web_calendar/static//src/js/  web_calendar.js -->
+        <record id="calender_event_form_id1" model="ir.ui.view">
+          <field name="name">calender_event</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="calendar.view_calendar_event_form_popup"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_ids']" position="after">
+                    <field name="c_is_meeting_done" string="Is Meeting Done?" readonly="1"/>
+                    <field name="c_contact_status" readonly="1"/>
+                    <field name="c_meeting_type" readonly="1"/>
+                    <field name="c_meeting_status" readonly="1"/>
+                    <field name="description"/>
+                </xpath>
+                <xpath expr="//field[@name='alarm_ids']" position="after">
+		        	<div name="buttons">
+			            <button name="%(ouc_meeting_wizard_action)d" string="Click here to log meeting" attrs="{'invisible':[('c_is_meeting_done', '=', True)]}" type="action" class="oe_highlight" />
+		            </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!--    adding custom report footer field in sales team    -->
+        <record id="crm_team_view_form_inherit_view" model="ir.ui.view">
+          <field name="name">crm_team</field>
+            <field name="model">crm.team</field>
+            <field name="inherit_id" ref="sales_team.crm_team_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='more_info']" position="after">
+                    <page string="Custom Footer Details">
+                        <group>
+                            <field name="c_cus_footer"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- employee to manager hierarchy -->
+        <record id="ouc_employee_manager_hierarchy" model="ir.ui.view">
+        	<field name="name">ouc.employee.manager.heirarchy.form</field>
+            <field name="model">ouc.employee.manager.heirarchy</field>
+            <field name="arch" type="xml">
+                <form string="Employee">
+                    <sheet>
+						<group>
+							<field name="employee_id"/>
+							<field name="managers_ids" readonly="1"  widget="many2many_tags"/>
+						</group>
+					</sheet>
+				</form>
+            </field>
+        </record>
+
+              <!--   Hot Prospects view for create   -->
+
+         <record id="crm.view_create_opportunity_simplified" model="ir.ui.view">
+            <field name="name">crm.lead.form.simple</field>
+            <field name="model">crm.lead</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form string="Create an Opportunity">
+                     <sheet>
+                        <group>
+                            <group>
+                                <label for="partner_id" string="Customer Name"/>
+                	               <div class="o_row">
+                		               <field name="partner_id" required="1" class="oe_inline" options="{'no_create': True}">
+                			               <filter domain="[('c_alliance_id', '!=', False)]"/>
+                                       </field>
+                		                 <span>  </span>
+                                       <field name="c_subscribed_customer" class="oe_inline oe_edit_only"/>
+	                                    <label for="c_subscribed_customer"  class="oe_inline oe_edit_only"/>
+                                   </div>
+                                <field name="email_from" invisible="1"/>
+                                <field name="phone" invisible="1"/>
+                                <label for="planned_revenue"/>
+                                    <div class="o_row">
+                                         <field name="planned_revenue"/>
+                                         <field name="company_currency" options="{'no_create': True}"/>
+                                     </div>
+                                <field name="c_created_from_lead" invisible="1"/>
+                                <field name="c_lead_source_id" attrs="{'invisible': [('c_created_from_lead','=',False)]}" options="{'no_create': True}"/>
+                                <field name="user_id"/>
+                                <field name="c_cost_center" readonly="1"/>
+			                    <field name="c_sp_emp" invisible="1"/>
+                                <field name="c_sales_support_id" options="{'no_create': True}"/>
+                                 <field name="priority" widget="priority"/>
+			                    <field name="is_la_lead" readonly="1" invisible="1" />"
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="FPTAG" autofocus="True"  attrs="{'invisible': [('is_la_lead', '=', True)]}">
+                                 <field name="c_fptags_ids" nolabel="1" colspan="4">
+                                      <tree editable="top" >
+                                         <field name="name" required="1" />
+                                      </tree>
+                                 </field>
+                            </page>
+                            <page name="lead" string="Contact Information">
+                            <group>
+                                <group>
+                                    <field name="partner_name" />
+                                    <label for="street" string="Address"/>
+                                         <div class="o_address_format">
+                                             <field name="street" placeholder="Street..." class="o_address_street" />
+                                             <field name="street2" placeholder="Street 2..." class="o_address_street" />
+                                             <div>
+                                                <field name="c_city_id" placeholder="City" required="1" options="{'no_create': True, 'no_open': True}"/>
+                                             </div>
+                                             <div>
+                                                <field name="state_id" placeholder="state" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                                <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                                                <field name="country_id"  placeholder="country" readonly="1" required="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                             </div>
+                                                <field name="zip" placeholder="Zip/Pincode" class="o_address_zip"/>
+                                         </div>
+                                </group>
+                                <group>
+                                    <label for="contact_name" />
+                                        <div class="o_row">
+                                            <field name="contact_name" />
+                                             <field name="title" placeholder="Title" domain="[]" options='{"no_create": True}' />
+                                        </div>
+                                    <field name="function"/>
+
+                                	<label for="c_contact_mobile" string="Company Mobile"/>
+									     <div class="o_row">
+					                    	<span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_1"  style="width:70px" options="{'no_create': True}"/></span>
+					                    	<span class="oe_inline" style="width:20%">+<field name="c_country_code_1" readonly="1"/></span>
+					                    	<field name="c_contact_mobile" string="Company Mobile" />
+                                         </div>
+
+					                <field name="opt_out" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        </notebook>
+                        <footer>
+                            <button string="Create" name="close_dialog" type="object" class="btn-primary"/>
+                            <button string="Discard" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="ouc_hr_department" model="ir.ui.view">
+         <field name="name">hr_department</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                	<field name="c_type" />
+                </xpath>
+                </field>
+        </record>
+
+        <record id="nf_la_slab_form" model="ir.ui.view">
+            <field name="name">LA Slab</field>
+			<field name="model">nf.la.slab</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+            	<form string="LA Slab">
+                    <sheet>
+                        <group col="4">
+                            <field name="code"/>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="nf_la_slab_tree" model="ir.ui.view">
+            <field name="name">LA Slab</field>
+			<field name="model">nf.la.slab</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+            	<tree string="LA Slab">
+                     <field name="code"/>
+                     <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!-- renamed  opportunity to hotprospects -->
+
+        <record model="ir.actions.act_window" id="crm.crm_lead_opportunities_tree_view">
+            <field name="name">Hot Prospects</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+            <field name="domain">[('type','=','opportunity')]</field>
+            <field name="context">{
+                'default_type': 'opportunity',
+                'default_user_id': uid,
+                'search_default_assigned_to_me': 1,
+             }</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+            (0, 0, {'view_mode': 'calendar'}),
+            (0, 0, {'view_mode': 'pivot'}),
+            (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="help" type="html"><p>
+                Odoo helps you keep track of your sales pipeline to follow
+                up potential sales and better forecast your future revenues.
+            </p><p>
+                You will be able to plan meetings and phone calls from
+                opportunities, convert them into quotations, attach related
+                documents, track all discussions, and much more.
+            </p>
+           </field>
+       </record>
+        <record id="crm.menu_crm_opportunities" model="ir.ui.menu">
+             <field name="name">Hot Prospects</field>
+        </record>
+
+                          <!-- actions  -->
+
+        <record id="ouc_employee_manager_hierarchy_action" model="ir.actions.act_window">
+            <field name="name">Employee Manager Hierarchy</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ouc.employee.manager.heirarchy</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="ouc_lead_source_id" model="ir.actions.act_window">
+            <field name="name">Lead Source</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ouc.lead.source</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <record id="ouc_city_action_id" model="ir.actions.act_window">
+            <field name="name">City</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ouc.city</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <record id="ouc_sale_journal_invoice_type_action" model="ir.actions.act_window">
+            <field name="name">Journal Invoice</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ouc.sale_journal.invoice.type</field>
+            <field name="view_type">form</field>
+        </record>
+
+         <record id="ouc_product_specialist_action" model="ir.actions.act_window">
+            <field name="name">Product Specialist</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ouc.product.specialist</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <record id="action_nf_la_slab" model="ir.actions.act_window">
+            <field name="name">Partner Slab</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">nf.la.slab</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_la_slab_tree"/>
+        </record>
+
+   <!-- menuitems for leadsoure,city, Invoice ,Productspecialist ,Employeehierarchy in configuration -->
+
+        <menuitem
+            id="ouc_menu_hr_employee_heirachy_id"
+            name="Employee Heirarchy"
+            parent="hr.menu_human_resources_configuration"
+            action="ouc_employee_manager_hierarchy_action"/>
+
+        <menuitem
+            id="menu_ouc_lead_source_id"
+            name="Lead Source"
+            parent="sale.menu_sales_config"
+            action="ouc_lead_source_id" />
+
+        <menuitem
+            id="menu_ouc_city_id"
+            name="City"
+            parent="sale.menu_sales_config"
+            action="ouc_city_action_id" />
+
+        <menuitem
+            id="menu_ouc_sale_journal_invoice_type"
+            name="Journal Invoice"
+            parent="sales_team.menu_config_bank_accounts"
+            action="ouc_sale_journal_invoice_type_action" />
+
+        <menuitem
+            id="menu_ouc_product_specialist"
+            name="Product Specialist"
+            parent="sale.menu_sales_config"
+            action="ouc_product_specialist_action" />
+
+        <menuitem
+            id="menu_nf_la_slab"
+            name="Partner Slab"
+            parent="sale.menu_sales_config"
+            action="action_nf_la_slab" />
+
+        <record id="nf_lead_opp_form_view" model="ir.ui.view">
+            <field name="name">crm.lead.form</field>
+            <field name="model">crm.lead</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                     <sheet>
+                        <group>
+                            <group>
+                                <label for="c_customer_fname" string="Contact Name"/>
+                                <div class="o_row">
+                                    <field name="title" class="oe_inline"  placeholder="Title" options="{'no_create': True}"/>
+                                    <field name="c_customer_fname" class="oe_inline" placeholder="First Name"/>
+                                    <field name="c_customer_lname" class="oe_inline" placeholder="Last Name"/>
+                                </div>
+                                  <field name="c_contact_email"/>
+                                <label for="c_contact_mobile"/>
+                                <div class="o_row">
+                                    <span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_1" style="width:70px" options="{'no_create': True}"/></span>
+                                    <span class="oe_inline" style="width:20%">+<field name="c_country_code_1" readonly="1"/></span>
+                                    <field name="c_contact_mobile" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="partner_name" required="1" string="Company Name"/>
+                                <field name="email_from" string="Company Email"/>
+                                <label for="mobile" string="Company Mobile"/>
+                                 <div class="o_row">
+                                    <span class="oe_inline oe_edit_only" style="width:20%"><field name="c_country_2" style="width:70px" options="{'no_create': True}"/></span>
+                                    <span class="oe_inline" style="width:20%">+<field name="c_country_code_2" readonly="1"/></span>
+                                    <field name="mobile" string="Company Mobile"/>
+                                 </div>
+                                <label for="street" string="Address"/>
+                                <div class="o_address_format">
+                                    <field name="street" placeholder="Street1" class="o_address_street"/>
+                                    <div>
+                                        <field name="street2"  placeholder="Street 2"/>
+                                        <field  name="c_addr_landmark" placeholder="Landmark"/>
+                                    </div>
+                                    <div>
+                                        <field name="c_city_id" placeholder="City" options="{'no_create_edit':True, 'no_open': True}"/>
+                                    </div>
+                                    <div>
+                                        <field name="state_id" placeholder="state" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                         <span attrs="{'invisible':[('c_city_id','=',False)]}">, </span>
+                                        <field name="country_id"  placeholder="country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                    </div>
+                                    <field name="zip" placeholder="Zip/Pincode"/>
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record id="nf_hr_leave_report_pivot" model="ir.ui.view">
+            <field name="name">Leave Summary Report</field>
+            <field name="model">nf.hr.leave.report</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <pivot string="Leaves Summary">
+                    <field name="no_of_leaves" type="measure"/>
+                    <field name="employee_id" type="row"/>
+                    <field name="type" type="row"/>
+                    <field name="holiday_status_id" type="row"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- Leave Report Search View -->
+        <record id="nf_hr_leave_report_filter" model="ir.ui.view">
+            <field name="name">Leave Summary Report</field>
+            <field name="model">nf.hr.leave.report</field>
+            <field name="arch" type="xml">
+                <search string="Leave Summary Report">
+                    <field name="employee_id" type="row"/>
+                    <field name="holiday_status_id"/>
+                    <field name="type"/>
+                    
+                </search>
+            </field>
+        </record>
+
+        <record id="action_nf_hr_leave_report" model="ir.actions.act_window">
+            <field name="name">Leave Summary Report</field>
+            <field name="res_model">nf.hr.leave.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph</field>
+         </record>
+
+        <record id="action_window_leave_pivot" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="nf_hr_leave_report_pivot"/>
+            <field name="act_window_id" ref="action_nf_hr_leave_report"/>
+        </record>
+
+        <!--  menu for leave report object  -->
+        <menuitem id="ve_hr_payroll_report_action_menu"  parent="hr_holidays.menu_hr_holidays_my_leaves" sequence="100" action="action_nf_hr_leave_report"/>
+      
+    </data>
+</openerp>

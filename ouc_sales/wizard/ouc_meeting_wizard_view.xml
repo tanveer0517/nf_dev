@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+        <record id="ouc_meeting_wizard_form" model="ir.ui.view">
+            <field name="name">Meeting Wizard</field>
+            <field name="model">ouc.meeting.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Meeting Details">
+                    <sheet>
+                        <field name="c_demo_type" required="1"  class="oe_edit_only" widget="radio"
+                               options="{'horizontal': true}" attrs="{'readonly':[('c_demo_status', '=',True)]}"/>
+                        <group colspan="2">
+                            <field name="c_demo_status" invisible="1"/>
+                            <field name="meeting_type" readonly="1"/>
+                            <field name="c_lead_id" invisible="1"/>
+                            <field name="contact_status" widget="radio" required="1" options="{'horizontal': true}"/>
+                            <field name="meeting_status" widget="radio" required="1" options="{'horizontal': true}"/>
+                            <field name="meeting_done" widget="radio" required="1" options="{'horizontal': true}"/>
+                            <field name="c_follow_date" attrs="{'invisible':[('meeting_status','!=','Follow up required')],'required':[('meeting_status','=','Follow up required')]}"/>
+                            <field name="c_fptag" options="{'no_create_edit':True,'no_create': True}" domain="[('lead_id','=',c_lead_id)]" attrs="{'required':[('c_demo_type','=','Demo')]}"/>
+                            <field name="c_customer_count" invisible="1"/>
+                            <field name="no_otp" invisible="1"/>
+                        </group>
+                        <div style="color:green;">
+                            <p><b>Generate Meeting ID and close meeting with Meeting ID</b></p>
+                        </div>    
+                        <group col="4">
+                             <label for="otp_number_type" />
+                             <div class="o_row">
+                                <field name="otp_received" invisible="1"/>
+                              <field name="otp_number_type" widget="radio"/>
+                              <field name="contact_mobile" readonly="1" attrs="{'invisible':[('otp_number_type', '=', 'Company Mobile')]}"/>
+                              <field name="company_mobile" readonly="1" attrs="{'invisible':[('otp_number_type', '=', 'Contact Mobile')]}"/>
+                             </div>
+                             <label for="otp" />
+                             <div class="o_row">
+                                <field name="otp" placeholder="****(Type Meeting ID)" help="Please type Meeting ID here"/>
+
+                            </div>
+                            <div class="o_row">
+                                <button name="generate_otp" string="Generate Meeting ID" type="object" class="oe_highlight" attrs="{'invisible':[('otp_received','=', True)]}" help="Please click to Generate Meeting ID" confirm="The customer will receive Meeting ID shortly as a text message on his/her phone. Click 'Ok' to continue."/>
+                            </div>
+                            <div class="o_row">
+                                <button name="generate_otp" string="Re-generate Meeting ID if not received" type="object" class="oe_highlight" attrs="{'invisible':[('otp_received','!=', True)]}" help="Please click to Re-Generate Meeting ID" confirm="The customer will receive Meeting ID shortly as a text message on his/her phone. Click 'Ok' to continue."/>
+                                <button name="generate_otp_oncall" string="Generate Meeting ID on Call" type="object" class="oe_highlight" attrs="{'invisible':[('otp_received','!=', True)]}" help="Please click to Generate Meeting ID on Call" confirm="The customer will receive Meeting ID shortly on call. Click 'Ok' to continue."/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="meeting_description" placeholder="Meeting description should be minimum 100 characters"/>
+                        </group>
+                        <footer>
+                            <button name="creating_meeting_button" string="Log a Meeting" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="ouc_meeting_wizard_action" model="ir.actions.act_window">
+            <field name="name">Meeting Details</field>
+            <field name="res_model">ouc.meeting.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="bm_meeting_comment_form" model="ir.ui.view">
+            <field name="name">BM Meeting Wizard</field>
+            <field name="model">bm.meeting.comment</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Meeting Comment">
+                    <sheet>
+                        <group>
+                            <field name="meeting_id" invisible="1"/>
+                            <field name="bm_comment" required="1" placeholder="Add your comments regarding meeting done with Customer."/>
+                        </group>
+                        <footer>
+                            <button name="submit_comment" string="Submit" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="bm_meeting_comment_action" model="ir.actions.act_window">
+            <field name="name">Meeting Comment</field>
+            <field name="res_model">bm.meeting.comment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="nf_meeting_logged_form" model="ir.ui.view">
+            <field name="name">Meeting Logged</field>
+            <field name="model">nf.meeting.logged</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Meeting Logged">
+                    <sheet>
+                        <div style="color:green;">
+                            <p style="text-align:center;"><h1>Meeting Logged Successfully!</h1></p>
+                        </div>
+                        <footer>
+                            <button string="Close" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="nf_meeting_logged_action" model="ir.actions.act_window">
+            <field name="name">Meeting Logged</field>
+            <field name="res_model">nf.meeting.logged</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!--  ==============NF Support Dashboard============== -->
+
+        <record id="nf_support_dashboard_form" model="ir.ui.view">
+            <field name="name">Support Dashboard</field>
+            <field name="model">nf.support.dashboard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Support Dashboard" create="false" edit="false">
+                    <iframe src="https://nowfloats.com" width="1250" height="1000"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- action to open url -->
+        <record id="nf_support_dashboard_action" model="ir.actions.act_window">
+            <field name="name">Support Dashboard</field>
+            <field name="res_model">nf.support.dashboard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="nf_support_dashboard_form"/>
+        </record>
+
+
+         <record id="wiz_mlc_onboarding_form" model="ir.ui.view">
+            <field name="name">MLC Onboarding</field>
+            <field name="model">wiz.mlc.onboarding</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="MLC Onboarding">
+                    <group col="4">
+                        <field name="partner_id" readonly="1"/>
+                        <field name="company_name" readonly="1"/>
+                        <field name="partner_email" readonly="1"/>
+                        <field name="partner_contact" readonly="1"/>
+                        <field name="so_id" readonly="1"/>
+                        <field name="contract_id" readonly="1"/>
+                        <field name="sales_person_id" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Locations">
+                            <field name="onboarding_line">
+                                <tree editable="bottom">
+                                    <field name="country_id" options="{'no_create_edit':True,'no_create': True}" required="1"/>
+                                    <field name="city_id" domain="[('country_id','=',country_id)]" options="{'no_create_edit':True,'no_create': True}" invisible="1"/>
+                                    <field name="city" required="1"/>
+                                    <field name="address" required="1"/>
+                                    <field name="contact_no" required="1"/>
+                                    <field name="email_id" required="1"/>
+                                    <field name="url"/>
+                                    <field name="location_type" required="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group>
+                        <group>
+                            <field name="existing_domain" required="1" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="domain_url" attrs="{'invisible':[('existing_domain','!=','Yes')]}"/>
+                            <field name="cpanel_user" invisible="1"/>
+                            <field name="cpanel_pwd" invisible="1" password="True"/>
+                        </group>
+                    </group>
+                    
+                    <footer>
+                        <button name="submit_info" type="object" string="Submit" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- <record id="wiz_mlc_onboarding_tree" model="ir.ui.view">
+            <field name="name">MLC Onboarding</field>
+            <field name="model">wiz.mlc.onboarding</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="MLC Onboarding">
+                    <field name="partner_id"/>
+                    <field name="company_name"/>
+                    <field name="so_id"/>
+                    <field name="contract_id"/>
+                </tree>
+            </field>
+        </record> -->
+
+
+        <!--           MLC Onboarding Action record          -->
+
+        <record id="wiz_mlc_onboarding_action" model="ir.actions.act_window">
+            <field name="name">MLC Onboarding</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wiz.mlc.onboarding</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wiz_mlc_onboarding_form"/>
+        </record>
+
+        <!-- <menuitem
+        id="nf_mlc_onboarding_menu"
+        name="MLC Onboarding"
+        parent="sales_team.menu_sales"
+        action="nf_mlc_onboarding_action" sequence="15"/> -->
+
+
+    <!-- =========================== Presale Wizard ============================-->
+
+        <record id="wiz_presale_form" model="ir.ui.view">
+            <field name="name">Pre Sale</field>
+            <field name="model">wiz.presale.order</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="MLC Onboarding">
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="presale_lines">
+                                <tree editable="bottom">
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="price_unit" />
+                                    <field name="sol_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+
+                    <footer>
+                        <button name="update_price" type="object" string="UPDATE" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wiz_presale" model="ir.actions.act_window">
+            <field name="name">Presale Order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wiz.presale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+     <!-- ====================================================================================== -->
+
+
+    </data>
+</openerp>

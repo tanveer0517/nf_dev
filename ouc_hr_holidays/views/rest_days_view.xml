@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+   	<data>
+
+   	<record model="ir.ui.view" id="hr_rest_days_form">
+        <field name="name">hr_rest_days</field>
+        <field name="model">hr.rest.days</field>
+        <field name="arch" type="xml">
+          <form string="Rest Days">
+          <sheet>
+              <group>
+                  <field name="c_rest_day_type" placeholder="Eg. Sat + Sun" required="1"/>
+              </group>
+              <group>
+                  <field name="c_sun"/>
+                  <field name="c_sat"/>
+                  <field name="c_fri"/>
+              </group>
+          </sheet>
+          </form>
+        </field>
+    </record>
+        <record model="ir.ui.view" id="hr_rest_days_tree">
+        <field name="name">hr_rest_days</field>
+        <field name="model">hr.rest.days</field>
+        <field name="arch" type="xml">
+          <tree string="Rest Days">
+              <field name="c_rest_day_type"/>
+          </tree>
+        </field>
+        </record>
+
+        <record id="hr_rest_days_action" model="ir.actions.act_window">
+            <field name="name">Rest Days</field>
+            <field name="res_model">hr.rest.days</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="hr_rest_days_tree"/>
+        </record>
+
+
+
+        <!--    Inheriting hr department adding rest days type field -->
+        <record id="hr_department_inherited_view" model="ir.ui.view">
+            <field name="name">hr_department</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="c_rest_day_type"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="hr_holiday_status_from_inherit" model="ir.ui.view">
+            <field name="name">hr_holidays_status</field>
+            <field name="model">hr.holidays.status</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='limit']" position="after">
+                    <field name="c_in_rest_days"/>
+                    <field name="c_in_pub_holidays"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="hr_holidays_from_inherit" model="ir.ui.view">
+            <field name="name">hr_holidays</field>
+            <field name="model">hr.holidays</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='holiday_status_id']" position="after">
+                    <field name="temp_no_leaves" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <menuitem id="menu_hr_rest_days"
+                  action="hr_rest_days_action"
+                  name="Rest Days"
+                  parent ="ouc_hr_holidays.menu_public_holidays_view"/>
+
+
+
+    </data>
+</openerp>

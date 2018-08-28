@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="report_custom_payslip2">
+            <t t-set="data_report_margin_top" t-value="20"/>
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <t t-name="report.external_layout_header">
+                        <div class="header">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 45px;"/>
+                                </div>
+                                <div class="col-xs-9 text-right" style="margin-top:20px;" t-field="o.company_id.rml_header1"/>
+                            </div>
+                            <div class="row zero_min_height">
+                                <div class="col-xs-12">
+                                    <div style="border-bottom: 1px solid black;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div>
+                                <span t-esc="o.company_id.street"/><br/>
+                                <span t-esc="o.company_id.street2"/><br/>
+                                <span t-esc="o.company_id.city"/><br/>
+                                <span t-esc="o.company_id.state_id.name"/>  <span t-esc="o.company_id.zip"/><br/>
+                                <span t-esc="o.company_id.country_id.name"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center" style="margin-top:20px;">
+                       <p><strong>Salary Slip of <span t-esc="o.employee_id.name"/> for <span t-esc="time.strftime('%b-%Y', time.strptime(o.date_to, '%Y-%m-%d'))" /></strong></p>
+                       <br/>
+                   </div>
+
+
+                     <table class="table table-condensed table-bordered">
+                        <tr>
+                            <td><strong>Employee ID</strong></td>
+                            <td><span t-esc="o.employee_id.nf_emp"/></td>
+                            <td><strong>Bank Account</strong></td>
+                            <td><span t-esc="o.employee_id.bank_account_id.c_bank_name"/> - <span t-esc="o.employee_id.bank_account_id.acc_number"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Name</strong></td>
+                            <td><span t-esc="o.employee_id.name"/></td>
+                            <td><strong>PAN</strong></td>
+                            <td><span t-esc="o.employee_id.pan"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Designation</strong></td>
+                            <td><span t-esc="o.employee_id.intrnal_desig"/></td>
+                            <td><strong>UAN</strong></td>
+                            <td><span t-esc="o.employee_id.uan"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Date of Joining</strong></td>
+                            <td><span t-esc="o.employee_id.join_date"/></td>
+                            <td><strong>PF Number</strong></td>
+                            <td><span t-esc="o.employee_id.pf_id"/></td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>Location</strong></td>
+                            <td><span t-esc="o.employee_id.branch_id.name"/></td>
+                            <td><strong>ESI Number</strong></td>
+                            <td><span t-esc="o.employee_id.c_esi_num"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-condensed table-bordered">
+                        <tbody>
+                            <tr>
+                                <td WIDTH="50%" class="text-center"><strong>Earning</strong></td>
+                                <td WIDTH="50%" class="text-center"><strong>Deduction</strong></td>
+                            </tr>
+                            <tr>
+                                <td WIDTH="50%">
+                                    <table WIDTH="100%" style="border-style: hidden;" class="table">
+                                        <tbody>
+                                            <tr t-foreach="o.details_by_salary_rule_category" t-as="p">
+                                                <t t-if="p.category_id.code in ('ALW','BASIC')">
+                                                    <t t-if="p.total != 0.0">
+                                                    <td WIDTH="80%"><span t-field="p.name"/></td>
+                                                    <td width="20%" style="text-align:right;"><span t-esc="p.total"/></td>
+                                                    </t>
+                                                </t>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td WIDTH="50%">
+                                    <table WIDTH="100%" style="border-style: hidden;" class="table">
+                                        <tbody>
+                                            <tr t-foreach="o.details_by_salary_rule_category" t-as="p">
+                                                <t t-if="p.category_id.code in ('DED')">
+                                                    <t t-if="p.total != 0.0">
+                                                    <td WIDTH="80%"><span t-field="p.name"/></td>
+                                                    <td WIDTH="20%" style="text-align:right;"><span t-esc="p.total"/></td>
+                                                    </t>
+                                                </t>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding-bottom:-1px;">
+                                    <table style="border-style: hidden;" class="table">
+                                        <tbody>
+                                            <tr>
+                                               <td><strong>Gross Total          </strong></td>
+                                                <td style="text-align:right;"><strong><span t-esc="o.total_earnings()"/></strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                 <td style="padding-bottom:-1px;">
+                                    <table style="border-style: hidden;" class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Total Deduction</strong></td>
+                                                <td style="text-align:right;"><strong><span t-esc="o.total_deductions()"/></strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-condensed table-bordered">
+                        <tbody>
+                            <tr t-foreach="o.details_by_salary_rule_category" t-as="p">
+                                <t t-if="p.code in ('BYODA','ARREARS','VARPAY','SPIN','BON','PRQA','LIEUA')">
+                                    <td WIDTH="80%"><span t-field="p.name"/></td>
+                                    <td WIDTH="20%" style="text-align:right;"><span t-esc="p.total"/></td>
+                                </t>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div>
+                        <strong>Net Salary Payable  (In Figure): Rs. </strong>
+                        <strong style="float:center;"><span t-esc="o.total_net()"/></strong>
+                    </div>
+                    <div>
+                        <strong>Net Salary Payable  (In Words): </strong>
+                        <strong style="float:center;"><span t-esc="o.net_words()"/></strong>
+                    </div>
+
+                <br></br><br></br>
+                <div style="font-size: 12px;">
+                    <strong>This is a Computer Generated Payslip and needs no signature.</strong>
+                </div>
+                </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</openerp>

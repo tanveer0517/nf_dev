@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+     <!-- <menuitem id="misc_payment_recovery" parent="hr_payroll.menu_hr_payroll_root" name="Misc Payment/Recovery" sequence="26"/> -->
+         <record id="view_hr_misc_payment_view" model="ir.ui.view">
+            <field name="name">hr.misc.payment.tree</field>
+            <field name="model">hr.misc.payment</field>
+            <field name="arch" type="xml">
+                <tree string="Misc Payment" editable="top">
+                    <field name="employee_id" required='1'/>
+                    <field name="pay_mode"/>
+                     <field name="salary_rule_id" required='1'/>
+		             <field name="amount" />
+		              <field name="doc_no" placeholder="Reference Number"/>
+		              <field name="date_from" placeholder="dd/mm/yyyy"/>
+		              <field name="date_to" placeholder="dd/mm/yyyy"/>
+		              <field name="company_id"/>
+		               <field name="date" invisible='1'/>
+		               <field name="active" invisible='1'/>
+		               <field name="payslip_id" invisible='1'/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_hr_misc_payment_form" model="ir.ui.view">
+            <field name="name">hr.misc.payment.form</field>
+            <field name="model">hr.misc.payment</field>
+            <field name="arch" type="xml">
+                <form string="Payscale">
+                    <group col="4">
+                      <field name="employee_id" required='1'/>
+                      <field name="pay_mode" required='1'/>
+                     <field name="salary_rule_id" required='1'/>
+		             <field name="amount" />
+		              <field name="doc_no" placeholder="Reference Number"/>
+		              <field name="date_from" placeholder="dd/mm/yyyy"/>
+		              <field name="date_to" placeholder="dd/mm/yyyy"/>
+		               <field name="company_id"/>
+		               <field name="date" invisible='1'/>
+		               <field name="active" invisible='1'/>
+		               <field name="payslip_id" invisible='1'/>
+                    </group>
+                 </form>
+             </field>
+        </record>
+        <record id="view_hr_misc_payment_filter" model="ir.ui.view">
+            <field name="name">hr.misc.payment.filter</field>
+            <field name="model">hr.misc.payment</field>
+            <field name="arch" type="xml">
+                <search string="Misc Payment/Recovery">
+                    <field name="employee_id" string="Employees"/>
+                    <field name="salary_rule_id" />
+                    <field name="doc_no"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                        <filter string="Payment/Recovery" icon="terp-personal" domain="[]" context="{'group_by':'salary_rule_id'}"/>
+                        <filter string="Zone" icon="terp-personal+" domain="[]" context="{'group_by':'company_id'}"/>
+                        <filter string="Month" icon="terp-personal+" domain="[]" context="{'group_by':'date'}"/>
+                    </group>
+                </search>
+             </field>
+        </record>
+
+        <record id="action_view_hr_misc_payment" model="ir.actions.act_window">
+            <field name="name">Misc Payment/Recovery</field>
+            <field name="res_model">hr.misc.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_misc_payment_view"/>
+        </record>
+
+
+		 <!-- <menuitem
+            id="menu_hr_misclaneous_views"
+            action="action_view_hr_misc_payment"
+            parent="misc_payment_recovery"
+            sequence="27" groups="base.group_no_one"
+        /> -->
+		
+<record id="view_hr_misc_payment_employee_form" model="ir.ui.view">
+            <field name="name">hr.misc.payment.employee.form</field>
+            <field name="model">hr.misc.payment.employee</field>
+            <field name="arch" type="xml">
+                <form string="Misc Pay/Rec Employee Wise">
+                    <group>
+                    <group col="4">
+                      <field name="employee_id"/>
+                    </group>
+                    <group> 
+					</group>
+					</group>
+                    <notebook>
+	                  	<page string="Misc Payment/Recovery Lines">
+	                    	<field name="misc_payment_line" context="{'default_employee_id':employee_id}">
+		                        <tree string="Misc Payment/Recovery Lines" editable="bottom">
+		                             <field name="employee_id" invisible="1"/>
+				                     <field name="salary_rule_id" required='1'/>
+				                     <field name="pay_mode"/>
+						             <field name="amount" />
+						             <field name="doc_no" placeholder="Reference Number"/>
+						             <field name="date_from" placeholder="dd/mm/yyyy"/>
+						             <field name="date_to" placeholder="dd/mm/yyyy"/>
+						             <field name="company_id"/>
+						             <field name="date" invisible='1'/>
+						             <field name="active" invisible='1'/>
+						             <field name="payslip_id" invisible='1'/>
+		          	            </tree>
+	                  	  </field>   
+	                    </page>
+                  </notebook>
+                 </form>
+             </field>
+        </record>
+        
+<record id="action_view_hr_misc_payment_employee" model="ir.actions.act_window">
+            <field name="name">Employee Wise</field>
+            <field name="res_model">hr.misc.payment.employee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_misc_payment_employee_form"/>
+        </record>
+
+
+		<!--  <menuitem
+            id="menu_hr_misclaneous_employee_views"
+            action="action_view_hr_misc_payment_employee"
+            parent="misc_payment_recovery"
+            sequence="28"
+        /> -->
+
+<record id="view_hr_misc_payment_head_form" model="ir.ui.view">
+            <field name="name">hr.misc.payment.head.form</field>
+            <field name="model">hr.misc.payment.head</field>
+            <field name="arch" type="xml">
+                <form string="Misc Pay/Rec Head Wise">
+                    <group>
+                    <group col="4">
+                      <field name="salary_rule_id"/>
+                    </group>
+                    <group></group>
+                    </group>
+                    <notebook>
+	                  	<page string="Misc Payment/Recovery Lines">
+	                    	<field name="misc_payment_line">
+		                        <tree string="Misc Payment/Recovery Lines" editable="bottom">
+		                          <field name="employee_id" required='1'/>
+			                      <field name="salary_rule_id" invisible='1'/>
+			                      <field name="pay_mode"/>
+					              <field name="amount" />
+					              <field name="doc_no" placeholder="Reference Number"/>
+					              <field name="date_from" placeholder="dd/mm/yyyy"/>
+					              <field name="date_to" placeholder="dd/mm/yyyy"/>
+				                  <field name="company_id"/>
+				                  <field name="date" invisible='1'/>
+				                  <field name="active" invisible='1'/>
+				                  <field name="payslip_id" invisible='1'/>
+		          	            </tree>
+	                  	  </field>   
+	                  </page>
+                  </notebook>
+                 </form>
+             </field>
+        </record>
+        
+<record id="action_view_hr_misc_payment_head" model="ir.actions.act_window">
+            <field name="name">Head Wise</field>
+            <field name="res_model">hr.misc.payment.head</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_misc_payment_head_form"/>
+        </record>
+
+
+		 <!-- <menuitem
+            id="menu_hr_misclaneous_head_views"
+            action="action_view_hr_misc_payment_head"
+            parent="misc_payment_recovery"
+            sequence="29"
+        /> -->
+	</data>
+</openerp>

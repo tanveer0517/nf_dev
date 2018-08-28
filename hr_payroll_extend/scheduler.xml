@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record forcecreate="True" id="ir_cron_salary_rule_scheduler_action" model="ir.cron">
+            <field name="name">Salary Rules</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field eval="True" name="doall"/>
+            <field eval="'hr.payslip.run'" name="model"/>
+            <field eval="'import_open_csv'" name="function"/>
+            <field eval="'()'" name="args"/>
+        </record>
+        
+        </data>
+        </openerp>
+        

@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_nf_pip,access_nf_pip_user,model_nf_pip,base.group_user,1,1,1,0
+access_nf_pip_improvement,access_nf_pip_improvement_user,model_nf_pip_improvement,base.group_user,1,1,1,0
+access_nf_pip_improvement_opp,access_nf_pip_improvement_opp_user,model_nf_pip_improvement_opp,base.group_user,1,1,1,0
+access_nf_pip_category_user,access_nf_pip_category_user,model_nf_pip_category,base.group_user,1,0,0,0
+access_nf_pip_category_hr,access_nf_pip_category_hr,model_nf_pip_category,hr.group_hr_manager,1,0,0,0

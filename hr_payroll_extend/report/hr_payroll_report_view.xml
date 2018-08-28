@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="report_custom_payslip1">
+    <t t-set="data_report_margin_top" t-value="0"/>
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+        
+        <t t-set="data_report_header_spacing" t-value="0" />
+        <t t-set="data_report_dpi" t-value="90" />
+        <t t-name="report.external_layout_header">
+				<div class="header">
+					<div class="row">
+						<div class="col-xs-3">
+							<img t-if="o.company_id.logo"  t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 70px;"/>
+					 	    <p><h4><strong><span t-esc="o.company_id.name or o.company_id.name"/></strong></h4></p>
+						
+						</div>
+						<br/><br/><br/><br/>
+						<div class="col-xs-5 text-center" >
+						  <p><h4.5><strong>Pay Slip :<span t-esc="time.strftime('%b-%Y', time.strptime(o.date_from, '%Y-%m-%d'))" /></strong></h4.5></p>
+						     
+						</div>
+						<div class="col-xs-4">
+						</div>
+					</div>
+				</div>
+				
+			</t>
+			
+			<P ALIGN="CENTER" STYLE="margin-bottom: 0cm; line-height: -20%"><BR></BR>
+</P>
+			
+	  <t t-name="report.external_layout_footer"> 
+    	
+    	 <div class="footer">
+    	 
+    	  
+    	    	 	
+    	 	<div class="row" style="border-top: 1px solid black;"> 
+    	 		
+    	 		<div class="col-xs-4 text-left">
+                      Run: <span t-esc="o.get_time()" />
+                    </div>
+                    
+                <div class="col-xs-4 text-center">
+                    <strong>
+                    Page:<span class="page"/>/<span class="topage"/>
+                    </strong>
+                </div>    
+                   
+                    <div class="col-xs-4 text-right">
+                        <p t-esc="o.get_user()"/>
+                    </div>
+    	 		
+    	 </div> 
+    	</div> 
+    </t>
+        
+     <t t-call="report.internal_layout">     
+      <div class="page">
+      <div class="row">
+             		
+                    
+<TABLE WIDTH="100%" style="border: 1px solid black;margin-bottom: 0cm;" CELLPADDING="10" CELLSPACING="0">
+	<TR VALIGN="TOP">
+		<TD WIDTH="18%" HEIGHT="9">
+			<b>Employee No</b>
+		</TD>
+		<TD WIDTH="1%">:</TD>
+		<TD WIDTH="15%">
+			<P ALIGN="LEFT"><span t-field="o.employee_id.employee_no"/>
+			</P>
+		</TD>
+		<TD WIDTH="40%" colspan="3">
+		</TD>
+		<TD WIDTH="16%">
+			<b>PF NO.</b> 
+		</TD>
+		<TD WIDTH="1%">:</TD>
+		<TD WIDTH="9%">
+			<P ALIGN="LEFT"><span t-field="o.employee_id.pattern"/>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN="TOP">
+		<TD WIDTH="18%" >
+			<b>Name</b>
+		</TD>
+		<TD WIDTH="1%">:</TD>
+		<TD WIDTH="15%">
+			<P ALIGN="LEFT"><span t-field="o.employee_id.name_related"/>
+			</P>
+		</TD>
+        <TD WIDTH="40%" colspan="3"> </TD>
+		<TD WIDTH="16%">
+			<b>Date Of Joining</b>
+		</TD>
+		<TD WIDTH="1%">:</TD>
+		<TD WIDTH="9%">
+			<P ALIGN="LEFT"><span t-field="o.employee_id.join_date"/>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN="TOP">
+		<TD WIDTH="18%">
+			<b>Designation</b>
+		</TD>
+		<TD WIDTH="1%"> : </TD>
+		<TD WIDTH="15%" >
+			<P ALIGN="LEFT"><span t-field="o.employee_id.job_id"/>
+			</P>
+		</TD>
+         <TD WIDTH="40%" colspan="3"> </TD> 
+         <TD WIDTH="16%">
+			<b>Branch</b>
+		</TD>
+		<TD WIDTH="1%">:</TD>
+		<TD WIDTH="9%">
+			<P ALIGN="LEFT"><span t-field="o.employee_id.branch_id"/>
+			</P>
+		</TD>
+	</TR>
+	
+	
+</TABLE>
+
+ <!-- <TABLE WIDTH="100%" style="border-left: 1px solid black;border-right: 1px solid black;" CELLPADDING="10" CELLSPACING="0">
+  <TR VALIGN="TOP" >
+		<TD WIDTH="15%" style="border-bottom: 1px solid black;">
+			<b>Earnings</b>
+		</TD>
+		
+		<TD WIDTH="15%" style="border-bottom: 1px solid black;">
+			<P ALIGN="RIGHT"> 100
+			</P>
+		</TD>
+        <TD WIDTH="1%" style="border-bottom: 1px solid black;border-right: 1px solid black;"></TD>
+        <TD WIDTH="15%" style="border-bottom: 1px solid black;">
+			<b>Deductions</b>
+		</TD>
+		
+		<TD WIDTH="15%" style="border-bottom: 1px solid black;">
+			<P ALIGN="RIGHT"> 100
+			</P>
+		</TD>
+		 <TD WIDTH="1%" style="border-bottom: 1px solid black;border-right: 1px solid black;"></TD>
+         <TD WIDTH="18%" >
+			<b>Cost Center</b>
+		</TD>
+		<TD WIDTH="2%" style="border-right: 1px solid black;">:</TD>
+		<TD WIDTH="18%" style="border-right: 1px solid black;">
+			<P ALIGN="RIGHT"><span t-field="o.employee_id.cost_centr"/>
+			</P>
+		</TD>
+	</TR>
+ </TABLE> -->
+ 
+ <TABLE WIDTH="100%" style="border-left: 1px solid black;border-right: 1px solid black;border-bottom: 1px solid black;">
+  <TR VALIGN="TOP">
+		<TD WIDTH="31%" style="border-bottom: 1px solid black;">
+			<TABLE width="100%">
+			<TR>
+			  <TD width="1%"></TD>
+			  <TD WIDTH="49%" style="border-bottom: 1px solid black;">
+			  <b>Earnings</b>
+		      </TD>
+		
+		      <TD WIDTH="49%" style="border-bottom: 1px solid black;" align="right">
+			   <b>Rs.</b>
+		      </TD>
+              <TD WIDTH="1%" style="border-bottom: 1px solid black;border-right: 1px solid black;"></TD>
+			</TR>
+			
+			<t t-foreach="o.details_by_salary_rule_category" t-as="val">
+			 <t t-if="val.category_id.code in ('ALW','BASIC')">
+			 <TR>
+			 <TD width="1%"></TD>
+			  <TD width="49%" class="text-left"> <span t-esc="val.name"/></TD>
+			  <TD width="49%" class="text-right" ><span t-esc="val.total"/></TD>
+			 <TD width="1%" style="border-right: 1px solid black;"></TD> 
+			 </TR>
+			</t> 
+			</t>
+			
+		   </TABLE>
+		</TD>
+		
+		<TD WIDTH="31%" style="border-bottom: 1px solid black;border-right: 1px solid black;">
+           <TABLE width="100%">
+           <TR style="border-bottom: 1px solid black;">
+            <TD width="1%"></TD>
+            <TD WIDTH="49%" >
+			  <b>Deductions</b>
+		    </TD>
+		
+		    <TD WIDTH="49%" align="right">
+			  <b>Rs.</b>
+		    </TD>
+		    <TD WIDTH="1%"></TD>
+           </TR>
+           
+           <t t-foreach="o.details_by_salary_rule_category" t-as="val">
+            <t t-if="val.category_id.code in ('DED')">
+			 <TR>
+			  <TD width="1%"></TD>
+			  <TD width="49%" class="text-left"><span t-esc="val.name"/></TD>
+			  <TD width="49%" class="text-right"><span t-esc="val.total"/></TD>
+			 <TD width="1%"></TD>
+			 </TR>
+		   </t>
+		  </t>
+		  
+		</TABLE> 
+		</TD>
+        <TD WIDTH="38%">
+         <TABLE width="100%">
+         
+         <TR>
+           <TD WIDTH="1%"></TD>
+           <TD WIDTH="49%" >
+			Cost Centre
+		   </TD>
+		   <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+		   <TD WIDTH="40%" ALIGN="LEFT">
+			<span t-field="o.employee_id.cost_centr"/>
+		   </TD>
+         </TR>
+          
+          <TR>
+           <TD width="1%"></TD>
+            <TD width="49%" align="left">
+             Standard Days
+            </TD>
+            <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+            <TD width="40%" align="LEFT">
+              31
+             </TD>
+            
+          </TR>
+          
+          <TR>
+           <TD width="1%"></TD>
+            <TD width="49%" align="left">
+             Days Worked
+            </TD>
+            <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+            <TD width="40%" align="LEFT">
+             31
+            </TD>
+            
+           </TR>
+           
+           <TR>
+           <TD width="1%"></TD>
+            <TD width="49%" align="left">
+             PAN
+            </TD>
+            <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+            <TD width="40%" align="LEFT">
+             <span t-esc="o.employee_id.tax_idcard_no"/>
+            </TD>
+           </TR>
+           
+           <TR style="border-bottom: 1px solid black;">
+           <TD width="1%"></TD>
+            <TD width="49%" align="left">
+             Gender
+            </TD>
+            <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+            <TD width="40%" align="LEFT">
+             <span t-esc="o.employee_id.gender"/>
+            </TD>
+           </TR>
+           
+           <TR>
+           <TD width="1%"></TD>
+            <TD width="49%" align="left">
+             Bank
+            </TD>
+            <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+            <TD width="40%" align="LEFT">
+             Axis Bank
+            </TD>
+           </TR>
+           
+           <TR>
+           <TD width="1%"></TD>
+            <TD width="49%" align="left">
+             A/C No.
+            </TD>
+            <TD WIDTH="8%">:</TD>
+            <TD width="2%"></TD>
+            <TD width="40%" align="LEFT">
+             1223463463
+            </TD>
+           </TR>
+         </TABLE>
+        </TD>
+        
+		
+	</TR>
+ </TABLE>
+ 
+ <TABLE WIDTH="100%" style="border-bottom: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;">
+  <TR>
+   <TD WIDTH="31%">
+     <TABLE WIDTH="100%">
+      <TR>
+		<TD width="1%"></TD>
+		<TD WIDTH="49%">
+	       <b>Total Earnings Rs.</b>
+		</TD>
+		
+		<TD WIDTH="49%" align="right">
+		   <span t-esc="o.total_earnings()"/>
+		</TD>
+        <TD WIDTH="1%" style="border-right: 1px solid black;"></TD>
+      </TR>
+     </TABLE>
+   </TD>
+   
+   <TD WIDTH="31%">
+    <TABLE WIDTH="100%">
+     <TR>
+		<TD width="1%"></TD>
+		<TD WIDTH="55%">
+	       <b>Total Deductions Rs.</b>
+		</TD>
+		
+		<TD WIDTH="40%" ALIGN="RIGHT">
+		  <span t-esc="o.total_deductions()"/>
+		</TD>
+        <TD WIDTH="4%" style="border-right: 1px solid black;"></TD>
+      </TR>
+    </TABLE>
+   </TD>
+   
+   <TD WIDTH="38%">
+    <TABLE WIDTH="100%">
+     <TR>
+		<TD width="1%"></TD>
+		<TD WIDTH="49%">
+	       <b>Net Salary Rs.</b>
+		</TD>
+		
+		<TD WIDTH="49%" align="right">
+		    <span t-esc="o.total_net()"/>
+		</TD>
+        <TD WIDTH="1%"></TD>
+      </TR>
+    </TABLE>
+    </TD>
+   </TR>
+ </TABLE>
+ 
+ <TABLE WIDTH="100%" style="border-bottom: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;">
+  <TR>
+   <TD width="60%">
+    <TABLE WIDTH="100%" style="border-right: 1px solid black;border-bottom: 1px solid black;border-top: 1px solid black;">
+     <TR>
+      <TD WIDTH="100%">
+       <P ALIGN="CENTER"> <b> Income Tax Calculation </b> </P>
+      </TD>
+     </TR>
+    </TABLE>
+    
+    <TABLE WIDTH="100%" style="border-right: 1px solid black;">
+     <TR>
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="45%">
+      <P ALIGN="LEFT"> <b> Particular </b> </P>
+      </TD>
+      <TD WIDTH="15%" ALIGN="CENTER">
+       <b> Total Amt </b>
+      </TD>
+      <TD WIDTH="20%" ALIGN="CENTER">
+       <b> Exempted Amt </b>
+      </TD>
+      <TD WIDTH="18%" ALIGN="RIGHT">
+       <b> Taxable Amt </b>
+      </TD>
+      <TD WIDTH="1%"></TD>
+     </TR>
+     
+     <TR t-foreach="o.get_tax_details()" t-as="tds">
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="45%" ALIGN="LEFT">
+       <span t-esc="tds[0]"/>
+      </TD>
+      <TD WIDTH="15%" ALIGN="RIGHT">
+       <span t-esc="tds[1]"/>
+      </TD>
+      <TD WIDTH="20%" ALIGN="RIGHT">
+       <span t-esc="tds[2]"/>
+      </TD>
+      <TD WIDTH="18%" ALIGN="RIGHT">	
+       <span t-esc="tds[3]"/>
+      </TD>
+      <TD WIDTH="1%">
+      </TD>
+     </TR>
+     
+     <TR>
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="45%" ALIGN="LEFT">
+       <b> Net Taxable Income </b>
+      </TD>
+      <TD WIDTH="15%" ALIGN="RIGHT">
+      </TD>
+      <TD WIDTH="20%" ALIGN="RIGHT">
+      </TD>
+      <TD WIDTH="18%" ALIGN="RIGHT" style="border-top: 1px solid black;">	
+       <span t-esc="o.get_net_tax()"/>
+      </TD>
+      <TD WIDTH="1%" style="border-top: 1px solid black;">
+      </TD>
+     </TR>
+     
+     <TR>
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="45%" ALIGN="LEFT">
+       <b> Gross Taxable Income </b>
+      </TD>
+      <TD WIDTH="15%" ALIGN="RIGHT">
+      </TD>
+      <TD WIDTH="20%" ALIGN="RIGHT">
+      </TD>
+      <TD WIDTH="18%" ALIGN="RIGHT" style="border-top: 1px solid black;">	
+       <span t-esc="o.get_gross_tax()"/>
+      </TD>
+      <TD WIDTH="1%" style="border-top: 1px solid black;">
+      </TD>
+     </TR>
+     
+    </TABLE>
+   </TD>
+   
+   <TD width="40%">
+    <TABLE WIDTH="100%" style="border-bottom: 1px solid black;border-top: 1px solid black;">
+     <TR>
+      <TD WIDTH="100%" ALIGN="CENTER">
+       <P ALIGN="CENTER"> <b> Investment Details </b> </P>
+      </TD>
+     </TR>
+    </TABLE>
+    
+    <TABLE WIDTH="100%">
+    <TR t-foreach="o.get_saving_details()" t-as="sv">
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="85%" ALIGN="LEFT">
+        <span t-esc="sv[0]"/> 
+      </TD>
+      <TD WIDTH="12%" ALIGN="RIGHT">
+        <span t-esc="sv[1]"/> 
+      </TD>
+      <TD WIDTH="2%">
+      </TD>
+     </TR>
+     
+     <TR t-foreach="o.get_medical_details()" t-as="md">
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="85%" ALIGN="LEFT">
+        <span t-esc="md[0]"/> 
+      </TD>
+      <TD WIDTH="12%" ALIGN="RIGHT">
+        <span t-esc="md[1]"/> 
+      </TD>
+      <TD WIDTH="2%">
+      </TD>
+     </TR>
+     
+     <TR>
+      <TD WIDTH="100%" colspan="4">
+      </TD>
+     </TR>
+     
+     <TR>
+      <TD WIDTH="100%" colspan="4">
+      </TD>
+     </TR>
+     
+     <TR style="border-top: 1px solid black;border-bottom: 1px solid black;background:#E8E8E8;">
+      <TD WIDTH="100%" ALIGN="CENTER" colspan="4">
+        <b> Other Declarations </b>
+      </TD>
+     </TR>
+     
+     <TR t-foreach="o.get_hra_details()" t-as="hra">
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="85%" ALIGN="LEFT">
+        <span t-esc="hra[0]"/> 
+      </TD>
+      <TD WIDTH="12%" ALIGN="RIGHT">
+        <span t-esc="hra[1]"/> 
+      </TD>
+      <TD WIDTH="2%">
+      </TD>
+     </TR>
+     
+     <TR t-foreach="o.get_other_details()" t-as="oth">
+      <TD WIDTH="1%"></TD>
+      <TD WIDTH="85%" ALIGN="LEFT">
+        <span t-esc="oth[0]"/> 
+      </TD>
+      <TD WIDTH="12%" ALIGN="RIGHT">
+        <span t-esc="oth[1]"/> 
+      </TD>
+      <TD WIDTH="2%">
+      </TD>
+     </TR>
+    
+    </TABLE>
+   </TD>
+  </TR>
+ </TABLE>
+<P ALIGN="CENTER" STYLE="margin-bottom: 0cm; line-height: 5%"><BR></BR>
+</P>					 
+            </div>
+            </div>
+           </t> 
+        </t>
+    </t>
+   
+</template>
+</data>
+</openerp>

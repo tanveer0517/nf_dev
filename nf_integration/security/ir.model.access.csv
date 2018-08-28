@@ -1,0 +1,8 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_,access_crm_call_history,model_crm_call_history,sales_team.group_sale_salesman,1,0,0,0
+access_nf_biometric,access_nf_biometric,model_nf_biometric,base.group_user,1,0,0,0
+access_nf_leave_swipe,access_nf_leave_swipe,model_nf_leave_swipe,base.group_user,1,0,0,0
+access_nf_leave_swipe,access_nf_leave_swipe,model_nf_leave_swipe,hr.group_hr_user,1,1,0,0
+access_nf_jibble_attendance,access_nf_jibble_attendance,model_nf_jibble_attendance,,1,1,1,0
+access_nf_jibble_attendance_line,access_nf_jibble_attendance_line,model_nf_jibble_attendance_line,,1,1,1,1
+

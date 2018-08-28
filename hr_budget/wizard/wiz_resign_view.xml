@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+        <record id="wiz_resign_form" model="ir.ui.view">
+            <field name="name">Employee Last Working Date</field>
+            <field name="model">wiz.resign</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Employee Last working Date">
+                    <sheet>
+                        <group>
+                            <field name="c_last_wor_date"/>
+                        </group>
+                        <footer>
+                            <button name="update_last_date" string="Update" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wiz_resign_action" model="ir.actions.act_window">
+            <field name="name">Employee Last Working Date</field>
+            <field name="res_model">wiz.resign</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wiz_termination_form" model="ir.ui.view">
+            <field name="name">Employee Last Working Date</field>
+            <field name="model">wiz.termination</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Employee Last working Date">
+                    <sheet>
+                        <group>
+                            <field name="c_last_wor_date"/>
+                        </group>
+                        <footer>
+                            <button name="update_last_date" string="Update" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wiz_termination_action" model="ir.actions.act_window">
+            <field name="name">Employee Last working Date</field>
+            <field name="res_model">wiz.termination</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+
+    </data>
+</openerp>

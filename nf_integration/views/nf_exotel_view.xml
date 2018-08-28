@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+
+    <!-- log a meeting wizard -->
+
+        <record id="crm.crm_activity_log_view_form" model="ir.ui.view">
+        <field name="name">Log an Activity</field>
+        <field name="model">crm.activity.log</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Log an Activity">
+                <div attrs="{'invisible': [('customer_number','=',False)]}">
+                    <label for="customer_number" attrs="{'invisible': [('customer_number','=',False)]}"/>
+                    <h1>
+                      <field name="customer_number" class="oe_inline" readonly="1" attrs="{'invisible': [('customer_number','=',False)]}"/>
+                    </h1>
+                </div>
+                <group>
+                    <field name="team_id" invisible="1"/>
+                    <field name="lead_id" invisible="1"/>
+                    <group>
+                        <field name="next_activity_id" required="1"
+                            domain="['|', ('team_id', '=', False), ('team_id', '=', team_id)]"
+                            options="{'no_create': True, 'no_open': True}" default="3" attrs="{'invisible':[('customer_number','!=',False)]}"/>
+                        <field name="title_action" placeholder="e.g. Discuss proposal" invisible="1"/>
+                        <field name="from_number" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])],'required': [('next_activity_id', 'in',[2])]}"/>
+                    </group>
+                    <group>
+                         <label for="c_contact_mobile" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}"/>
+                    <div class="o_row">
+                        <field name="c_contact_mobile" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}"/>
+                        <button name="call_contact_mobile" type="object" icon="fa-phone" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}" class="oe_highlight"/>
+                    </div>
+                    <label for="c_mobile" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}"/>
+                    <div class="o_row">
+                        <field name="c_mobile" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}"/>
+                        <button name="call_company_mobile" icon="fa-phone" type="object" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}" class="oe_highlight"/>
+                    </div>
+                    <label for="c_phone" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}"/>
+                    <div class="o_row">
+                        <field name="c_phone" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}"/>
+                        <button name="call_company_landline" icon="fa-phone" type="object" attrs="{'invisible': ['|',('customer_number','!=',False),('next_activity_id', 'not in',[2])]}" class="oe_highlight"/>
+                    </div>
+                        <field name="planned_revenue" attrs="{'invisible':['|',('customer_number','!=',False),('next_activity_id','not in',3)]}"/>
+                        <field name="date_deadline" attrs="{'invisible':[('next_activity_id','not in',3)]}"/>
+                    </group>
+                </group>
+                <group col="2">
+                <field name="c_to" attrs="{'invisible':[('next_activity_id','not in',1)]}"/>
+                <field name="c_subject" attrs="{'invisible':[('next_activity_id','in',2)]}"/>
+                <field name="c_cc" invisible="1"/>
+                <field name="call_sid" invisible="1"/>
+                </group>
+
+                <field name="note" placeholder="Log a note..." attrs="{'invisible':[('next_activity_id','in',2)]}"/>
+                <group col="4">
+                    <field name="attachment_ids" widget="many2many_binary" string="Attach a file" nolabel="1" colspan="2" attrs="{'invisible':[('next_activity_id','not in',1)]}"/>
+                    <field name="template_id" options="{'no_create': True}" attrs="{'invisible':[('next_activity_id','not in',1)]}"/>
+                </group>
+                <footer>
+                    <button name="action_log_and_schedule" string="Log &amp; Schedule Next" type="object" attrs="{'invisible': [('next_activity_id', 'not in',[3])]}" class="btn btn-primary"/>
+                    <button name="action_log" string="Log Only" type="object" attrs="{'invisible': [('next_activity_id', 'not in',[3])]}" class="btn btn-primary" />
+                    <button string="Send Email" name="send_email" type="object" attrs="{'invisible': [('next_activity_id', 'not in',[1])]}" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    <button name="log_call" type="object" string="Log a Call" class="oe_highlight" attrs="{'invisible': [('customer_number','=',False)]}"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_crm_call_history_form" model="ir.ui.view">
+            <field name="name">Call History</field>
+            <field name="model">crm.call.history</field>
+            <field name="arch" type="xml">
+                <form string="Call History" create="false" edit="false">
+                    <sheet>
+                        <group>
+                            <field name="recording_url" widget="url"/>
+                            <field name="call_sid"/>
+                        </group>
+                        <group col="4" colspan="4">
+                            <field name="start_time"/>
+                            <field name="end_time"/>
+                            <field name="from_number"/>
+                            <field name="to_number"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_crm_call_history_tree" model="ir.ui.view">
+            <field name="name">Call History</field>
+            <field name="model">crm.call.history</field>
+            <field name="arch" type="xml">
+                <tree string="Call History" create="false" edit="false">
+                    <field name="recording_url" widget="url"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="from_number"/>
+                    <field name="to_number"/>
+                </tree>
+            </field>
+        </record>
+
+			<!-- actions  -->
+
+        <record id="action_crm_call_history" model="ir.actions.act_window">
+            <field name="name">CRM Call History</field>
+            <field name="res_model">crm.call.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+      <menuitem
+            id="menu_crm_call_history"
+            name="Call History"
+            parent="sale.menu_sales_config"
+            action="action_crm_call_history" />
+
+  </data>
+</openerp>

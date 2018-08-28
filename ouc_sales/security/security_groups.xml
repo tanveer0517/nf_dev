@@ -1,0 +1,40 @@
+<openerp>
+    <data noupdate="1">
+
+        <record model="res.groups" id="group_ops_discount">
+            <field name="name">OPS Discount Approval</field>
+        </record>
+
+        <record model="res.groups" id="group_la_approval">
+            <field name="name">Channel Sales Approval</field> 
+        </record>
+
+        <record model="res.groups" id="group_edit_customer_oppo">
+            <field name="name">Edit Opportunity Customer</field>
+        </record>
+
+        <!-- Employee users -->
+        <record model="res.groups" id="group_emp_user">
+            <field name="name">Employee / User</field>
+        </record>
+
+        <!-- Employee managers -->
+        <record model="res.groups" id="group_emp_manager">
+            <field name="name">Employee / Manager</field>
+            <field name="implied_ids" eval="[(4, ref('group_emp_user'))]"/>
+        </record>
+
+        <record model="res.groups" id="group_mlc">
+            <field name="name">MLC</field>
+        </record>
+
+        <record model="res.groups" id="group_presale">
+            <field name="name">Presale</field>
+        </record>
+
+         <record model="res.groups" id="group_cancel_sales_order">
+            <field name="name">Cancel S.O.</field>
+        </record>
+
+    </data>
+</openerp>

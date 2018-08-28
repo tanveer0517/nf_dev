@@ -1,0 +1,39 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+   
+   
+       <record id="view_nf_import_form" model="ir.ui.view">
+           <field name="name">NF IMPORT</field>
+           <field name="model">nf.import</field>
+           <field name="type">form</field>
+           <field name="arch" type="xml">
+             <form string="NF IMPORT">
+              <button name="import_hr_employee" type="object" string="IMPORT HR EMPLOYEE" />
+              </form>
+            </field>
+        </record>
+        
+        <record id="view_nf_import_tree" model="ir.ui.view">
+           <field name="name">NF IMPORT</field>
+           <field name="model">nf.import</field>
+           <field name="type">tree</field>
+           <field name="arch" type="xml">
+             <tree string="NF IMPORT">
+              </tree>
+            </field>
+        </record>
+
+      <record model="ir.actions.act_window" id="action_nf_import">
+        <field name="name">NF IMPORT</field>
+        <field name="res_model">nf.import</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	    <field name="domain">[]</field>
+	    <field name="context">{}</field>
+	  </record>   
+        
+    <menuitem name="NF IMPORT" id="menu_import" parent="hr.menu_hr_main" action="action_nf_import"/>
+
+    </data>
+</openerp>                    

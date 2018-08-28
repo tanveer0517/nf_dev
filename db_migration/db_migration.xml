@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="db_migration_id" model="ir.ui.view">
+            <field name="name">DB Migration</field>
+            <field name="model">ouc.dbmigration</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<header>
+					<button name="execute_job" type="object" string="Run Operation"/>
+				</header>
+            	<form string="Migration">
+                    <sheet>
+                    	<group cols="4">
+                    		<field name="job_name"/>
+                    		<field name="job_description"/>
+                    	</group>
+                    	<group cols="4">
+                    		<field name="db_host"/>
+	                    	<field name="db_port"/>
+	                    	<field name="db_name"/>
+	                    	<field name="db_user"/>
+	                    	<field name="db_passwd" password="True"/>
+	                    	<field name="table_ids">
+	                    		<tree>
+		                    		<field name="table_name"/>
+	                    			<field name="operation"/>
+		                    		<field name="source_table"/>
+	                    		</tree>	                    		
+	                    	</field>
+                    	</group>
+                    	<group string="LOGs">
+	                    	<field name="log_field" nolabel="1" readonly="1"/>
+                    	</group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="table_update_id" model="ir.ui.view">
+            <field name="name">Table Operation</field>
+            <field name="model">ouc.table_update</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+            	<form string="Migration">
+                    <sheet>
+                    	<group cols="4">
+		                   	<field name="operation"/>
+		                   	<field name="query"/>
+	                    	<field name="table_name"/>
+	                    	<field name="source_table" attrs="{'invisible':[('operation','=','query')]}"/>
+		                   	<field name="column_mapping" attrs="{'invisible':[('operation','=','query')]}"/>
+                    	</group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+
+        <record id="db_migration_model_view" model="ir.actions.act_window">
+            <field name="name">DB Migration</field>
+            <field name="res_model">ouc.dbmigration</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="table_update_model_view" model="ir.actions.act_window">
+            <field name="name">Table Operations</field>
+            <field name="res_model">ouc.table_update</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="menu_db_migration_root" name="DB Migration" sequence="1" web_icon="static/description/icon.png"/>
+        <menuitem id="menu_db_migration" action="db_migration_model_view" parent="menu_db_migration_root" name="Migration Jobs" sequence="9" />
+        <menuitem id="menu_tabel_update_root" action="table_update_model_view" parent="menu_db_migration_root" name="Table Operations" sequence="1" />
+
+
+    </data>
+</openerp>

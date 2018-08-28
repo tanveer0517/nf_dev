@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	
+        <!-- Payscale View -->
+
+        <record id="view_hr_payscale_list_view" model="ir.ui.view">
+            <field name="name">hr.payscale.tree</field>
+            <field name="model">hr.payscale</field>
+            <field name="arch" type="xml">
+                <tree string="Payscale">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="amount_from"/>
+                    <field name="amount_to"/>
+                    <field name="grade_pay"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_hr_payscale_form" model="ir.ui.view">
+            <field name="name">hr.payscale.form</field>
+            <field name="model">hr.payscale</field>
+            <field name="arch" type="xml">
+                <form string="Payscale">
+                    <group col="4">
+                        <field name="name" required="1"/>
+                        <field name="code" required="1"/>
+                        <field name="amount_from" required="1"/>
+	                    <field name="amount_to" required="1"/>
+	                    <field name="grade_pay" required="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_view_hr_payscale" model="ir.actions.act_window">
+            <field name="name">HR Payscale</field>
+            <field name="res_model">hr.payscale</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_payscale_list_view"/>
+        </record>
+
+       <menuitem
+            id="menu_hr_payscale_view"
+            action="action_view_hr_payscale"
+            parent="hr_payroll.menu_hr_payroll_configuration"
+            sequence="26"
+        />
+       
+        <!-- End Payscale View-->
+ 
+       <!-- Salary Rule  View Inherited-->
+       
+        <record id="hr_salary_rul_form_inherit_" model="ir.ui.view">
+            <field name="name">hr.salary.rule.form.inherit</field>
+            <field name="model">hr.salary.rule</field>
+            <field name="inherit_id" ref="hr_payroll.hr_salary_rule_form"/>
+            <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='code']" position="after">
+                   	<field name="rule_type"/>
+		    		<field name="frequency"/>
+                    <field name="saving_category_id" attrs="{'invisible': [('rule_type', '!=', 'S')]}"/>
+                	<field name="gl_code"/>
+                    <field name="type"/>
+                    <field name="limit_based_on"/>
+                    <field name="limit" />
+                    <field name="saving_rebate" />
+                    <field name="rebate_limit" />
+                </xpath>
+            </data>
+            </field>
+        </record>
+        
+    <!-- payslip view inherited start -->
+    
+       <record id="hr_payslip_form_inherit_" model="ir.ui.view">
+            <field name="name">hr.payslip.form.inherit</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+            <field name="arch" type="xml">
+            <data>
+ <xpath expr="//field[@name='employee_id']" position="replace">
+ <field domain="[('salary_done','=',False)]" name="employee_id" 
+ on_change="onchange_employee_id(date_from, date_to, employee_id, contract_id,region_id,unit_id,rate_of_pay,location_id,department_id,job_title)"/>                     
+  </xpath>              
+
+                <xpath expr="//button[@name='compute_sheet']" position="after">
+                    <button name="compute_income_tax" type="object" string="Compute Tax" states="draft" class="oe_highlight" groups="base.group_erp_manager"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='credit_note']" position="after">
+                    <field name="region_id" invisible="1"/>
+                    <field name="unit_id" invisible="1"/>
+                    <field name="tds_id" invisible="1"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='name']" position="after">
+                <field name="location_id"/>
+                <field name="department_id"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='struct_id']" position="after">
+                <field name="rate_of_pay"/>
+                <field name="job_title"/>
+                </xpath>
+                
+               <xpath expr="//field[@name='credit_note']" position="attributes">
+               		<attribute name="invisible">1</attribute>
+               </xpath> 
+	               
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="pay_mode"/>
+                </xpath>
+                <xpath expr="//field[@name='quantity']" position="replace">
+                    <field name="quantity" invisible='1'/>
+                </xpath>
+                <xpath expr="//field[@name='rate']" position="replace">
+                    <field name="rate" invisible='1'/>
+                </xpath>
+                <xpath expr="//field[@name='amount']" position="replace">
+                    <field name="amount" invisible='1'/>
+                </xpath>
+                <xpath expr="//field[@name='number_of_days']" position="before">
+                    <field name="days_in_month"/>
+                    
+                </xpath>
+                 <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="string">Zone</attribute>
+                </xpath>
+                
+                
+                <xpath expr="//field[@name='number_of_days']" position="after">
+                    <field name="leave_ded_amount" invisible='1'/>
+                    <field name="last_month_leave_days" invisible='1'/>
+                    <field name="cur_month_leave_days" invisible='1'/>
+                    <field name="last_month_leave_salary" invisible="1"/>
+                    <field name="cur_month_leave_salary" invisible="1"/>
+                    <field name="days_before_promotion" invisible='1'/>
+                    <field name="days_after_promotion" invisible='1'/>
+
+                    <field name="days_before_transfer" invisible='1'/>
+                    <field name="days_after_transfer" invisible='1'/>
+                    
+					
+                    <field name="leave_ded_amount_eol" invisible='1'/>
+                    <field name="leave_ded_amount_hpl" invisible='1'/>
+                    
+					<field name="eol_days" invisible="1"/>
+					<field name="hpl_days" invisible='1'/>
+					<field name="cl_days" invisible='1'/>
+					<field name="el_days" invisible='1'/>
+					<field name="hl_days" invisible='1'/>
+					<field name="com_days" invisible='1'/>
+					<field name="pat_days" invisible='1'/>
+					<field name="mat_days" invisible='1'/>
+					<field name="abs_days" invisible='1'/>
+					
+					<field name="nh_days" invisible="1"/>
+					<field name="nd_hours" invisible="1"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='number_of_days']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                </xpath>
+				 <!--<xpath expr="/form/sheet/notebook/page[2]" position="replace">-->
+                 <!--</xpath>-->
+                 <!---->
+                 <xpath expr="//field[@name='number_of_hours']" position="attributes">
+                 <attribute name="invisible">1</attribute>
+                 </xpath>
+
+
+
+                <!---->
+                 <!--<page string="Salary Computation" >-->
+                            <!--<field name="line_ids" colspan="4" nolabel="1">-->
+                                <!--<tree string="Salary Structure" editable="bottom" decoration-info="total == 0">-->
+                                    <!--<field name="name"/>-->
+                                    <!--<field name="code"/>-->
+                                    <!--<field name="category_id"/>-->
+                                    <!--<field name="sequence" invisible="1"/>-->
+                                    <!--<field name="quantity"/>-->
+                                    <!--<field name="rate"/>-->
+                                    <!--<field name="salary_rule_id"/>-->
+                                    <!--<field name="amount"/>-->
+                                    <!--<field name="total"/>-->
+                                <!--</tree>-->
+                                <!--<form string="Payslip Line">-->
+                                    <!--<group col="4">-->
+                                        <!--<field name="name"/>-->
+                                        <!--<field name="code"/>-->
+                                        <!--<field name="category_id"/>-->
+                                        <!--<field name="sequence"/>-->
+                                        <!--<field name="quantity"/>-->
+                                        <!--<field name="rate"/>-->
+                                        <!--<field name="amount"/>-->
+                                        <!--<field name="total"/>-->
+                                        <!--<field name="salary_rule_id"/>-->
+                                    <!--</group>-->
+                                <!--</form>-->
+                            <!--</field>-->
+                        <!--</page>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </data>
+            </field>
+        </record>
+        
+	<record id="hr_payslip_filter_inherit_" model="ir.ui.view">
+            <field name="name">hr.payslip.filter.inherit</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_filter"/>
+            <field name="arch" type="xml">
+            <data>
+                 <xpath expr="//group[1]" position="inside">
+                    <filter string="Region" icon="terp-personal" domain="[]" context="{'group_by':'region_id'}"/>
+                    <filter string="Unit" icon="terp-personal" domain="[]" context="{'group_by':'unit_id'}"/>
+                </xpath> 
+                
+            </data>
+            </field>
+        </record>
+        
+ 	<record id="hr_payslip_tree_inherit_" model="ir.ui.view">
+            <field name="name">hr.payslip.tree.inherit</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_tree"/>
+            <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="string">Zone</attribute>
+                </xpath> 
+                
+            </data>
+            </field>
+        </record>
+        
+        <record id="hr_payslip_run_form_inherit_" model="ir.ui.view">
+            <field name="name">hr.payslip.run.form.inherit</field>
+            <field name="model">hr.payslip.run</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payslip_run_form"/>
+            <field name="arch" type="xml">
+            <data>
+                <xpath expr="//button[@name='draft_payslip_run']" position="after">
+                	<button string="Confirm" name="confirm" type="object" states="draft" class="oe_highlight"/>   
+                </xpath>
+				<xpath expr="//field[@name='credit_note']" position="after">
+                 	<field name='company_id' required="1"/> 
+                </xpath>
+              
+            </data>
+            </field>
+        </record>
+        
+
+	</data>
+</openerp>

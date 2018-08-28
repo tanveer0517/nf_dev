@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_payleave,hr.payleave,model_hr_payleave,,1,1,1,0
+access_hr_leave_credit,hr.leave.credit,model_hr_leave_credit,,1,1,1,0
+access_hr_leave_credit_line,hr.leave.credit.line,model_hr_leave_credit_line,,1,1,1,0
+access_hr_leave_balance_entry,hr.leave.balance.entry,model_hr_leave_balance_entry,,1,1,1,0
+access_hr_payleave_encash,hr.payleave.encash,model_hr_payleave_encash,,1,1,1,0
+access_nf_hr_leave_report,nf.hr.leave.report,model_nf_hr_leave_report,,1,1,1,0

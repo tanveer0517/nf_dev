@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <!-- Hr Loan Start -->
+           <record id="view_hr_loan" model="ir.ui.view">
+            <field name="name">hr.loan.form</field>
+            <field name="model">hr.loan</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                    <field name="type" required='1'/>
+                    <field name="employee_id" required='1'/>
+                    <field name="loan_amt" required='1'/>
+                    <field name="installment_amt" required='1'/>
+                      <field name="c_loan_duration"/>
+                   </group>
+                   <group>
+                    <field name="recovery_from"/>
+                    <field name="recovery_to"/>
+                    <field name="loan_payslip_appear"/>
+                    <field name="company_id"/>
+                </group>
+                </group>
+                <separator string="Recovery/Payment"/>
+                    <field name = "recovery_line"> 
+                   <tree editable="top">
+                   <field name="name"/>
+                   <field name="date_from"/>
+                   <field name="date_to"/>
+                   <field name="amount"/>
+                  </tree>
+                  </field>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_hr_loan_tree" model="ir.ui.view">
+            <field name="name">hr.loan.tree</field>
+            <field name="model">hr.loan</field>
+            <field name="arch" type="xml">
+            <tree>
+            	     <field name="type" required='1' />
+                    <field name="employee_id"/>
+                    <field name="loan_amt"/>
+                    <field name="installment_amt"/>
+                    <field name="recovery_from"/>
+                    <field name="recovery_to"/>
+                    <field name="company_id"/>
+                    
+            </tree>
+		</field>
+        </record>
+        
+        <record id="view_hr_loan_filter" model="ir.ui.view">
+            <field name="name">hr.loan.filter</field>
+            <field name="model">hr.loan</field>
+            <field name="arch" type="xml">
+                <search string="Employee Loan">
+                    <field name="employee_id" string="Employees"/>
+                    <field name="type" />
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                        <filter string="Loan Type" icon="terp-personal" domain="[]" context="{'group_by':'type'}"/>
+                        <filter string="Zone" icon="terp-personal+" domain="[]" context="{'group_by':'company_id'}"/>
+                        <filter string="Month" icon="terp-personal+" domain="[]" context="{'group_by':'date'}"/>
+                    </group>
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="hr_loan">
+            <field name="name">Employee Loan &amp; Advances</field>
+            <field name="res_model">hr.loan</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Employee Loan &amp; Advances"
+            parent="hr_payroll.menu_hr_payroll_root"
+            id="menu_hr_loan" action="hr_loan" sequence="34" groups="hr_payroll.group_hr_payroll_user"/>
+       <!-- Hr Loan End -->
+       
+       <!-- Recovery/Payment Lines Start -->
+  
+
+
+       <record id="view_recovery_payment_lines_tree" model="ir.ui.view">
+           <field name="name">payment.recovery.line</field>
+           <field name="model">payment.recovery.line</field> 
+            <field name="arch" type="xml">
+            <tree>
+            	    <field name="name"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="amount"/>
+                    
+            </tree>
+		</field>
+
+       </record>     
+</data>
+</openerp>
+        

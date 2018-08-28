@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+     <!-- form view to open url  -->
+        <record id="nf_open_url_form" model="ir.ui.view">
+            <field name="name">nf_open_url</field>
+            <field name="model">nf.open.url</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Your Performance" create="false" edit="false">
+                    <iframe src="https://nowfloatsmis.com" width="1250" height="1000"/>
+                </form>
+            </field>
+        </record>
+         
+      <record id="nf_attendence_form" model="ir.ui.view">
+            <field name="name">nf.attendence.url.form</field>
+            <field name="model">nf.attendence.url</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Attendence" create="false" edit="false">
+                    <iframe src="https://nowfloatsmis.com" width="1250" height="1000"/>
+                </form>
+            </field>
+        </record>
+
+			<!-- actions  -->
+
+        <record id="nf_open_url_action" model="ir.actions.act_window">
+            <field name="name">Your Performance</field>
+            <field name="res_model">nf.open.url</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="nf_open_url_form"/>
+        </record>
+
+        <record id="nf_attendence_action" model="ir.actions.act_window">
+            <field name="name">Attendence</field>
+            <field name="res_model">nf.attendence.url</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="nf_attendence_form"/>
+        </record>
+
+        <menuitem id="nf_open_url_action_menu" name="My Performance" action="nf_open_url_action" sequence="170" groups="sales_team.group_sale_salesman"/>
+
+        <menuitem id="nf_attendence_action_menu" name="My Attendance" action="nf_attendence_action" sequence="170" groups="sales_team.group_sale_salesman"/>
+
+  </data>
+</openerp>

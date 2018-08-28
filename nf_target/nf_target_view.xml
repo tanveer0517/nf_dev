@@ -1,0 +1,219 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+   
+   
+   <!-- =====================BYOD Verification Form==================================== -->
+        
+        <record id="view_nf_sale_target_form" model="ir.ui.view">
+           <field name="name">Target &amp; Achievement</field>
+           <field name="model">nf.sale.target</field>
+           <field name="type">form</field>
+           <field name="arch" type="xml">
+             <form string="NF Sale Target">
+              <sheet>
+               <group col="4">
+                   <field name="nf_fy" required="1" attrs="{'readonly':[('doc','=',True)]}"/>
+                   <field name="employee_id" required="1" attrs="{'readonly':[('doc','=',True)]}"/>
+                   <field name="user_id" invisible="1"/>
+                   <field name="suppress" attrs="{'invisible':[('doc','!=',True)]}"/>
+                   <field name="doc" invisible="1"/>
+               </group>
+
+               <notebook>
+                 <page string="Target &amp; Lines">
+                     <field name="nf_sale_trgt_lines" colspan="4" nolabel="1">
+                         <tree editable="top" create="false" delete="false" colors="red:crr_frwd_thd > 0;green:crr_frwd_thd == 0">
+                             <field name="date" readonly="1"/>
+                             <field name="target" readonly="1"/>
+                             <field name="suppress" />
+                             <field name="monthly_thd" attrs="{'readonly':[('suppress','!=',True)]}"/>
+                             <field name="crr_frwd_thd" attrs="{'readonly':[('suppress','!=',True)]}"/>
+                             <field name="ytd" attrs="{'readonly':[('suppress','!=',True)]}"/>
+                             <field name="achievment" attrs="{'readonly':[('suppress','!=',True)]}"/>
+                             <field name="nf_fy" invisible="1"/>
+                         </tree>
+                     </field>
+                 </page>
+               </notebook>
+              </sheet>
+               <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+              </form>
+            </field>
+        </record>
+
+
+       <record id="view_nf_sale_target_tree" model="ir.ui.view">
+           <field name="name">Target &amp; Achievement</field>
+           <field name="model">nf.sale.target</field>
+           <field name="type">tree</field>
+           <field name="arch" type="xml">
+             <tree string="NF Sale Target">
+                 <field name="nf_fy"/>
+                 <field name="employee_id"/>
+             </tree>
+            </field>
+        </record>
+        
+
+        <record id="view_nf_sale_target_search" model="ir.ui.view">
+           <field name="name">Target &amp; Achievement</field>
+           <field name="model">nf.sale.target</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="NF Sale Target">
+                 <field name="employee_id"/>
+                 <field name="nf_fy"/>
+
+             <group string="Group By">
+              <filter name="emp_id" string="Employee" context="{'group_by':'employee_id'}"/>
+              <filter name="fy" string="FY" context="{'group_by':'nf_fy'}"/>
+              </group>
+             </search>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="action_nf_sale_target">
+        <field name="name">Target &amp; Achievement</field>
+        <field name="res_model">nf.sale.target</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	    <field name="domain">[]</field>
+	    <field name="context">{}</field>
+        <field name="search_view_id" ref="view_nf_sale_target_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          Target &amp; Achievement
+          </p>
+        </field>
+    </record>
+
+
+    <!-- ==================== NF Sale Target Line================================== -->
+
+
+       <record id="view_nf_sale_target_line_tree" model="ir.ui.view">
+           <field name="name">Target &amp; Achievement Line</field>
+           <field name="model">nf.sale.target.line</field>
+           <field name="type">tree</field>
+           <field name="arch" type="xml">
+             <tree string="NF Sale Target" create="false" colors="red:crr_frwd_thd > 0;green:crr_frwd_thd == 0">
+                 <field name="employee_id"/>
+                 <field name="date"/>
+                 <field name="target"/>
+                 <field name="monthly_thd"/>
+                 <field name="crr_frwd_thd"/>
+                 <field name="ytd"/>
+                 <field name="achievment"/>
+              </tree>
+            </field>
+        </record>
+
+
+        <record id="view_nf_sale_target_line_search" model="ir.ui.view">
+           <field name="name">Target &amp; Achievement Line</field>
+           <field name="model">nf.sale.target.line</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="Sale Target Line">
+                 <field name="employee_id"/>
+                 <field name="nf_fy"/>
+                 <field name="date"/>
+
+             <group string="Group By">
+              <filter name="emp_id" string="Employee" context="{'group_by':'employee_id'}"/>
+              <filter name="fy" string="FY" context="{'group_by':'nf_fy'}"/>
+              <filter name="date" string="Date" context="{'group_by':'date'}"/>
+              </group>
+             </search>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="action_nf_sale_target_line">
+        <field name="name">Target &amp; Achievement Line</field>
+        <field name="res_model">nf.sale.target.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+	    <field name="domain">[]</field>
+	    <field name="context">{}</field>
+        <field name="search_view_id" ref="view_nf_sale_target_line_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          Target &amp; Achievement
+          </p>
+        </field>
+    </record>
+
+
+
+       <!-- =======================Threshold Log ============================== -->
+
+
+        <record id="view_nf_thd_log_tree" model="ir.ui.view">
+           <field name="name">nf thd log</field>
+           <field name="model">nf.thd.log</field>
+           <field name="type">tree</field>
+           <field name="arch" type="xml">
+             <tree string="NF Threshold Log" editable="top">
+                 <field name="designation" required="1"/>
+                 <field name="from_date" required="1"/>
+                 <field name="till_date" required="1"/>
+                 <field name="monthly_thd" required="1"/>
+             </tree>
+            </field>
+        </record>
+
+
+        <record id="view_nf_thd_log_search" model="ir.ui.view">
+           <field name="name">nf thd log</field>
+           <field name="model">nf.thd.log</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="NF Sale Target">
+                 <field name="designation"/>
+                 <field name="from_date"/>
+                 <field name="till_date"/>
+                 <field name="monthly_thd"/>
+             <group string="Group By">
+              <filter name="designation" string="Internal Designation" context="{'group_by':'designation'}"/>
+              </group>
+             </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_nf_thd_log">
+            <field name="name">Threshold Log</field>
+            <field name="res_model">nf.thd.log</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_nf_thd_log_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+              Threshold Log
+              </p>
+            </field>
+        </record>
+
+       
+
+  <!-- ==================== MENU ================================== -->
+    
+    <menuitem name="Target &amp; Achievement" id="menu_nf_sale_target" parent="hr.menu_hr_main" action="action_nf_sale_target" sequence="6" groups="nf_target.group_nf_thd"/>
+    <menuitem name="Target &amp; Achievements" id="menu_nf_sale_target_lines" parent="hr.menu_hr_main" action="action_nf_sale_target_line" sequence="5" />
+
+    <menuitem name="Threshold Log" id="menu_thd_log" parent="hr.menu_hr_main" action="action_nf_thd_log" sequence="5" groups="nf_target.group_nf_thd"/>
+
+
+
+
+
+
+
+
+
+
+   </data>
+</openerp>                    

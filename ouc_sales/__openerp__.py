@@ -1,0 +1,36 @@
+{
+    'name' : 'Now Floats Sales',
+	'version' : '0.1',
+	'category' : 'sales',
+	'description' : """
+		This module is created to handle Sales in Nowfloats
+	""",
+    'author': 'OpenErp4you',
+    'depends': ['sale','crm', 'account_accountant','sale_contract','website_contract','nf_integration','employee_master'],
+    'data': [
+        'security/security_groups.xml',
+        'security/ir.model.access.csv',
+        'wizard/ouc_meeting_wizard_view.xml',
+        'report/report_invoice.xml',
+        'report/report_sale_order.xml',
+        'account_invoice_view.xml',
+        'crm_leads_view.xml',
+        'sales_view.xml',
+        'sale_subscription_view.xml',
+        'sequence/sequence_view.xml',
+        'package_extension_view.xml',
+        'res_partner_view.xml',
+        'product_template_view.xml',
+        'account_analytic_view.xml',
+        'purchase_order_view.xml',
+        'crm_calendar_meeting_view.xml',
+        'web_custom_view.xml',
+        'wizard/nf_custom_quotation_view.xml',
+        'report/report_custom_quotation.xml',
+    ],
+    
+    'demo': [],
+    'test': [],
+    'installable': True,
+    'auto_install': False,
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="view_hr_lease_form" model="ir.ui.view">
+            <field name="name">hr.lease.form</field>
+            <field name="model">hr.lease</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="employee_no" required='True'/>
+                     <field name="employee_name" required='True'/>
+                     <field name="lease_type" required='True'/>
+                     <field name="owner" required='True'/>
+                     <field name="area" required='True'/>
+                     <field name="lease_share"/>
+                     </group>
+                     <group>
+		     		<field name="address"/>
+		     		<field name="rent" required='True'/>
+		     		<field name="special_lease_amount"/>
+		     		<field name="from_date" required='True'/>
+		     		<field name="to_date" required='True'/>
+		     		<field name="lease_notes"/>
+		     		<field name="brokerage_charge"/>
+		     		</group>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_hr_lease_tree" model="ir.ui.view">
+            <field name="name">hr.lease.tree</field>
+            <field name="model">hr.lease</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="employee_no"/>
+                <field name="employee_name"/>
+                <field name="lease_type"/>
+                <field name="owner"/>
+                <field name="area"/>
+		       <field name="address"/>
+		       <field name="rent"/>
+		       <field name="from_date"/>
+		       <field name="to_date"/>
+            </tree>
+		</field>
+        </record>
+        
+        <record id="view_hr_lease_filter" model="ir.ui.view">
+            <field name="name">hr.lease.filter</field>
+            <field name="model">hr.lease</field>
+            <field name="arch" type="xml">
+                <search string="Lease">
+                    <field name="employee_no" string="Employee No"/>
+                    <field name="employee_name" string="Name"/>
+                    
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_hr_lease">
+            <field name="name">Employee Lease</field>
+            <field name="res_model">hr.lease</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- <menuitem
+            name="Employee Lease Details"
+            parent="hr.menu_hr_main"
+            id="menu_hr_lease" action="action_hr_lease" sequence="5"/> -->
+
+</data>
+</openerp>

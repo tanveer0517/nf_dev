@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nf_helpdesk_comments,access_nf_helpdesk_comments,model_nf_helpdesk_comments,,1,1,1,0

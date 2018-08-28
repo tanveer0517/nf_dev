@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+   	<data>
+   	
+   	
+   	<record id="view_hr_employee_referral_form" model="ir.ui.view">
+            <field name="name">hr.employee.referral.form</field>
+            <field name="model">hr.employee.referral</field>
+            <field name="arch" type="xml">
+                <form string="Employee Referrals">
+                    <header>
+                        <button string="Send Reference" name="send_to_reference" type="object" class="oe_highlight" attrs="{'invisible':[('state','not in',['Draft'])]}"/>
+                        <button string="Selected" name="selected_request" type="object" class="oe_highlight" states='Reference Sent' groups="hr_recruitment.group_hr_recruitment_user,hr_recruitment.group_hr_recruitment_manager"/>
+                        <button string="Joined" name="joined_request" type="object" class="oe_highlight" states='Selected' groups="hr_recruitment.group_hr_recruitment_user,hr_recruitment.group_hr_recruitment_manager"/>
+                        <button string="Did Not Join" name="not_joined" type="object" class="oe_highlight" states='Selected' groups="hr_recruitment.group_hr_recruitment_user,hr_recruitment.group_hr_recruitment_manager"/>
+                        <button string="Rejected" name="reject_request" type="object" class="oe_highlight" states='Reference Sent' groups="hr_recruitment.group_hr_recruitment_user,hr_recruitment.group_hr_recruitment_manager"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet string ="Employee Referrals">
+                        <group col="2">
+                            <field name="name" readonly="1"/>
+                        </group>
+                        <group string="Candidate Details">
+                            <group>
+                                <field name="candidate_name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="candidate_contact_number" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="candidate_email_id" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="candidate_experience" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="nf_curr_ctc" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="nf_expected_ctc" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="nf_curr_designation" attrs="{'readonly':[('state','!=','Draft')]}" required="1"/>
+                            </group>
+                            <group>
+                                <field name="department" attrs="{'readonly':[('state','not in',['Draft','Reference Sent','Selected'])]}"/>
+                                <field name="job_title" attrs="{'readonly':[('state','not in',['Draft','Reference Sent','Selected'])]}"/>
+                                <field name="referred_by" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                                <field name="referred_date" readonly="1"/>
+                                <field name="employee_email" invisible="1" />
+                                <field name="filename" invisible="1"/>
+                                <field name="resume" required="1" attrs="{'readonly':[('state','!=','Draft')]}" filename="filename"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="candidate_other" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                        </group>
+                        <group string="Approval Details">
+                            <group>
+                                <field name="ref_notification" attrs="{'readonly':[('state','!=','Selected')]}" groups="hr_recruitment.group_hr_recruitment_user"/>
+                                <field name="approval_by" readonly="1"/>
+                                <field name="joining_date" attrs="{'readonly':[('state','!=','Selected')]}"/>
+                            </group>
+                            <group>
+                                <field name="assign_to" domain="[('job_id.name','ilike','%Talent Acquisition%')]" widget="selection" attrs="{'readonly':[('state','!=','Reference Sent')]}" groups="hr_recruitment.group_hr_recruitment_manager"/>
+                                <field name="assign_date" readonly="1" groups="hr_recruitment.group_hr_recruitment_manager"/>
+                            </group>
+                        </group>
+                        <group string="Payout Details" groups="hr_recruitment.group_hr_recruitment_manager" attrs="{'invisible':[('state','!=','Joined')]}">
+                            <group>
+                                <field name="payout" invisible="1"/>
+                                <field name="payout_status" attrs="{'readonly':[('payout','=',True)],'invisible':[('state','!=','Joined')]}"/>
+                                <field name="payout_date" attrs="{'invisible':[('payout_status','!=','Yes')],'required':[('payout_status','=','Yes')],'readonly':[('payout','=',True)]}"/>
+                                <field name="payout_amount" attrs="{'invisible':[('payout_status','!=','Yes')],'required':[('payout_status','=','Yes')],'readonly':[('payout','=',True)]}"/>
+                            </group>
+                        </group>
+                        <button name="payout_done" string="Confirm Payout" type="object" class="oe_highlight" attrs="{'invisible':['|',('payout','=',True),('state','!=','Joined')]}" groups="hr_recruitment.group_hr_recruitment_manager"/>
+                        <group string="Feedback" groups="hr_recruitment.group_hr_recruitment_user,hr_recruitment.group_hr_recruitment_manager">
+                            <field name="selected_feedback" attrs="{'readonly':[('state','!=','Reference Sent')]}"/>
+                            <field name="joined_feedback" attrs="{'readonly':[('state','!=','Selected')]}"/>
+                            <field name="not_joined_feedback" attrs="{'readonly':[('state','!=','Selected')]}"/>
+                            <field name="rejected_feedback" attrs="{'readonly':[('state','!=','Reference Sent')]}"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_employee_reference_tree" model="ir.ui.view">
+            <field name="name">hr.employee.referral.tree</field>
+            <field name="model">hr.employee.referral</field>
+            <field name="arch" type="xml">
+                <tree string="Employee Referrals">
+                    <field name="name"/>
+                    <field name="referred_by"/>
+                    <field name="department" />
+                    <field name="job_title" />
+                    <field name="resume"/>
+                    <field name="state"/>
+                    <field name="joining_date"/>
+                    <field name="approval_by"/>
+                    <field name="assign_to"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_action_hr_employee_referral_form" model="ir.actions.act_window">
+            <field name="name">Employee Referrals</field>
+            <field name="res_model">hr.employee.referral</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_employee_reference_tree"/>
+        </record>
+
+
+        <menuitem action="view_action_hr_employee_referral_form" id="menu_employee_referral"
+             parent="hr.menu_hr_main" sequence="100" name="Employee Referrals"/>
+
+	</data>
+</openerp>
+   	

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<openerp>
+	<data noupdate="1">
+        
+        <record id="group_nf_biometric" model="res.groups">
+          <field name="name">Biometric</field>
+        </record>
+
+         <record id="nf_leave_swipe_attendance_rule" model="ir.rule">
+            <field name="name">Own Attendance Rule</field>
+            <field ref="model_nf_leave_swipe" name="model_id"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="nf_leave_swipe_all_attendance_rule" model="ir.rule">
+            <field name="name">All Leave Swipe Attendance Rule</field>
+            <field ref="model_nf_leave_swipe" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        </record>
+
+    </data>
+</openerp>
+		

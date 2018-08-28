@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_interviewer_hist_line,access_interviewer_hist_line,model_interviewer_hist_line,,1,1,1,1
+access_wiz_interview_form,access_wiz_interview_form,model_wiz_interview_form,,1,1,1,1
+access_task_subject,access_task_subject,model_task_subject,,1,1,1,1
+access_task_onboarding_applicant,access_task_onboarding_applicant,model_task_onboarding_applicant,,1,1,1,1
+access_job_position_view,access_job_position_view,model_job_position_view,,1,1,1,1
+access_applicant_selection_note,access_applicant_selection_note,model_applicant_selection_note,,1,1,1,1
+access_hr_applicant,access_hr_applicant,model_hr_applicant,base.group_user,1,1,0,0
+employee_access_hr_recruitment_stage_user,hr.recruitment.stage.employee.user,model_hr_recruitment_stage,base.group_user,1,0,0,0
+access_hr_employee_referral,access_hr_employee_referral,model_hr_employee_referral,,1,1,1,0
+access_nf_joining_candidate_recruiter,access_nf_joining_candidate_recruiter,model_nf_joining_candidate,hr_recruitment.group_hr_recruitment_user,1,1,1,0
+access_nf_joining_candidate_hr,access_nf_joining_candidate_hr,model_nf_joining_candidate,hr.group_hr_user,1,1,1,0
+access_nf_candidate_onboarding,access_nf_candidate_onboarding,model_nf_candidate_onboarding,,1,1,1,0
+access_nf_candidate_onboarding_family,access_nf_candidate_onboarding_family,model_nf_candidate_onboarding_family,,1,1,1,1
+access_nf_previous_employment,access_nf_previous_employment,model_nf_previous_employment,,1,1,1,1

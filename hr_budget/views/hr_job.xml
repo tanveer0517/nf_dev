@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+	
+		  <record id="hr_job_custom_inherit" model="ir.ui.view">
+            <field name="name">hr.job</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr.view_hr_job_form"/>
+            <field name="arch" type="xml">
+            
+             <xpath expr="//field[@name='name']" position="attributes">
+              <attribute name="attrs">{'readonly':[('parent','=',False)]}</attribute>
+             </xpath>
+             
+             <xpath expr="//label[@for='name']" position="attributes">
+              <attribute name="invisible">1</attribute>
+             </xpath>
+            
+	         <xpath expr="//field[@name='department_id']" position="before">
+	          <field name="parent_id" options="{'no_create': True}" domain="[('parent','=',True)]" attrs="{'required':[('parent','=',False)],'invisible':[('parent','=',True)]}"/>
+	          <field name="parent" invisible="1"/>
+	         </xpath>
+	         
+	         <xpath expr="//field[@name='department_id']" position="after">
+	          <field name="priority" widget="priority" attrs="{'invisible':[('parent','=',True)]}"/>
+	          <field name="attach_doc" filename="filename" required="1"/>
+                 <field name="index_content"/>
+	          <field name="filename" invisible="1"/>
+	         </xpath>
+	         
+	         <xpath expr="//field[@name='department_id']" position="attributes">
+	          <attribute name="required">1</attribute>
+	         </xpath>
+	         
+	         <xpath expr="//field[@name='no_of_recruitment']" position="attributes">
+	          <attribute name="invisible">1</attribute>
+	         </xpath>
+	         
+	         <xpath expr="//field[@name='department_id']" position="attributes">
+              <attribute name="domain">[('parent_id','!=',False)]</attribute>
+             </xpath>
+             
+             <xpath expr="//field[@name='department_id']" position="attributes">
+              <attribute name="string">Division</attribute>
+             </xpath>
+             
+             <xpath expr="//field[@name='department_id']" position="attributes">
+              <attribute name="options">{'no_create': True}</attribute>
+             </xpath>
+	         	         	         	         	         	         
+	         <xpath expr="//field[@name='description']" position="after">
+            		
+            		<notebook>
+            		    <page string="Onboarding Task" attrs="{'invisible':[('parent','=',False)]}">
+	            			<field name="onboarding_tasks" nolable="1">
+	            				<tree editable="top">
+	            					<field name="name"/>
+	            					<field name="expected_days"/>
+	            					<field name="job_id" invisible="1"/>
+	            				</tree>
+	            			</field>
+	            		</page>
+	            		<page string="Budget History" attrs="{'invisible':[('parent','=',False)]}">
+	            			<field name="budget_lines" readonly="1" nolable="1">
+	            				<tree>
+	            					<field name="budget_id"/>
+	            					<field name="date"/>
+	            					<field name="new_res"/>
+	            					<field name="total_cost"/>
+	            				</tree>
+	            			</field>
+	            		</page>
+	            		<page string="Requisition History" attrs="{'invisible':[('parent','=',False)]}">
+	            			<field name="requisition_lines" readonly="1" nolable="1">
+	            				<tree>
+	            					<field name="requisition_id"/>
+	            					<field name="date"/>
+	            					<field name="emp_total"/>
+	            					<field name="avail_budget"/>
+	            				</tree>
+	            			</field>
+	            		</page>
+            		</notebook>
+            	</xpath>
+	             
+            </field>
+            </record>
+            
+            
+         <record id="hr_job_survey_inherit1" model="ir.ui.view">
+            <field name="name">hr.job</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr_recruitment.hr_job_survey"/>
+            <field name="arch" type="xml">
+            
+	         <xpath expr="//field[@name='address_id']" position="after">
+	                 <field name="branch_id" options="{'no_create': True}" attrs="{'required':[('parent','=',False)],'invisible':[('parent','=',True)]}"/>
+                     <field name="requisition_date" attrs="{'required':[('parent','=',False)],'invisible':[('parent','=',True)]}"/>
+        		     <field name="month" invisible="1"/>
+        			 <field name="year" invisible="1"/>
+        			  <field name="expected_no_of_emp" attrs="{'invisible':[('parent','=',True)]}"/>
+        			  <field name="avail_budget" attrs="{'invisible':[('parent','=',True)]}"/>
+        			  <field name="requisition_pipe"/>
+        			  <field name="requisition_type" attrs="{'required':[('parent','=',False)],'invisible':[('parent','=',True)]}"/>	
+        			  <field name="replace_employee_id" attrs="{'invisible':[('requisition_type','not in',('Replacement'))],'required':[('requisition_type','=','Replacement')]}"/>
+	         </xpath>
+	         
+	         <xpath expr="//field[@name='address_id']" position="attributes">
+	           <attribute name="attrs">{'invisible':[('parent','=',False)]}</attribute>
+	         </xpath>
+	      
+	       </field>
+         </record>
+         
+      <!-- hr related job position menu action Inherited-->
+         <record model="ir.actions.act_window" id="hr_recruitment.action_hr_job_config">
+            <field name="name">Job Position</field>
+            <field name="res_model">hr.job</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="hr.view_hr_job_tree"/>
+            <field name="context">{'search_default_in_recruitment': 1,'default_parent':True}</field>
+            <field name="domain">[('parent','=',True)]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                  Click here to create a new job position.
+              </p><p>
+                  Once a job position is created, you can track the applicants
+                  and manage the recruitment process related to the job
+                  position.
+              </p>
+            </field>
+        </record>
+        
+        <record id="hr.view_hr_job_tree" model="ir.ui.view">
+            <field name="name">hr.job.tree</field>
+            <field name="model">hr.job</field>
+            <field name="arch" type="xml">
+                <tree string="Job" decoration-bf="message_needaction==True">
+                    <field name="name"/>
+                    <field name="department_id"/>
+                    <field name="no_of_employee" invisible="1"/>
+                    <field name="no_of_recruitment" invisible="1"/>
+                    <field name="expected_employees" invisible="1"/>
+                    <field name="no_of_hired_employee"/>
+                    <field name="state"/>
+                    <field name="message_needaction" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_hr_job_requisition_tree" model="ir.ui.view">
+            <field name="name">hr.job.tree</field>
+            <field name="model">hr.job</field>
+            <field name="arch" type="xml">
+                <tree string="Job" decoration-bf="message_needaction==True">
+                    <field name="name" string="Name"/>
+                    <field name="parent_id" string="HR Job"/>
+                    <field name="department_id"/>
+                    <field name="branch_id"/>
+                    <field name="priority" />
+                    <field name="avail_budget"/>
+                    <field name="expected_no_of_emp" />
+                    <field name="no_of_hired_employee"/>
+                    <field name="state"/>
+                    <field name="message_needaction" invisible="1"/>
+                </tree>
+            </field>
+        </record>       
+         
+         <record model="ir.actions.act_window" id="hr_recruitment.action_hr_job">
+            <field name="name">Requisition</field>
+            <field name="res_model">hr.job</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_id" ref="view_hr_job_requisition_tree"/>
+            <field name="context">{'default_name':'/'}</field>
+            <field name="domain">[('parent','=',False)]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                  Click here to create a new job position.
+              </p><p>
+                  Once a job position is created, you can track related applications
+                  and manage the recruitment process.
+              </p>
+            </field>
+        </record>
+        
+        <menuitem parent="hr_recruitment.menu_hr_recruitment_root" name="Requisition" id="hr_recruitment.menu_hr_job_position" action="hr_recruitment.action_hr_job" sequence="1"/>
+        
+        
+        
+        <record id="view_hr_job_for_refferal_requisition_tree" model="ir.ui.view">
+            <field name="name">hr.job.tree</field>
+            <field name="model">hr.job</field>
+            <field name="arch" type="xml">
+                <tree string="Job" decoration-bf="message_needaction==True" editable="top" create="false" delete="false">
+                    <field name="name" string="Name" readonly="1"/>
+                    <field name="parent_id" string="HR Job" readonly="1"/>
+                    <field name="department_id" readonly="1"/>
+                    <field name="branch_id" readonly="1"/>
+                    <field name="refferal"/>
+                    <field name="state" readonly="1"/>
+                    <field name="message_needaction" invisible="1"/>
+                </tree>
+            </field>
+        </record>       
+         
+         <record model="ir.actions.act_window" id="action_refferal_hr_job">
+            <field name="name">Requisition For Refferal</field>
+            <field name="res_model">hr.job</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_hr_job_for_refferal_requisition_tree"/>
+            <field name="context">{'default_name':'/'}</field>
+            <field name="domain">[('parent','=',False)]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                  Click here to create a new job position.
+              </p><p>
+                  Once a job position is created, you can track related applications
+                  and manage the recruitment process.
+              </p>
+            </field>
+        </record>
+        
+        <menuitem parent="hr_recruitment.menu_hr_recruitment_configuration" name="Requisition For Refferal" id="menu_refferal_requisition_id" action="action_refferal_hr_job" sequence="1"/>
+        
+        <record model="ir.actions.act_window" id="action_employee_refferal_hr_job">
+            <field name="name">Referral Requisition</field>
+            <field name="res_model">hr.job</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_hr_job_for_refferal_requisition_tree"/>
+            <field name="context">{'default_name':'/','default_refferal':True}</field>
+            <field name="domain">[('parent','=',False),('refferal','=',True)]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                  Click here to create a new job position.
+              </p><p>
+                  Once a job position is created, you can track related applications
+                  and manage the recruitment process.
+              </p>
+            </field>
+        </record>
+        
+        <menuitem parent="hr.menu_hr_root" name="Referral Requisition" id="menu_employee_refferal_requisition_id" action="action_employee_refferal_hr_job" sequence="1"/>
+           
+        </data>
+              
+</openerp>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+   	<data>
+		<!-- Employee Inherit -->
+        <record id="view_employee_form_budget" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+            	
+            	<!-- <xpath expr="//page[3]" position="after">
+            		<page string="Budget History">
+            			<field name="budget_lines" nolable="1">
+            				<tree>
+            					<field name="budget_id"/>
+            					<field name="date"/>
+            					<field name="new_res"/>
+            					<field name="total_cost"/>
+            				</tree>
+            			</field>
+            		</page>
+            		<page string="Requisition History">
+            			<field name="requisition_lines" nolable="1">
+            				<tree>
+            					<field name="requisition_id"/>
+            					<field name="date"/>
+            					<field name="emp_total"/>
+            					<field name="avail_budget"/>
+            				</tree>
+            			</field>
+            		</page>
+            	</xpath> -->
+            </field>
+        </record>
+    </data>
+</openerp>

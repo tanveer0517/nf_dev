@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Email template -->
+        <record id="applicant_review_template" model="mail.template">
+            <field name="name">applicant review email</field>
+            <field name="email_from">${(object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">${object.company_id.name} Request for review(Ref ${object.name or 'n/a' })</field>
+            <field name="model_id" ref="hr_recruitment_extend.model_hr_applicant"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+
+    <br/><br/>
+
+    <center>
+        <a href="http://nowfloatsuat.openerp4you.com/web#id=${object.id}&view_type=form&model=hr.applicant&action=346&menu_id=89" style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">'View'</a>
+        <br/><br/>
+        <span style="color:#888888">(or view attached PDF)</span>
+    </center>
+    <br/>
+
+
+<p>You can reply to this email if you have any questions.</p>
+<p>Thank you,</p>
+
+<p style="color:#eeeeee;">
+% if object.user_id and object.user_id.signature:
+    ${object.user_id.signature | safe}
+% endif
+</p>
+]]></field>
+        </record>
+
+        <record id="menu_onboarding" model="website.menu">
+            <field name="name">Onboarding</field>
+            <field name="url">/web</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">20</field>
+        </record>
+
+
+    </data>
+</odoo>

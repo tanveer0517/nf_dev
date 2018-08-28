@@ -1,0 +1,1340 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+       <!-- saving details -->
+       
+           <record id="view_employee_saving" model="ir.ui.view">
+            <field name="name">employee.saving.form</field>
+            <field name="model">employee.saving</field>
+            <field name="arch" type="xml">
+            <form>
+              <header>
+                <button name="submit" string="Submit" type="object" states='Draft' class="oe_highlight"/>
+                <button name="confirm" string="Confirm" type="object" states='Submit' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <button name="close" string="close" type="object" states='Draft' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <button name="reject" string="Reject" type="object" states='Draft,Submit,Close' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <button name="reset_draft" string="Reset to Draft" type="object" states='Submit,Confirm,Close,Reject' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <field name="state" widget="statusbar"/>
+              </header>
+             <sheet>
+               <group col="2">
+                <field name="fin_year_id" options="{'no_create': True}" readonly="1"/>
+              </group>
+               <group>
+                 <group>
+                  <field name="employee_id" required='1' attrs="{'readonly':[('state','!=','Draft')]}"/>
+                  <field name="pan_no" readonly="1"/>
+                  <field name="emp_pan_attachment" filename="emp_pan_filename" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                  <field name="emp_pan_filename" invisible="1"/>
+                  <field name="resident" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                  <field name="no_children" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                 </group>
+                 <group>
+                  <field name="emp_id" readonly="1"/>
+                  <field name="join_date" readonly="1"/>
+                  <field name="current_city" options="{'no_create': True}" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                  <field name="company_id" readonly="1"/>
+                 </group> 
+                </group>
+                  <group string="Saving Details" groups="hr_payroll.group_hr_payroll_manager">
+                    <field name="proposed_amount" invisible="1"/>
+                    <field name="hra_receipt_amount"/>
+                    <field name="income_house_amount"/>
+                    <field name="other_income_amount"/>
+                    <field name="bill_amount"/>
+                    <field name="ded80c_amount"/>
+                  </group>
+                  <div>
+                    <label for="house_property" class="oe_inline"/>
+                    <field name="house_property" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                  </div>
+                  <div>
+                    <label for="interest_education_loan" string="80 E- Repayment of Interest on Education loan taken for Higher Education for SELF, SPOUSE AND CHILDREN(Interest Paid for 8 Years)" class="oe_inline"/>
+                    <field name="interest_education_loan" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="interest_education_attachment" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}" filename="interest_education_filename"/>
+                    <field name="interest_education_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="interest_resident_loan" string=" Interest on Loan taken for New Residential House U/s 80EE (Maximum Allowed is Rs.50,000/-)" class="oe_inline"/>
+                    <field name="interest_resident_loan" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="interest_resident_attachment" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}" filename="interest_resident_filename"/>
+                    <field name="interest_resident_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="nps_passbook" class="oe_inline"/>
+                    <field name="nps_passbook" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="nps_passbook_attachment" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}" filename="nps_passbook_filename"/>
+                    <field name="nps_passbook_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="donation_ded" class="oe_inline"/>
+                    <field name="donation_ded" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="donation_ded_attachment" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}" filename="donation_ded_filename"/>
+                    <field name="donation_ded_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="leave_travel_allowance" class="oe_inline"/>
+                    <field name="leave_travel_allowance" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="leave_travel_attachment" class="oe_inline" attrs="{'readonly':[('state','!=','Draft')]}" filename="leave_travel_filename"/>
+                    <field name="leave_travel_filename" invisible="1"/>
+                  </div>
+                <separator string="HRA Details (If more than Rs 1,00,000 Landlord's PAN is mandatory.)"/>
+                    <field name="hra_line_ids" attrs="{'readonly':[('state','!=','Draft')]}">
+                       <form string="Receipt">
+                        <group col="4">
+                          <field name="reference"/>
+                          <field name="date"/>
+                          <field name="type" required='1'/>
+                          <!-- <field name="fin_year_id" required='1'/> -->
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                       </group>
+                        </form>
+                        <tree string="Receipt" editable="bottom" create="false" delete="false">
+                          <field name="reference" readonly="1"/>
+                          <field name="date" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <!-- <field name="fin_year_id" required='1'/> -->
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                            <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('C'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>
+                  <group col="4">
+                    <field name="landlord_pan_no" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="landlord_pan_attachment" filename="landlord_pan_filename" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    <field name="landlord_pan_filename" invisible="1"/>
+                  </group>
+                <separator string="Loss / Income from House Property (attach Form 12C / Computation Satement - Mandatory)"/>
+                    <field name="house_property_ids" attrs="{'readonly':[('state','!=','Draft')]}">
+                       <form>
+                        <group col="4">
+                        <field name="name"/>
+                        <field name="type" required='1'/>
+                        <field name="description"/>
+                        <field name="amount" required='1'/>
+                        <field name="attach_doc" filename="filename"/>
+                        <field name="filename" invisible="1"/>
+                     </group>   
+                        </form>
+                        <tree editable="bottom" create="false" delete="false">
+                          <field name="name" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="description"/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                            <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('Confirmed'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>
+                  <separator string="Income from Other Sources, if any"/>
+                    <field name="other_income_ids" attrs="{'readonly':[('state','!=','Draft')]}">
+                        <form string="Other Source Income">
+                         <group col="4">
+                          <field name="income_source"/>
+                          <field name="reference"/>
+                          <field name="date"/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                       </group>   
+                        </form>
+                        <tree string="Other Source Income" editable="bottom" create="false" delete="false">
+                          <field name="income_source"/>
+                          <field name="reference"/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                        </tree>
+                      </field>
+                  <separator string="Deduction under Chapter VI A"/>
+                    <field name="medical_line_ids" attrs="{'readonly':[('state','!=','Draft')]}">
+                        <form string="Bill">
+                         <group col="4">
+                          <field name="reference"/>
+                          <field name="date"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                        </group>
+                        </form> 
+                        <tree string="Bill" editable="bottom" create="false" delete="false">
+                          <field name="reference" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                          <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('C'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>   
+                  
+                 <separator string="Deduction under section 80C"/>
+                    <field name="ded_sec80c_ids" attrs="{'readonly':[('state','!=','Draft')]}">
+                       <form>
+                        <group col="4">
+                          <field name="name"/>
+                          <field name="type" required='1'/>
+                          <field name="description"/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                       </group>
+                        </form>
+                        <tree editable="bottom" create="false" delete="false">
+                          <field name="name" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="description"/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                            <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('Confirmed'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>
+                 <separator string="Other Information"/>
+                     <group string="Previous Employment">
+                       <group>
+                        <field name="gross_income_previous" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                        <field name="professional_tax_previous" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                        <field name="previous_payslip_attachment" attrs="{'readonly':[('state','!=','Draft')]}" filename="previous_payslip_filename"/>
+                        <field name="previous_payslip_filename" invisible="1"/>
+                       </group>
+                       <group>
+                        <field name="ded_previous_emp" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                        <field name="income_tax_paid" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                        <field name="previous_form16_attachment" attrs="{'readonly':[('state','!=','Draft')]}" filename="previous_form16_filename"/>
+                        <field name="previous_form16_filename" invisible="1"/>
+                        </group>
+                     </group>
+              </sheet>
+              <div class="oe_chatter">
+                  <field name="message_follower_ids" widget="mail_followers"/>
+                  <field name="message_ids" widget="mail_thread"/>
+              </div>
+            </form>
+		</field>
+        </record>
+        <record id="view_employee_saving_tree" model="ir.ui.view">
+            <field name="name">employee.saving.tree</field>
+            <field name="model">employee.saving</field>
+            <field name="arch" type="xml">
+            <tree>
+        	    <field name="employee_id"/>
+              	<field name="emp_id"/>
+                <field name="join_date"/>
+                <field name="current_city"/>
+              	<field name="bill_amount"/>
+                <field name="hra_receipt_amount"/>
+                <field name="other_income_amount"/>
+              	<field name="state"/>
+            </tree>
+		</field>
+        </record>
+        <record id="view_employee_saving_filter" model="ir.ui.view">
+            <field name="name">employee.saving.filter</field>
+            <field name="model">employee.saving</field>
+            <field name="arch" type="xml">
+                <search string="Employee Saving">
+                    <field name="employee_id" string="Employees"/> 
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                        
+                    </group>                   
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="employee_saving">
+            <field name="name">Employee Saving Details</field>
+            <field name="res_model">employee.saving</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Tax &amp; Saving Details"
+            parent="hr_payroll.menu_hr_payroll_root"
+            id="menu_employee_saving" action="employee_saving" sequence="35"/>
+            
+       <!-- saving Line Tree -->
+            
+        <record id="view_saving_line_tree" model="ir.ui.view">
+            <field name="name">saving.line.tree</field>
+            <field name="model">saving.line</field>
+            <field name="arch" type="xml">
+            <tree>
+            	    <field name="salary_rule_id" required='1'/>
+                    <field name="type" required='1'/>
+		    <field name="prop_type"/>	
+                    <field name="saving_no"/>
+                    <!-- <field name="fin_year_id" required='1'/> -->
+      	            <field name="amount" required='1'/>  
+            </tree>
+		</field>
+        </record>
+        <!-- Medical Receipt Line Tree -->
+            
+        <record id="view_medical_bill_tree" model="ir.ui.view">
+            <field name="name">medical.bill.line.tree</field>
+            <field name="model">medical.bill.line</field>
+            <field name="arch" type="xml">
+            <tree>
+                    <field name="name"/>
+                    <field name="reference"/>
+                    <!-- <field name="fin_year_id" required='1'/> -->
+      	            <field name="amount" required='1'/>  
+            </tree>
+		</field>
+        </record>
+        <!-- HRA Receipt Line Tree -->
+            
+        <record id="view_hra_receipt_tree" model="ir.ui.view">
+            <field name="name">hra.receipt.line.tree</field>
+            <field name="model">hra.receipt.line</field>
+            <field name="arch" type="xml">
+              <tree>
+                      <field name="name"/>
+                      <field name="hra_receipt_id"/>
+                      <field name="date"/>
+                      <!-- <field name="fin_year_id" required='1'/> -->
+        	            <field name="amount" required='1'/>  
+              </tree>
+  		      </field>
+        </record>
+
+        <record id="view_employee_saving_manager" model="ir.ui.view">
+            <field name="name">employee.saving.form</field>
+            <field name="model">employee.saving</field>
+            <field name="arch" type="xml">
+            <form>
+              <header>
+                <button name="submit" string="Submit" type="object" states='Draft' class="oe_highlight"/>
+                <button name="confirm" string="Confirm" type="object" states='Submit' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <button name="close" string="close" type="object" states='Draft' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <button name="reject" string="Reject" type="object" states='Draft,Submit,Close' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <button name="reset_draft" string="Reset to Draft" type="object" states='Submit,Confirm,Close,Reject' class="oe_highlight" groups="hr_payroll.group_hr_payroll_manager"/>
+                <field name="state" widget="statusbar"/>
+              </header>
+             <sheet>
+               <group col="2">
+                <field name="fin_year_id" options="{'no_create': True}" readonly="1"/>
+              </group>
+               <group>
+                 <group>
+                  <field name="employee_id" required='1' attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                  <field name="pan_no" readonly="1"/>
+                  <field name="emp_pan_attachment" filename="emp_pan_filename" required="1" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                  <field name="emp_pan_filename" invisible="1"/>
+                  <field name="resident" required="1" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                  <field name="no_children" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                 </group>
+                 <group>
+                  <field name="emp_id" readonly="1"/>
+                  <field name="join_date" readonly="1"/>
+                  <field name="current_city" options="{'no_create': True, 'no_open': True}" required="1" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                  <field name="company_id" readonly="1"/>
+                 </group> 
+                </group>
+                  <group string="Saving Details" groups="hr_payroll.group_hr_payroll_manager">
+                    <field name="proposed_amount" invisible="1"/>
+                    <field name="hra_receipt_amount"/>
+                    <field name="income_house_amount"/>
+                    <field name="other_income_amount"/>
+                    <field name="bill_amount"/>
+                    <field name="ded80c_amount"/>
+                  </group>
+                  <div>
+                    <label for="house_property" class="oe_inline"/>
+                    <field name="house_property" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                  </div>
+                  <div>
+                    <label for="interest_education_loan" string="80 E- Repayment of Interest on Education loan taken for Higher Education for SELF, SPOUSE AND CHILDREN(Interest Paid for 8 Years)" class="oe_inline"/>
+                    <field name="interest_education_loan" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="interest_education_attachment" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="interest_education_filename"/>
+                    <field name="interest_education_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="interest_resident_loan" string=" Interest on Loan taken for New Residential House U/s 80EE (Maximum Allowed is Rs.50,000/-)" class="oe_inline"/>
+                    <field name="interest_resident_loan" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="interest_resident_attachment" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="interest_resident_filename"/>
+                    <field name="interest_resident_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="nps_passbook" class="oe_inline"/>
+                    <field name="nps_passbook" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="nps_passbook_attachment" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="nps_passbook_filename"/>
+                    <field name="nps_passbook_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="donation_ded" class="oe_inline"/>
+                    <field name="donation_ded" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="donation_ded_attachment" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="donation_ded_filename"/>
+                    <field name="donation_ded_filename" invisible="1"/>
+                  </div>
+                  <div>
+                    <label for="leave_travel_allowance" class="oe_inline"/>
+                    <field name="leave_travel_allowance" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="leave_travel_attachment" class="oe_inline" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="leave_travel_filename"/>
+                    <field name="leave_travel_filename" invisible="1"/>
+                  </div>
+                <separator string="HRA Details (If more than Rs 1,00,000 Landlord's PAN is mandatory.)"/>
+                    <field name="hra_line_ids" attrs="{'readonly':[('state','in',['Close','Reject'])]}">
+                       <form string="Receipt">
+                        <group col="4">
+                          <field name="reference"/>
+                          <field name="date"/>
+                          <field name="type" required='1'/>
+                          <!-- <field name="fin_year_id" required='1'/> -->
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                       </group>
+                        </form>
+                        <tree string="Receipt" editable="bottom" create="false" delete="false">
+                          <field name="reference" readonly="1"/>
+                          <field name="date" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <!-- <field name="fin_year_id" required='1'/> -->
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                            <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('C'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>
+                  <group col="4">
+                    <field name="landlord_pan_no" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="landlord_pan_attachment" filename="landlord_pan_filename" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                    <field name="landlord_pan_filename" invisible="1"/>
+                  </group>
+                <separator string="Loss / Income from House Property (attach Form 12C / Computation Satement - Mandatory)"/>
+                    <field name="house_property_ids" attrs="{'readonly':[('state','in',['Close','Reject'])]}">
+                       <form>
+                        <group col="4">
+                        <field name="name"/>
+                        <field name="type" required='1'/>
+                        <field name="description"/>
+                        <field name="amount" required='1'/>
+                        <field name="attach_doc" filename="filename"/>
+                        <field name="filename" invisible="1"/>
+                     </group>   
+                        </form>
+                        <tree editable="bottom" create="false" delete="false">
+                          <field name="name" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="description"/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                            <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('Confirmed'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>
+                  <separator string="Income from Other Sources, if any"/>
+                    <field name="other_income_ids" attrs="{'readonly':[('state','in',['Close','Reject'])]}">
+                        <form string="Other Source Income">
+                         <group col="4">
+                          <field name="income_source"/>
+                          <field name="reference"/>
+                          <field name="date"/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                       </group>   
+                        </form>
+                        <tree string="Other Source Income" editable="bottom" create="false" delete="false">
+                          <field name="income_source"/>
+                          <field name="reference"/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                        </tree>
+                      </field>
+                  <separator string="Deduction under Chapter VI A"/>
+                    <field name="medical_line_ids" attrs="{'readonly':[('state','in',['Close','Reject'])]}">
+                        <form string="Bill">
+                         <group col="4">
+                          <field name="reference"/>
+                          <field name="date"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                        </group>
+                        </form> 
+                        <tree string="Bill" editable="bottom" create="false" delete="false">
+                          <field name="reference" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                          <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('C'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>   
+                  
+                 <separator string="Deduction under section 80C"/>
+                    <field name="ded_sec80c_ids" attrs="{'readonly':[('state','in',['Close','Reject'])]}">
+                       <form>
+                        <group col="4">
+                          <field name="name"/>
+                          <field name="type" required='1'/>
+                          <field name="description"/>
+                          <field name="amount" required='1'/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                       </group>
+                        </form>
+                        <tree editable="bottom" create="false" delete="false">
+                          <field name="name" readonly="1"/>
+                          <field name="type" required='1'/>
+                          <field name="amount" required='1'/>
+                          <field name="description"/>
+                          <field name="attach_doc" filename="filename"/>
+                          <field name="filename" invisible="1"/>
+                            <button name="get_confirm" type="object" string="Confirm" attrs="{'invisible':[('type','in',('Confirmed'))]}" groups="hr_payroll.group_hr_payroll_manager"/>
+                        </tree>
+                      </field>
+                 <separator string="Other Information"/>
+                     <group string="Previous Employment">
+                       <group>
+                        <field name="gross_income_previous" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                        <field name="professional_tax_previous" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                        <field name="previous_payslip_attachment" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="previous_payslip_filename"/>
+                        <field name="previous_payslip_filename" invisible="1"/>
+                       </group>
+                       <group>
+                        <field name="ded_previous_emp" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                        <field name="income_tax_paid" attrs="{'readonly':[('state','in',['Close','Reject'])]}"/>
+                        <field name="previous_form16_attachment" attrs="{'readonly':[('state','in',['Close','Reject'])]}" filename="previous_form16_filename"/>
+                        <field name="previous_form16_filename" invisible="1"/>
+                        </group>
+                     </group>
+              </sheet>
+              <div class="oe_chatter">
+                  <field name="message_follower_ids" widget="mail_followers"/>
+                  <field name="message_ids" widget="mail_thread"/>
+              </div>
+            </form>
+    </field>
+        </record>
+        <record id="view_employee_saving_tree_manager" model="ir.ui.view">
+            <field name="name">employee.saving.tree</field>
+            <field name="model">employee.saving</field>
+            <field name="arch" type="xml">
+            <tree>
+              <field name="employee_id"/>
+                <field name="emp_id"/>
+                <field name="join_date"/>
+                <field name="current_city"/>
+                <field name="bill_amount"/>
+                <field name="hra_receipt_amount"/>
+                <field name="other_income_amount"/>
+                <field name="state"/>
+            </tree>
+    </field>
+        </record>
+        <record id="view_employee_saving_filter_manager" model="ir.ui.view">
+            <field name="name">employee.saving.filter</field>
+            <field name="model">employee.saving</field>
+            <field name="arch" type="xml">
+                <search string="Employee Saving">
+                    <field name="employee_id" string="Employees"/> 
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                        
+                    </group>                   
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="employee_saving_manager">
+            <field name="name">Employee Saving Details</field>
+            <field name="res_model">employee.saving</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_employee_saving_tree_manager"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="employee_saving_manager_form_action_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_saving_manager"/>
+            <field name="act_window_id" ref="employee_saving_manager"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="employee_saving_manager_tree_action_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_employee_saving_tree_manager"/>
+            <field name="act_window_id" ref="employee_saving_manager"/>
+        </record>
+
+        <menuitem
+            name="Tax &amp; Saving Details(Manager View)"
+            parent="hr_payroll.menu_hr_payroll_root"
+            id="menu_employee_saving_manager" action="employee_saving_manager" sequence="100" groups="hr_payroll.group_hr_payroll_manager"/>
+
+
+<!-- PAYROLL COMPONENTS FOR PAYROLL DEPARTMENT -->
+      <record id="nf_payslip_components_form" model="ir.ui.view">
+            <field name="name">nf.payslip.components.form</field>
+            <field name="model">nf.payslip.components</field>
+            <field name="arch" type="xml">
+            <form>
+              <header>
+                <button name="payroll_approve" string="Approve by Payroll" type="object" class="oe_highlight" attrs="{'invisible':[('status', 'not in', ('Draft','On Hold','Rejected'))]}"/>
+                <button name="payroll_hold" string="Hold" type="object" class="oe_highlight" attrs="{'invisible':[('status', '!=', 'Draft')]}"/>
+                <button name="hold_to_reset" string="Reset" type="object" class="oe_highlight" groups="base.group_system" />
+              </header>
+             <sheet>
+                <field name="name"/>
+                <group string="Employee Details">
+                    <field name="date"/>
+                    <field name="employee_id"/>
+                    <field name="emp_id"/>
+                    <field name="c_contract_id" />
+                    <field name="c_emp_branch" />
+                    <field name="c_emp_department" />
+                    <field name="c_employee_pf_id" />
+                    <field name="c_employee_uan" />
+                    <field name="c_employee_account" />
+                    <field name="c_bank_name" />
+                    <field name="c_bank_branch" />
+                    <field name="working_days" />
+                    <field name="c_payroll_remarks" />
+                    <field name="finance_remarks" readonly="1" />
+                    <field name="c_final_remarks" attrs="{'readonly':[('status', '!=', 'Rejected')]}" />
+                    <field name="approval_attachment" />
+                    <field name="status" readonly="1" />
+                    <field name="c_approved_payroll" invisible="1" />
+                    <field name="c_ifsc" invisible="1"/>
+                    <field name="c_work_location" invisible="1"/>
+                    <field name="c_internal_desig" invisible="1"/>
+                    <field name="c_branch_state" invisible="1"/>
+                    <field name="c_employee_email" invisible="1"/>
+                    <field name="c_work_mobile" invisible="1"/>
+                    <field name="c_emp_pan" invisible="1"/>
+                    <field name="c_emp_aadhar" invisible="1"/>
+                    <field name="c_esi_number" invisible="1"/>
+                    <field name="c_pf_applicability" invisible="1"/>
+                    <field name="c_esi_applicability" invisible="1"/>
+                    <field name="join_date" invisible="1" />
+                    <field name="c_total_deductions" invisible="1" />
+                    <field name="c_net_salary" invisible="1" />
+                    <field name="c_per_day_sal" invisible="1" />
+                    <field name="ctc" invisible="1" />
+                    <field name="c_division" />
+                    <field name="c_pf_wage" invisible="1" />
+                    <field name="c_esi_wage" invisible="1" />
+                    <field name="no_of_days_month" invisible="1" />
+                </group>
+
+                <notebook>
+                  <page string="Payroll Components">
+                    <group string="Earned Income">
+                      <group  string="Gross Pay">
+                        <field name="wage"/>
+                        <field name="basic"/>
+                        <field name="hra"/>
+                        <field name="medical_conveyance"/>
+                        <field name="special_allowance"/>
+                        <field name="lt_allowance"/>
+                        <field name="gross"/>
+                      </group>
+                      <group  string="Additions">
+                        <field name="arrears"/>
+                        <field name="byod"/>
+                        <field name="variable_pay"/>
+                        <field name="bonus"/>
+                        <field name="special_incentive"/>
+                      </group>
+                      <group  string="Deletions">
+                        <field name="absent_days"/>
+                        <field name="lop"/>
+                        <field name="medical_insurance"/>
+                        <field name="medical_insurance_parents"/>
+                        <field name="general_recovery"/>
+                        <field name="incentive_recovery"/>
+                        <field name="advance"/>
+                        <field name="pf_employee"/>
+                        <field name="pf_employer"/>
+                        <field name="esic_employee"/>
+                        <field name="esic_employer"/>
+                        <field name="professional_tax"/>
+                      </group>
+                    </group>
+                    <group>
+                      <group string="Saving Details">
+                        <field name="saving_hra"/>
+                        <field name="saving_lta"/>
+                        <field name="total_savings"/>
+                        <field name="total_pf"/>
+                        <field name="total_pt"/>
+                      </group>
+                      <group string="Tax Calculations">
+                        <field name="taxable_income"/>
+                        <field name="rebate"/>
+                        <field name="surcharge"/>
+                        <field name="cess"/>
+                        <field name="annual_tax"/>
+                        <field name="tds" string="Tax(per month)"/>
+                      </group>
+                    </group>
+                  </page>
+                <page string="Form 16">
+                  <div>
+                    <table border="1" width="100%">
+                      <tr>
+                        <td><label string="Gross Salary Components"/></td>
+                        <td align="center"><label string="Previous Months Earned"/></td>
+                        <td align="center"><label string="Current Month Earned"/></td>
+                        <td align="center"><label string="Estimated Months Earned"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="Basic"/></td>
+                        <td align="right"><field name="f16_pre_basic" nolabel="1"/></td>
+                        <td align="right"><field name="f16_curr_basic" nolabel="1"/></td>
+                        <td align="right"><field name="f16_estm_basic" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="HRA"/></td>
+                        <td align="right"><field name="f16_pre_hra" nolabel="1"/></td>
+                        <td align="right"><field name="f16_curr_hra" nolabel="1"/></td>
+                        <td align="right"><field name="f16_estm_hra" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="Medical And Conveyance"/></td>
+                        <td align="right"><field name="f16_pre_med_conv" nolabel="1"/></td>
+                        <td align="right"><field name="f16_curr_med_conv" nolabel="1"/></td>
+                        <td align="right"><field name="f16_estm_med_conv" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="LTA"/></td>
+                        <td align="right"><field name="f16_pre_lta" nolabel="1"/></td>
+                        <td align="right"><field name="f16_curr_lta" nolabel="1"/></td>
+                        <td align="right"><field name="f16_estm_lta" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="Special Allowance"/></td>
+                        <td align="right"><field name="f16_pre_special_allowance" nolabel="1"/></td>
+                        <td align="right"><field name="f16_curr_special_allowance" nolabel="1"/></td>
+                        <td align="right"><field name="f16_estm_special_allowance" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="Earned Gross"/></td>
+                        <td align="right"><field name="f16_pre_earned_gross" nolabel="1"/></td>
+                        <td align="right"><field name="f16_curr_earned_gross" nolabel="1"/></td>
+                        <td align="right"><field name="f16_estm_earned_gross" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td align="center"><label string="Gross Amount"/></td>
+                        <td align="center"><label string="Deductible Amount" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="1. a)Salary as per provisions contained in sec. 17"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_1_a_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="b)Value of perquisites u/s 17(2)"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_1_b_b" nolabel="1" /></td>
+                        <td align="right"><field name="f16_1_b_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="C)Profits in lieu of salary under section 17(3)"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_1_c_b" nolabel="1" /></td>
+                        <td align="right"><field name="f16_1_c_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="2. Less: Allowance to the extent exempt U/s 10"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="A) HRA Exemption"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><font color="red"><field name="f16_2_a_c" nolabel="1" /></font></td>
+                      </tr>
+                      <tr>
+                        <td><label string="i)Actual HRA received"/></td>
+                        <td align="right"><field name="f16_2_1_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="ii) Rent paid - (10% on Basic)"/></td>
+                        <td align="right"><field name="f16_2_2_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="iii) 40 % or 50 % on Basic"/></td>
+                        <td align="right"><field name="f16_2_3_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="B) Leave Travel Allowance"/></td>
+                        <td align="right"><field name="f16_2_b_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_2_b_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="C)Standard Deductions (max -40000)"/></td>
+                        <td align="right"><field name="f16_2_c_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_2_c_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="3. Deductions :"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="(a) Entertainment allowance"/></td>
+                        <td align="right"><field name="f16_3_a_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_3_a_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="(b) Tax on employment (PT)"/></td>
+                        <td align="right"><field name="f16_3_b_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_3_b_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="(C) Tax on employment (PT - Previous Employer)"/></td>
+                        <td align="right"><field name="f16_3_c_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_3_c_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="4.Home Loan Interest Section 24b (Max 200000)"/></td>
+                        <td align="right"><field name="f16_4_a_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_4_a_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="5. Add: Any other income reported by the employee"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="a) Income from Previous Employment"/></td>
+                        <td align="right"><field name="f16_5_a_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="b) Income from House Property"/></td>
+                        <td align="right"><field name="f16_5_b_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="c) Income from Other Sources"/></td>
+                        <td align="right"><field name="f16_5_c_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="d)Total"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_5_d_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="6. Gross Total income"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_6_a_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="7. Deductions under Chapter VI A"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="(A) sections 80C, 80CCC and 80CCD"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="i) PF Contribution (80C)"/></td>
+                        <td align="right"><field name="f16_7_a_1_a" nolabel="1"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="i) PF Contribution (80C- Previous employer)"/></td>
+                        <td align="right"><field name="f16_7_a_2_a" nolabel="1"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="ii) Other Deductions under 80C, 80CCC and 80CCD"/></td>
+                        <td align="right"><field name="f16_7_a_3_a" nolabel="1"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="Sec 80C Total amount"/></td>
+                        <td align="right"><field name="f16_7_a_4_a" nolabel="1"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_7_a_4_c" nolabel="1"/></td>
+                      </tr>
+                      <tr>
+                        <td><label string="(B) other sections under Chapter VI-A"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80CCD (1b) (Contribution to NPS)"/></td>
+                        <td align="right"><field name="f16_7_b_1_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80D (Medical Insurance)"/></td>
+                        <td align="right"><field name="f16_7_b_2_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80DD (Rehabilitation of Handicapped Dependent)"/></td>
+                        <td align="right"><field name="f16_7_b_3_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80DDB (Medical Expenditure on Self or Dependent)"/></td>
+                        <td align="right"><field name="f16_7_b_4_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80E (Interest on Loan for Higher Studies)"/></td>
+                        <td align="right"><field name="f16_7_b_5_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80EE (Interest on Loan taken for New Residential House )"/></td>
+                        <td align="right"><field name="f16_7_b_6_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80TTA (Interest on Savings account)"/></td>
+                        <td align="right"><field name="f16_7_b_7_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="80G(Deductions on Donation to Charitable Institutions)"/></td>
+                        <td align="right"><field name="f16_7_b_8_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="Total amount  other sections under Chapter VI-A"/></td>
+                        <td align="right"><field name="f16_7_b_9_a" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_7_b_9_c" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="8. Aggregate of deductible amount under Chapter VI A(A+B)"/></td>
+                        <td><label string="" /></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_8_a" nolabel="1" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="9. Total Income (8-10)"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_9_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="10. Tax on total income"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_10_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="11. Tax on total income previous employer"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_11_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="12. Rebate U/S 87A"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_12_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="13. Tax Payable after rebate"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_13_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="14. Surcharge"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_14_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="15. Cess @4%"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_15_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                      <tr>
+                        <td><label string="16. Tax Payable"/></td>
+                        <td><label string="" /></td>
+                        <td align="right"><field name="f16_16_b" nolabel="1" /></td>
+                        <td><label string="" /></td>
+                      </tr>
+                    </table>
+                  </div>
+                </page>
+              </notebook>
+              </sheet>
+            </form>
+    </field>
+        </record>
+        <record id="nf_payslip_components_tree" model="ir.ui.view">
+            <field name="name">nf.payslip.components.tree</field>
+            <field name="model">nf.payslip.components</field>
+            <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="date"/>
+              <field name="employee_id"/>
+              <field name="ctc"/>
+              <field name="basic"/>
+              <field name="hra"/>
+              <field name="lop"/>
+              <field name="gross"/>
+              <field name="c_net_salary"/>
+              <field name="status" />
+              <field name="c_payroll_remarks" />
+              <field name="finance_remarks" />
+              <field name="c_final_remarks" />
+            </tree>
+    </field>
+        </record>
+        <record id="nf_payslip_components_filter" model="ir.ui.view">
+            <field name="name">nf.payslip.components.filter</field>
+            <field name="model">nf.payslip.components</field>
+            <field name="arch" type="xml">
+                <search string="Payslip Details">
+                    <field name="employee_id" string="Employees"/> 
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                        
+                    </group>                   
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="nf_payslip_components_action">
+            <field name="name">Payslip Details</field>
+            <field name="res_model">nf.payslip.components</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_payslip_components_tree"/>
+        </record>
+
+        <menuitem
+            name="Payslip Components"
+            parent="hr_payroll.menu_hr_payroll_root"
+            id="nf_payslip_components_menu" action="nf_payslip_components_action" sequence="110" groups="hr_payroll.group_hr_payroll_manager"/>         
+
+
+
+<!-- PAYROLL FINANCE VERIFICATION VIEW -->
+
+      <record model="ir.ui.view" id="nf_payroll_finance_tree">
+          <field name="name">Payroll Finance</field>
+          <field name="model">nf.payslip.components</field>
+          <field name="arch" type="xml">
+            <tree string="Payroll Finance" editable="false" create="false" unlink="false" edit ="false" open="false" delete="false">
+              <field name="date" readonly="1" />
+              <field name="employee_id" readonly="1" string="Employee" />
+              <field name="join_date" readonly="1" />
+              <field name="c_employee_account" readonly="1" />
+              <field name="c_ifsc" readonly="1" />
+              <field name="c_bank_name" readonly="1" />
+              <field name="c_bank_branch" readonly="1" />
+              <field name="c_internal_desig" readonly="1" />
+              <field name="c_emp_department" readonly="1" />
+              <field name="c_division" readonly="1" />
+              <field name="c_emp_branch" readonly="1" />
+              <field name="c_work_location" readonly="1" />
+              <field name="c_branch_state" readonly="1" />
+              <field name="c_employee_email" readonly="1" string="Official Email" />
+              <field name="c_work_mobile" readonly="1" string="Official Mobile" />
+              <field name="c_emp_pan" readonly="1" />
+              <field name="c_emp_aadhar" readonly="1" />
+              <field name="c_pf_applicability" readonly="1" />
+              <field name="c_employee_uan" readonly="1" />
+              <field name="c_employee_pf_id" readonly="1" />
+              <field name="c_esi_applicability" readonly="1" />
+              <field name="c_esi_number" readonly="1" />
+              <field name="working_days" readonly="1" />
+              <field name="ctc" readonly="1" />
+              <field name="wage" readonly="1" />
+              <field name="c_per_day_sal" readonly="1" />
+              <field name="basic" readonly="1" />
+              <field name="hra" readonly="1" />
+              <field name="medical_conveyance" readonly="1" />
+              <field name="lt_allowance" readonly="1" />
+              <field name="special_allowance" readonly="1" />
+              <field name="gross" readonly="1" />
+              <field name="byod" readonly="1" />
+              <field name="arrears" readonly="1" />
+              <field name="variable_pay" readonly="1" />
+              <field name="bonus" readonly="1" />
+              <field name="special_incentive" readonly="1" />
+              <field name="absent_days" readonly="1" string="LOP (Days)" />
+              <field name="lop" readonly="1" />
+              <field name="general_recovery" readonly="1" />
+              <field name="incentive_recovery" readonly="1" />
+              <field name="advance" readonly="1" />
+              <field name="medical_insurance" readonly="1" />
+              <field name="medical_insurance_parents" readonly="1" />
+              <field name="pf_employee" readonly="1" />
+              <field name="pf_employer" readonly="1" />
+              <field name="esic_employee" readonly="1" />
+              <field name="esic_employer" readonly="1" />
+              <field name="professional_tax" readonly="1" />
+              <field name="tds" readonly="1" />
+              <field name="c_total_deductions" readonly="1" />
+              <field name="c_net_salary" readonly="1" />
+              <field name="status" readonly="1"/>
+              <field name="c_payroll_remarks" readonly="1"/>
+              <field name="finance_remarks"/>
+              <field name="c_final_remarks" />
+              <field name="approval_attachment" />
+
+              <button name="finance_approve" string="Approve" type="object" icon="fa-check-circle" class="oe_highlight" attrs="{'invisible':[('status', '!=', 'Approved By Payroll')]}" />
+              <button name="%(hr_tds_saving.nf_payroll_finance_reject_reason_wizard_action)d" type="action" icon="fa-times-circle" class="oe_highlight" string="Reject" attrs="{'invisible':[('status', '!=', 'Approved By Payroll')]}" />
+
+            </tree>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_payroll_finance_search">
+            <field name="name">Payroll Finance</field>
+            <field name="model">nf.payslip.components</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                </search>
+            </field>
+        </record>
+
+      <record id="nf_payroll_finance_action" model="ir.actions.act_window">
+          <field name="name">Payroll Finance</field>
+          <field name="res_model">nf.payslip.components</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree</field>
+          <field name="view_id" ref="nf_payroll_finance_tree"/>
+          <field name="search_view_id" ref="nf_payroll_finance_search"/>
+      </record>
+
+        <record model="ir.actions.act_window.view" id="nf_payroll_finance_tree_action">
+            <field name="sequence" eval="4"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="nf_payroll_finance_tree"/>
+            <field name="act_window_id" ref="nf_payroll_finance_action"/>
+        </record>
+
+        <menuitem
+        sequence="111" id="nf_payroll_finance_action_menu" name="Payroll Finance" parent="hr_payroll.menu_hr_payroll_root" action="nf_payroll_finance_action"/>
+
+
+
+    <!-- Full and Final Settlement -->
+      <record id="nf_fnf_settlement_form" model="ir.ui.view">
+            <field name="name">nf.fnf.settlement.form</field>
+            <field name="model">nf.fnf.settlement</field>
+            <field name="arch" type="xml">
+            <form>
+              <sheet>
+                <group>
+                  <field name="name" />
+                </group>
+                <group col="2">
+                  <group>
+                    <field name="emp_id" />
+                    <field name="employee_id" domain="[('active', '=', False)]"/>
+                    <field name="doj" />
+                    <field name="department_id" />
+                    <field name="designation" />
+                    <field name="branch_id" />
+                    <field name="payable_month" />
+                  </group>
+                  <group>
+                    <field name="resignation_date" />
+                    <field name="relieving_date" />
+                    <field name="last_working_day" />
+                    <field name="notice_period" />
+                    <field name="notice_period_served" />
+                    <field name="shortfall" />
+                    <field name="ctc_per_month" />
+                    <field name="total_working_days" />
+                  </group>
+                </group>
+                <group col="3">
+
+                  <label string="Salary Particulars" />
+                  <label string="Actuals" />
+                  <label string="Earned" />
+
+                  <label string="BASIC" />
+                  <field name="actual_basic" nolabel="1" />
+                  <field name="earned_basic" nolabel="1" />
+
+                  <label string="HRA" />
+                  <field name="actual_hra" nolabel="1" />
+                  <field name="earned_hra" nolabel="1" />
+
+                  <label string="Medical and Conveyance" />
+                  <field name="actual_med_conv" nolabel="1" />
+                  <field name="earned_med_conv" nolabel="1" />
+
+                  <label string="LTA Allowance" />
+                  <field name="actual_lta_allowance" nolabel="1" />
+                  <field name="earned_lta_allowance" nolabel="1" />
+
+                  <label string="Special Allowance" />
+                  <field name="actual_spl_allowance" nolabel="1" />
+                  <field name="earned_spl_allowance" nolabel="1" />
+
+                  <label string="Total Gross" />
+                  <field name="actual_total_gross" nolabel="1" />
+                  <field name="earned_total_gross" nolabel="1" />
+                </group>
+
+                <separator string="Deductions"/>
+
+                <group col="3">
+                  <label string="Employee Provident Fund" />
+                  <field name="actual_epf" nolabel="1" />
+                  <field name="earned_epf" nolabel="1" />
+
+                  <label string="Employer Provident Fund" />
+                  <field name="actual_erpf" nolabel="1" />
+                  <field name="earned_erpf" nolabel="1" />                    
+
+                  <label string="Employee ESIC" />
+                  <field name="actual_esi" nolabel="1" />
+                  <field name="earned_esi" nolabel="1" />
+
+                  <label string="Employer ESIC" />
+                  <field name="actual_ersi" nolabel="1" />
+                  <field name="earned_ersi" nolabel="1" />
+
+                  <label string="Professinal Tax" />
+                  <field name="actual_pt" nolabel="1" />
+                  <field name="earned_pt" nolabel="1" />
+
+                  <label string="TDS" />
+                  <field name="actual_tds" nolabel="1" />
+                  <field name="earned_tds" nolabel="1" />
+
+                  <label string="Salary Advance" />
+                  <field name="actual_advance" nolabel="1" />
+                  <field name="earned_advance" nolabel="1" />
+
+                  <label string="Others (if any)" />
+                  <field name="actual_others" nolabel="1" />
+                  <field name="earned_others" nolabel="1" />
+
+                  <label string="Total Deductions" />
+                  <label string="-" />
+                  <field name="total_deductions" nolabel="1" />
+                </group>
+
+                <separator string="Additions"/>
+                <group col="3">
+                  <label string="Notice Period Payout" />
+                  <label string="B31" />
+                  <label string="C31" />
+
+                  <label string="Other (If any, specify)" />
+                  <label string="B32" />
+                  <label string="C32" />
+
+                  <label string="Total Additions" />
+                  <label string=" " />
+                  <field name="total_additions" nolabel="1" />
+
+                  <label string="Notice Period/Recovery" />
+                  <label string="B34" />
+                  <label string=" " />
+                </group>
+
+                
+              </sheet>
+            </form>
+    </field>
+        </record>
+        <record id="nf_fnf_settlement_tree" model="ir.ui.view">
+            <field name="name">nf.fnf.settlement.tree</field>
+            <field name="model">nf.fnf.settlement</field>
+            <field name="arch" type="xml">
+            <tree>
+              <field name="employee_id" />
+              <field name="emp_id" />
+              <field name="doj" />
+              <field name="department_id" />
+              <field name="designation" />
+              <field name="branch_id" />
+            </tree>
+    </field>
+        </record>
+        <record id="nf_fnf_settlement_filter" model="ir.ui.view">
+            <field name="name">nf.fnf.settlement.filter</field>
+            <field name="model">nf.fnf.settlement</field>
+            <field name="arch" type="xml">
+                <search string="Full and Final Settlement">
+                    <field name="employee_id" string="Employees"/> 
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                    </group>                   
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="nf_fnf_settlement_action">
+            <field name="name">Full and Final Settlement </field>
+            <field name="res_model">nf.fnf.settlement</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_fnf_settlement_tree"/>
+        </record>
+
+        <menuitem
+            name="Full and Final Settlement"
+            parent="hr_payroll.menu_hr_payroll_root"
+            id="nf_fnf_settlement_menu" action="nf_fnf_settlement_action" sequence="111" groups="hr_payroll.group_hr_payroll_manager"/>
+  </data>
+</openerp>
+        

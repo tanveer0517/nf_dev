@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_income_tax,income.tax,model_income_tax,,1,1,1,1
+access_income_tax_line,income.tax.line,model_income_tax_line,,1,1,1,1
+access_employee_tds,employee.tds,model_employee_tds,,1,1,1,1
+access_employee_tds_line,employee.tds.line,model_employee_tds_line,,1,1,1,1
+access_employee_tds_run,employee.tds.run,model_employee_tds_run,,1,1,1,1

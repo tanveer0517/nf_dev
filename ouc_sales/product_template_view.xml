@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!--      Product Template Inherited Form View     -->
+        <record id="adding_fields_product_form_id" model="ir.ui.view">
+            <field name="name">product.template</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+            	<xpath expr="//field[@name='purchase_method']" position="before">
+                	<field name="c_default_discount"/>
+                	<field name="c_max_discount"/>
+		        </xpath>
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="partner_id" domain="[('c_is_partner','=',True)]"/>
+                    <field name="c_package_id" />
+                    <field name="c_validity" />
+                    <field name="c_activation_req" required="1"/>
+                    <field name="c_package_extension"/>
+                    <field name="is_corporate_website"/>
+                    <field name="is_kitsune"/>
+                </xpath>
+                <!-- <xpath expr="//field[@name='categ_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_stock_procurement']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_stock_production']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_stock_inventory']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='deferred_revenue_category_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_account_income_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True,'no_open':True}</attribute>
+                </xpath>
+                 <xpath expr="//field[@name='taxes_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True,'no_open':True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='asset_category_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True,'no_open':True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_account_expense_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True,'no_open':True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='supplier_taxes_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True,'no_open':True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='property_account_creditor_price_difference']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True,'no_open':True}</attribute>
+                </xpath> -->
+
+            </field>
+        </record>
+
+        <record id="nf_product_template_only_form_view" model="ir.ui.view">
+            <field name="name">product.template</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group_standard_price']" position="replace">
+                    <group name="group_standard_price" groups="base.group_erp_manager">
+                        <field name="list_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                        <label for="standard_price" groups="base.group_user"/>
+                        <div name="standard_price_uom" groups="base.group_user">
+                            <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}" class="oe_inline"/>
+                        </div>
+                        <field name="company_id" groups="base.group_multi_company"
+                            options="{'no_create': True}"/>
+                        <field name="uom_id" groups="product.group_uom" options="{'no_create': True}"/>
+                        <field name="uom_po_id" groups="product.group_uom" options="{'no_create': True}"/>
+                        <field name="currency_id" invisible="1"/> 
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

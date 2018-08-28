@@ -1,0 +1,264 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+   
+   
+   <!-- =====================BYOD Verification Form==================================== -->
+        
+        <record id="view_nf_byod_form" model="ir.ui.view">
+           <field name="name">BYOD</field>
+           <field name="model">nf.byod</field>
+           <field name="type">form</field>
+           <field name="arch" type="xml">
+             <form string="BYOD" version="7.0">
+             <header>
+                <button name="approved" states="Draft" type="object" string="Approved" class="oe_highlight"/>
+                <button name="rejected" states="Draft,Genuine" type="object" string="Rejected" class="oe_highlight"/>
+                <button name="reset_to_draft" type="object" states="Rejected" string="Reset To Draft" class="oe_highlight"/>
+                <field name="state" widget="statusbar" statusbar_visible="Draft,Genuine"/>
+                </header>
+              <sheet>
+                <h1>
+                  <field name="name" class="oe_inline" readonly="1"/>
+                </h1> 
+               <group col="4">
+                 <field name="employee_id" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                 <field name="byod_type" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                 <field name="device" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+
+                   <field name="email" readonly="1"/>
+                   <field name="date" readonly="1"/>
+                   <field name="city" readonly="1"/>
+                 <field name="mobile_phone" readonly="1"/>
+                 <field name="depart" readonly="1"/>
+                 <field name="sale_channel" readonly="1"/>
+                 <field name="verified_date" readonly="1" attrs="{'invisible':[('state','in',('Draft'))]}"/>
+                 <field name="next_verification_date" readonly="1" attrs="{'invisible':[('state','in',('Draft'))]}"/>
+                 <field name="emp_user_id" invisible="1"/>
+                 <field name="active" invisible="1"/>
+                 <field name="user_id" invisible="1"/>
+               </group>
+               
+               <notebook>
+                 <page string="System Details">
+                  <group string="System Details" col="4" colspan="6">
+                   <field name="os" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="model" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="sys_config" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="serial_no" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="mac_address" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="nf_soft" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="device_details" filename="filename" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="filename" invisible="1"/> 
+                  </group> 
+                 </page>
+               </notebook>
+               <group string="Remark"/>
+                <field name="remark" placeholder="Remark ..." attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+              </sheet>
+               <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div> 
+              </form>
+            </field>
+        </record>
+
+   <!-- =====================BYOD Verification Tree==================================== -->
+   
+       <record id="view_nf_byod_tree" model="ir.ui.view">
+           <field name="name">BYOD</field>
+           <field name="model">nf.byod</field>
+           <field name="type">tree</field>
+           <field name="arch" type="xml">
+             <tree string="BYOD" colors="blue:state == 'Draft';red:state == 'Rejected';green:state=='Genuine'">
+                 <field name="employee_id" />
+                 <field name="email" />
+                 <field name="byod_type" />
+                 <field name="date" />
+                 <field name="state"/>
+             </tree>
+            </field>
+        </record>
+        
+        
+    <!-- =====================BYOD Verification Action==================================== -->    
+        
+        <record id="view_nf_byod_search" model="ir.ui.view">
+           <field name="name">nf_byod</field>
+           <field name="model">nf.byod</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="BYOD">
+                 <field name="employee_id" />
+                 <field name="name" />
+                 <field name="byod_type" />
+                 <field name="date" />
+              
+             <filter name="draft" string="Draft" domain="[('state','=','Draft')]"/>    
+             <filter name="genuine" string="Genuine" domain="[('state','=','Genuine')]"/>
+			 <filter name="rejected" string="Rejected" domain="[('state','=','Rejected')]"/>
+             
+             <group string="Group By">
+              <filter name="byod_type" string="BYOD Type" context="{'group_by':'byod_type'}"/>
+              <filter name="state" string="Status" context="{'group_by':'state'}"/>
+              <filter name="date" string="Date" context="{'group_by':'date'}"/>
+              </group>
+             </search>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="action_nf_byod_verification">
+        <field name="name">BYOD Verification</field>
+        <field name="res_model">nf.byod</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	    <field name="domain">[]</field>
+	    <field name="context">{}</field>
+        <field name="search_view_id" ref="view_nf_byod_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          Bring Your Own Device
+          </p>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window.view" id="action_byod_verification_tree">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_nf_byod_tree"/>
+        <field name="act_window_id" ref="action_nf_byod_verification"/>
+    </record>
+    
+    <record model="ir.actions.act_window.view" id="action_byod_verification_form">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_nf_byod_form"/>
+        <field name="act_window_id" ref="action_nf_byod_verification"/>
+    </record>
+    
+    
+    
+    
+    <!-- ==================== BYOD Request Form================================== -->
+       
+       
+       <record id="view_nf_byod_request_form" model="ir.ui.view">
+           <field name="name">BYOD Request</field>
+           <field name="model">nf.byod</field>
+           <field name="type">form</field>
+           <field name="arch" type="xml">
+             <form string="BYOD" version="7.0">
+             <header>
+                <field name="state" widget="statusbar" statusbar_visible="Draft,Genuine"/>
+                </header>
+              <sheet>
+                <h1>
+                  <field name="name" class="oe_inline" readonly="1"/>
+                </h1> 
+               <group col="4">
+                 <field name="employee_id" widget="selection" domain="[('user_id','=',uid)]" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                 <field name="byod_type" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                 <field name="device" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="email" readonly="1"/>
+
+                   <field name="date" readonly="1"/>
+                   <field name="city" readonly="1"/>
+
+
+                 <!--<field name="job_id" /> -->
+                 <field name="mobile_phone" readonly="1"/>
+                 <field name="depart" readonly="1"/>
+                 <field name="sale_channel" readonly="1"/>
+                 <field name="verified_date" readonly="1" attrs="{'invisible':[('state','in',('Draft'))]}"/>
+                 <field name="next_verification_date" readonly="1" attrs="{'invisible':[('state','in',('Draft'))]}"/>
+                 <field name="emp_user_id" invisible="1"/>
+                 <field name="active" invisible="1"/>
+                 <field name="user_id" invisible="1"/>
+               </group>
+               <notebook>
+                 <page string="System Details">
+                  <group string="System Details" col="4" colspan="6">
+                   <field name="os" required="1" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="model" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="sys_config" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="serial_no" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="mac_address" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="nf_soft" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="device_details" filename="filename" attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+                   <field name="filename" invisible="1"/>
+                  </group> 
+                 </page>
+               </notebook>
+               <group string="Remark"/>
+                <field name="remark" placeholder="Remark ..." attrs="{'readonly':[('state','not in',('Draft'))]}"/>
+              </sheet>
+               <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div> 
+              </form>
+            </field>
+        </record>
+        
+    <!-- ==================== BYOD Request Action================================== --> 
+       
+       <record model="ir.actions.act_window" id="action_nf_byod_request">
+        <field name="name">BYOD Request</field>
+        <field name="res_model">nf.byod</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	    <field name="domain">[('emp_user_id','=',uid)]</field>
+	    <field name="context">{}</field>
+        <field name="search_view_id" ref="view_nf_byod_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          Bring Your Own Device
+          </p>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window.view" id="action_byod_request_tree">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_nf_byod_tree"/>
+        <field name="act_window_id" ref="action_nf_byod_request"/>
+    </record>
+    
+    <record model="ir.actions.act_window.view" id="action_byod_request_form">
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_nf_byod_request_form"/>
+        <field name="act_window_id" ref="action_nf_byod_request"/>
+    </record>
+       
+        
+    
+    
+    <!-- ====================== BYOD IN EMPLOYEE ================================ -->
+
+    
+      <record id="view_employee_form_inherit" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+            <xpath expr="//page[3]" position="after">
+                <page string="BYOD" groups="hr.group_hr_user">
+                 <group string="BYOD" col="4" colspan="6">
+                  <field name="byod_id"/>
+                  <field name="byod_state" readonly="1"/>
+                  <field name="byod_type" readonly="1"/>
+                  <field name="byod_device" readonly="1"/>
+                </group> 
+                </page> 
+             </xpath>             
+            </field>
+       </record>
+  
+  
+  <!-- ==================== BYOD MENU ================================== -->
+    
+    <menuitem name="BYOD Verification" id="menu_nf_byod_verification" parent="hr.menu_hr_main" action="action_nf_byod_verification" sequence="6" groups="nf_byod.group_byod"/>
+    <menuitem name="BYOD Request" id="menu_nf_byod_request" parent="hr.menu_hr_main" action="action_nf_byod_request" sequence="5" />
+
+    </data>
+</openerp>                    

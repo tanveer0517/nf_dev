@@ -1,0 +1,438 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+   
+    <menuitem name="Performance Management" id="hr_appraisal.menu_hr_appraisal_root" web_icon="hr_appraisal,static/description/icon.png" sequence="25"/>
+
+    <menuitem name="Performance Management" parent="hr_appraisal.menu_hr_appraisal_root" id="hr_appraisal.menu_open_view_hr_appraisal_tree"
+        action="hr_appraisal.open_view_hr_appraisal_tree" groups="base.group_user"/>
+
+    <record id="nf_view_hr_appraisal_form" model="ir.ui.view">
+      <field name="name">hr.appraisal.form</field>
+      <field name="model">hr.appraisal</field>
+      <field name="inherit_id" ref="hr_appraisal.view_hr_appraisal_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="replace">
+          <header>
+            <button name="button_send_appraisal" string="Start Appraisal and Send Forms" states="new" type="object" class="oe_highlight"  groups="hr_appraisal.group_hr_appraisal_user" invisible="1"/>
+            <button name="button_done_appraisal" string="Done" states="pending" type="object" groups="hr_appraisal.group_hr_appraisal_user" invisible="1"/>
+            <button name="button_cancel_appraisal" string="Cancel" states="pending,RepMan Confirm,DeptMan Confirm" type="object"  groups="hr_appraisal.group_hr_appraisal_user"/>
+            <field name="state" widget="statusbar"/>
+          </header>
+        </xpath>
+        <xpath expr="//div[@name='button_box']" position="replace">
+          <div class="oe_button_box" name="button_box" invisible="1">
+            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" attrs="{'invisible':[('state', 'not in', ('done','cancel'))]}">
+                <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+            </button>
+            <button class="oe_inline oe_stat_button"
+                name="action_get_users_input"
+                type="object"
+                icon="fa-envelope-o"
+                context="{'answers':True}">
+                <field name="count_completed_survey" string="Answers" widget="statinfo"/>
+            </button>
+        </div>
+          <div style="text-align:center">
+              <separator string="PERFORMANCE APPRAISAL FORM"/>
+          </div>
+          <div>
+              <h3>EMPLOYEE DETAILS</h3>
+          </div>
+        </xpath>
+        <xpath expr="//field[@name='date_close']" position="replace">
+          <field name="emp_id" readonly="1"/>
+          <field name="parent_id" attrs="{'readonly':['|',('state', 'in', ['done','cancel']),('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}"/>
+          <field name="reporting_manager_id" attrs="{'readonly':['|',('state', 'in', ['done','cancel']),('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}"/>
+          <field name="branch_id" readonly="1"/>
+          <field name="job_id" options="{'no_create': True,'no_create_edit': True}" readonly="1"/>
+          <field name="state_id" readonly="1"/>
+          <field name="date_close" attrs="{'readonly':['|',('state', 'in', ['done','cancel']),('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}" string="Deadline" invisible="1"/>
+          <field name="check_access" invisible="1"/>
+        </xpath>
+        <xpath expr="//field[@name='date_final_interview']" position="replace">
+          <field name="join_date" readonly="1"/>
+          <field name="sub_dep" readonly="1"/>
+          <field name="intrnal_desig" readonly="1"/>
+          <field name="experience" readonly="1"/>
+          <field name="review_date" attrs="{'readonly':[('state', '!=', 'new')]}"/>
+          <field name="date_final_interview" attrs="{'readonly':['|',('state', 'in', ['done','cancel']),('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}" string="Final Discussion"/>
+        </xpath>
+        <xpath expr="//field[@name='mail_template_id']" position="replace">
+          <field name="mail_template_id" attrs="{'readonly':[('state', '!=', 'new')]}" groups="base.group_no_one" string="Email Template" invisible="1"/>
+        </xpath>
+        <xpath expr="//page[2]" position="replace">
+          <page string="Plan" invisible="1">
+              <group col="4">
+                  <field name="manager_appraisal" attrs="{'readonly':[('state', '!=', 'new')]}"/>
+                  <field name="manager_ids" nolabel="1" placeholder="Select Appraisal Reviewer..." widget="many2many_tags" attrs="{'invisible':[('manager_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}" readonly="0"/>
+                  <field name="manager_survey_id" nolabel="1" placeholder="Appraisal Form..." attrs="{'invisible':[('manager_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}"/>
+
+                  <field name="employee_appraisal" string="Employee" attrs="{'readonly':[('state', '!=', 'new')]}"/>
+                  <separator/>
+                  <field name="employee_survey_id" nolabel="1" placeholder="Appraisal Form..." attrs="{'invisible':[('employee_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}"/>
+
+                  <field name="collaborators_appraisal" attrs="{'readonly':[('state', '!=', 'new')]}"/>
+                  <field name="collaborators_ids" nolabel="1" placeholder="Select Appraisal Reviewer..." widget="many2many_tags" attrs="{'invisible':[('collaborators_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}"/>
+                  <field name="collaborators_survey_id" nolabel="1" placeholder="Appraisal Form..." attrs="{'invisible':[('collaborators_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}"/>
+
+                  <field name="colleagues_appraisal" attrs="{'readonly':[('state', '!=', 'new')]}"/>
+                  <field name="colleagues_ids" nolabel="1" placeholder="Select Appraisal Reviewer..." widget="many2many_tags" attrs="{'invisible':[('colleagues_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}" readonly="0"/>
+                  <field name="colleagues_survey_id" placeholder="Appraisal Form..." nolabel="1" attrs="{'invisible':[('colleagues_appraisal','=',False)], 'readonly':[('state', '!=', 'new')]}"/>
+              </group>
+          </page>
+        </xpath>
+        <xpath expr="//notebook" position="before">
+          <group>
+            <group>
+              <field name="rating_criteria">
+                <tree editable="bottom" create="false" delete="false">
+                  <field name="rating" readonly="1"/>
+                  <field name="rating_scale" readonly="1"/>
+                  <field name="criteria" readonly="1"/>
+                </tree>
+                <form>
+                  <group>
+                    <field name="rating"/>
+                    <field name="rating_scale"/>
+                    <field name="criteria"/>
+                  </group>
+                </form>
+              </field>
+            </group>
+            <group>
+              <field name="appraisal_score" readonly="1"/>
+              <field name="appraisal_rating_scale" readonly="1"/>
+            </group>
+          </group>
+        </xpath>
+
+        <xpath expr="//page[1]" position="replace">
+          <page string='Self Evaluation'>
+            <field name="emp_submit" invisible="1"/>
+            <field name='employee_assessment' attrs="{'readonly':['|',('state', '!=', 'new'),('check_access','not in',['Emp'])]}">
+              <tree editable="bottom" create="false" delete="false" colors="red:rating_scale == 'Below Expectations';orange:rating_scale == 'Exceptional';green:rating_scale == 'Meets Expectations';grey:rating_scale == 'Needs Improvement'">
+                <field name="name" readonly="1"/>
+                <field name="weightage" readonly="1"/>
+                <field name="rating"/>
+                <field name="rating_scale" readonly="1"/>
+                <field name="final_score" readonly="1"/>
+                <field name="comment" placeholder="Provide details to support your self assessment rating." attrs="{'required':[('final_score','!=',False)]}"/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="name" readonly="1"/>
+                    <field name="rating"/>
+                    <field name="rating_scale" readonly="1"/>
+                    <field name="weightage" readonly="1"/>
+                    <field name="final_score" readonly="1"/>
+                    <field name="comment" placeholder="Provide details to support your self assessment rating."/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+            <group>
+              <field name="emp_total_score" readonly="1"/>
+            </group>
+            <button name="submit_employee" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|','|',('emp_submit','=',True),('state', 'in', ['done','cancel']),('check_access','not in',['Emp'])]}"/>
+          </page>
+          <page string='Reporting Manager Evaluation' attrs="{'invisible':[('check_access','not in',['RepMan','Man','ManHR','RepManHR','HR','RepandMan','RepandManHR'])]}">
+            <field name="rm_submit" invisible="1"/>
+            <field name='reporting_manager_assessment' attrs="{'readonly':['|',('state', 'in', ['RepMan Confirm','DeptMan Confirm','done','cancel']),('check_access','not in',['Emp','RepMan','RepManHR','RepandMan','RepandManHR'])]}">
+              <tree editable="bottom" create="false" delete="false" colors="red:rating_scale == 'Below Expectations';orange:rating_scale == 'Exceptional';green:rating_scale == 'Meets Expectations';grey:rating_scale == 'Needs Improvement'">
+                <field name="name" readonly="1"/>
+                <field name="weightage" readonly="1"/>
+                <field name="check_access" invisible="1"/>
+                <field name="rating" attrs="{'required':[('check_access','in',['RepMan','RepManHR','RepandMan','RepandManHR'])]}"/>
+                <field name="rating_scale" readonly="1"/>
+                <field name="final_score" readonly="1"/>
+                <field name="comment" attrs="{'required':[('check_access','in',['RepMan','RepManHR','RepandMan','RepandManHR'])]}" placeholder="Provide details to support your assessment rating."/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="name" readonly="1"/>
+                    <field name="rating"/>
+                    <field name="check_access" invisible="1"/>
+                    <field name="rating_scale" readonly="1"/>
+                    <field name="weightage" readonly="1"/>
+                    <field name="final_score" readonly="1"/>
+                    <field name="comment" placeholder="Provide details to support your assessment rating."/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+            <group>
+              <field name="rm_total_score" readonly="1"/>
+              <field name="reporting_manager_remarks" attrs="{'readonly':['|',('state', 'in', ['RepMan Confirm','DeptMan Confirm','done','cancel']),('check_access','not in',['RepMan','RepManHR','RepandMan','RepandManHR'])]}"/>
+            </group>
+            <button name="submit_reportig_manager" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|','|',('rm_submit','=',True),('state', 'in', ['done','cancel']),('check_access','not in',['RepMan','RepManHR','RepandMan','RepandManHR'])]}"/>
+          </page>
+          <page string='Department Manager Evaluation' attrs="{'invisible':[('check_access','not in',['Man','ManHR','RepManHR','HR','RepandMan','RepandManHR'])]}">
+            <field name="man_submit" invisible="1"/>
+            <field name='manager_assessment' attrs="{'readonly':['|',('state', 'in', ['DeptMan Confirm','done','cancel']),('check_access','not in',['Emp','Man','ManHR','RepandMan','RepandManHR'])]}">
+              <tree editable="bottom" create="false" delete="false" colors="red:rating_scale == 'Below Expectations';orange:rating_scale == 'Exceptional';green:rating_scale == 'Meets Expectations';grey:rating_scale == 'Needs Improvement'">
+                <field name="name" readonly="1"/>
+                <field name="weightage" readonly="1"/>
+                <field name="check_access" invisible="1"/>
+                <field name="rating" attrs="{'required':[('check_access','in',['Man','ManHR','RepandMan','RepandManHR'])]}"/>
+                <field name="rating_scale" readonly="1"/>
+                <field name="final_score" readonly="1"/>
+                <field name="comment" placeholder="Provide details to support your assessment rating."/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="name" readonly="1"/>
+                    <field name="check_access" invisible="1"/>
+                    <field name="rating"/>
+                    <field name="rating_scale" readonly="1"/>
+                    <field name="weightage" readonly="1"/>
+                    <field name="final_score" readonly="1"/>
+                    <field name="comment" placeholder="Provide details to support your assessment rating."/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+            <group>
+              <field name="man_total_score" readonly="1"/>
+              <field name="manager_remarks" attrs="{'readonly':['|',('state', 'in', ['DeptMan Confirm','done','cancel']),('check_access','not in',['Man','ManHR','RepandMan','RepandManHR'])]}"/>
+            </group>
+            <button name="submit_manager" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|','|',('man_submit','=',True),('state', 'in', ['done','cancel']),('check_access','not in',['Man','ManHR','RepandMan','RepandManHR'])]}"/>
+          </page>
+          
+          <page string='HR Evaluation' attrs="{'invisible':[('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}" groups="hr_appraisal.group_hr_appraisal_manager">
+            <field name="hr_submit" invisible="1"/>
+            <field name='hr_assessment' attrs="{'readonly':['|',('state', 'in', ['done','cancel']),('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}">
+              <tree editable="bottom" create="false" delete="false" colors="red:rating_scale == 'Below Expectations';orange:rating_scale == 'Exceptional';green:rating_scale == 'Meets Expectations';grey:rating_scale == 'Needs Improvement'">
+                <field name="name" readonly="1"/>
+                <field name="weightage" readonly="1"/>
+                <field name="check_access" invisible="1"/>
+                <field name="rating"/>
+                <field name="rating_scale" readonly="1"/>
+                <field name="final_score" readonly="1"/>
+                <field name="comment" placeholder="Provide details to support your assessment rating."/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="name" readonly="1"/>
+                    <field name="rating"/>
+                    <field name="check_access" invisible="1"/>
+                    <field name="rating_scale" readonly="1"/>
+                    <field name="weightage" readonly="1"/>
+                    <field name="final_score" readonly="1"/>
+                    <field name="comment" placeholder="Provide details to support your assessment rating."/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+            <group>
+              <field name="hr_total_score" readonly="1"/>
+              <field name="action_plan" string="HR Remarks" attrs="{'readonly':['|',('state', 'in', ['done','cancel']),('check_access','not in',['ManHR','RepManHR','HR','RepandManHR'])]}"/>
+            </group>
+            <button name="submit_hr" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|',('hr_submit','=',True),('state', 'in', ['done','cancel'])]}"/>
+          </page>
+        </xpath>
+        <xpath expr="//field[@name='message_follower_ids']" position="replace">
+          <field name="message_follower_ids" widget="mail_followers" groups="hr_appraisal.group_hr_appraisal_manager"/>
+        </xpath>
+        <xpath expr="//field[@name='message_ids']" position="replace">
+          <field name="message_ids" widget="mail_thread" groups="hr_appraisal.group_hr_appraisal_manager"/>
+        </xpath>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="hr_appraisal.view_hr_appraisal_tree">
+        <field name="name">hr.appraisal.tree</field>
+        <field name="model">hr.appraisal</field>
+        <field name="arch" type="xml">
+            <tree string="Appraisal">
+                <field name="active" invisible="1"/>
+                <field name="employee_id" string="Name"/>
+                <field name="review_date"/>
+                <field name="date_final_interview"/>
+                <field name="date_close"/>
+                <field name="state"/>
+                <field name="count_sent_survey" invisible="1"/>
+                <field name="count_completed_survey" invisible="1"/>
+                <field name="appraisal_score"/>
+              <field name="appraisal_rating_scale"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="hr_appraisal.open_view_hr_appraisal_tree">
+        <field name="name">Performance Management</field>
+        <field name="res_model">hr.appraisal</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"search_default_next_month":1}</field>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to create a new performance management.
+          </p><p>
+            You will be able to choose which forms will be sent (Employee,Managers,Collaborators or Colleagues),
+            to whom and the evaluation deadline. Once you have defined it,
+            change the stage to send it and view the results.
+          </p>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="survey.survey_response_line_tree">
+            <field name="name">survey_response_line_tree</field>
+            <field name="model">survey.user_input_line</field>
+            <field name="arch" type="xml">
+                <tree string="Survey Answer Line" create="false">
+                    <field name="survey_id" invisible="1"/>
+                    <field name="user_input_id" invisible="1"/>
+                    <field name="page_id" invisible="1"/>
+                    <field name="question_id"/>
+                    <field name="date_create"/>
+                    <field name="answer_type"/>
+                    <field name="skipped"/>
+                    <field name="quizz_mark" groups="base.group_no_one"/>
+                </tree>
+            </field>
+        </record>
+
+            <record id="nf_appraisal_question_form" model="ir.ui.view">
+              <field name="name">nf.appraisal.question.form</field>
+              <field name="model">nf.appraisal.question</field>
+              <field name="arch" type="xml">
+                <form>
+                 <sheet>
+                    <group col="4" colspan="4">
+                       <field name="sequence" required="1"/>
+                       <field name="name" required='1'/>
+                       <field name="job" required='1'/>
+                       <field name="weightage" required="1"/>
+                       <field name="job_ids" widget="many2many_tags" options="{'no_create': True,'no_create_edit': True}"/>
+                    </group>
+                  </sheet>
+                </form>
+            </field>
+          </record>
+
+          <record id="nf_appraisal_question_tree" model="ir.ui.view">
+            <field name="name">nf.appraisal.question.tree</field>
+            <field name="model">nf.appraisal.question</field>
+            <field name="arch" type="xml">
+              <tree>
+                 <field name="sequence"/>
+                 <field name="name"/>
+                 <field name="weightage"/>
+                 <field name="job"/>
+              </tree>
+            </field>
+          </record>
+
+          <record model="ir.actions.act_window" id="action_nf_appraisal_question">
+              <field name="name">Appraisal Questions</field>
+              <field name="res_model">nf.appraisal.question</field>
+              <field name="view_type">form</field>
+              <field name="view_mode">tree,form</field>
+          </record>
+
+          <menuitem
+              name="Appraisal Questions"
+              parent="hr_appraisal.menu_hr_appraisal_root"
+              id="menu_nf_appraisal_question" action="action_nf_appraisal_question" sequence="50" groups="hr_appraisal.group_hr_appraisal_manager"/>
+
+
+          <record id="nf_appraisal_rating_criteria_form" model="ir.ui.view">
+            <field name="name">nf.appraisal.rating.criteria.form</field>
+            <field name="model">nf.appraisal.rating.criteria</field>
+            <field name="arch" type="xml">
+                <form>
+                 <sheet>
+                      <group col="4" colspan="4">
+                         <field name="rating" required='1'/>
+                         <field name="rating_scale" required='1'/>
+                         <field name="min_rate"/>
+                         <field name="max_rate"/>
+                         <field name="criteria" required='1'/>
+                    </group>
+                  </sheet>
+                </form>
+            </field>
+          </record>
+          <record id="nf_appraisal_rating_criteria_tree" model="ir.ui.view">
+            <field name="name">nf.appraisal.rating.criteria.tree</field>
+            <field name="model">nf.appraisal.rating.criteria</field>
+            <field name="arch" type="xml">
+              <tree>
+                 <field name="rating"/>
+                 <field name="min_rate"/>
+                 <field name="max_rate"/>
+                 <field name="rating_scale"/>
+                 <field name="criteria"/>
+              </tree>
+            </field>
+          </record>
+
+          <record model="ir.actions.act_window" id="action_nf_appraisal_rating_criteria">
+              <field name="name">Rating Criteria</field>
+              <field name="res_model">nf.appraisal.rating.criteria</field>
+              <field name="view_type">form</field>
+              <field name="view_mode">tree,form</field>
+          </record>
+
+          <menuitem
+              name="Rating Criteria"
+              parent="hr_appraisal.menu_hr_appraisal_root"
+              id="menu_nf_appraisal_rating_criteria" action="action_nf_appraisal_rating_criteria" sequence="60" groups="hr_appraisal.group_hr_appraisal_manager"/>
+
+        <record id="hr_appraisal.hr_employee_view_form" model="ir.ui.view">
+          <field name="name">hr.employee.view.form.inherit.appraisal</field>
+          <field name="model">hr.employee</field>
+          <field name="inherit_id" ref="hr.view_employee_form"/>
+          <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(hr_appraisal.open_view_hr_appraisal_tree2)d"
+                    class="oe_inline oe_stat_button"
+                    icon="fa-sitemap"
+                    type="action" groups="hr.group_hr_manager">
+                    <field name="appraisal_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='public']" position="after">
+                <page string="Appraisal" invisible="1">
+                    <group string="Send Appraisal Form To" col="4">
+                        <field name="appraisal_by_manager"/>
+                        <field name="appraisal_manager_ids" nolabel="1" placeholder="Select Appraisal Reviewer..." widget="many2many_tags" attrs="{'invisible':[('appraisal_by_manager','=',False)]}" readonly="0"/>
+                        <field name="appraisal_manager_survey_id" nolabel="1" placeholder="Appraisal Form..." attrs="{'invisible':[('appraisal_by_manager','=',False)]}"/>
+
+                        <field name="appraisal_self"/>
+                        <field name="appraisal_employee" nolabel="1" attrs="{'invisible':[('appraisal_self','=',False)]}"/>
+                        <field name="appraisal_self_survey_id" nolabel="1" placeholder="Appraisal Form..." attrs="{'invisible':[('appraisal_self','=',False)]}"/>
+
+                        <field name="appraisal_by_collaborators"/>
+                        <field name="appraisal_collaborators_ids" nolabel="1" placeholder="Select Appraisal Reviewer..." widget="many2many_tags" attrs="{'invisible':[('appraisal_by_collaborators','=',False)]}"/>
+                        <field name="appraisal_collaborators_survey_id" nolabel="1" placeholder="Appraisal Form..." attrs="{'invisible':[('appraisal_by_collaborators','=',False)]}"/>
+                        <field name="appraisal_by_colleagues"/>
+                        <field name="appraisal_colleagues_ids" nolabel="1" placeholder="Select Appraisal Reviewer..." widget="many2many_tags" attrs="{'invisible':[('appraisal_by_colleagues','=',False)]}" readonly="0"/>
+                        <field name="appraisal_colleagues_survey_id" placeholder="Appraisal Form..." nolabel="1" attrs="{'invisible':[('appraisal_by_colleagues','=',False)]}"/>
+                        <field name="child_ids" invisible="1"/>
+                    </group>
+                    <group string="Periodicity" col="4">
+                        <group>
+                            <field name="periodic_appraisal"/>
+                            <field name="appraisal_date" attrs="{'invisible':[('periodic_appraisal','=',False)], 'required':[('periodic_appraisal','=',True)]}"/>
+                        </group>
+                        <group>
+                            <label for="appraisal_frequency" string="Repeat Every"/>
+                            <div class="o_row">
+                                <field name="appraisal_frequency" attrs="{'invisible':[('periodic_appraisal','=',False)], 'required':[('periodic_appraisal','=',True)]}" class="oe_inline"/>
+                                <field name="appraisal_frequency_unit" attrs="{'invisible':[('periodic_appraisal','=',False)], 'required':[('periodic_appraisal','=',True)]}" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+          </field>
+      </record>
+
+   </data>
+</openerp>                    

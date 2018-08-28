@@ -1,0 +1,194 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+   
+    <!-- inheriting helpdesk form view to add field -->
+    <record id="nf_helpdesk_ticket_view_form" model="ir.ui.view">
+      <field name="name">helpdesk.ticket.form</field>
+      <field name="model">helpdesk.ticket</field>
+      <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="before">
+          <h1><field name="tkt_number" readonly="1"/></h1>
+        </xpath>
+        <xpath expr="//field[@name='kanban_state']" position="replace">
+          <field name="kanban_state" widget="kanban_state_selection" invisible="1"/>
+          <field name="deadline_readonly" invisible="1"/>
+          <field name="tkt_deadline" attrs="{'readonly':[('deadline_readonly','=',True)]}"/>
+        </xpath>
+        <xpath expr="//field[@name='team_id']" position="replace">
+          <field name="team_id" options="{'no_create': True,'no_open': True}"/>
+        </xpath>
+        <xpath expr="//field[@name='user_id']" position="replace">
+          <field name="user_id" options="{'no_create': True,'no_open': True}"/>
+        </xpath>
+        <xpath expr="//field[@name='tag_ids']" position="replace">
+          <field name="tag_ids" string="Category" widget="many2many_tags" options="{'no_create': True,'no_open': True}" domain="[('team_id','=',team_id)]"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+            <attribute name="readonly">1</attribute>
+         </xpath>
+         <xpath expr="//field[@name='ticket_type_id']" position="attributes">
+            <attribute name="required">1</attribute>
+         </xpath>
+         <xpath expr="//field[@name='description']" position="attributes">
+            <attribute name="required">1</attribute>
+         </xpath>
+         <xpath expr="//field[@name='team_id']" position="attributes">
+            <attribute name="required">1</attribute>
+         </xpath>
+        <xpath expr="//button[@name='assign_ticket_to_self']" position="replace">
+          <button name="assign_ticket_to_self" string="I take it" type="object" class="oe_highlight" groups="helpdesk.group_helpdesk_user" invisible="1"/>
+        </xpath>
+        <xpath expr="//button[@name='open_customer_tickets']" position="replace">
+          <button class="oe_stat_button" name="open_customer_tickets" icon="fa-ticket"
+              type="object" attrs="{'invisible': ['|', ('partner_id', '=', False), ('partner_tickets', '&lt;=', 1)]}" invisible="1">
+              <field name="partner_tickets" string="Customer Tickets" widget="statinfo" invisible="1"/>
+          </button>
+        </xpath>
+        <xpath expr="//field[@name='description']" position="after">
+          <separator string="Follow-up Comments"/>
+          <field name="comments_ids" nolabel="1">
+            <tree editable="bottom">
+              <field name="comments" attrs="{'readonly':[('submit','=',True)]}"/>
+              <field name="comment_date" readonly="1"/>
+              <field name="comment_by" readonly="1"/>
+              <field name="submit" invisible="1"/>
+            </tree>
+            <form>
+              <sheet>
+                <group>
+                  <field name="comment_date"/>
+                  <field name="comment_by"/>
+                  <field name="comments"/>
+                </group>
+              </sheet>
+            </form>
+          </field>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- inheriting helpdesk tree view to add field -->
+    <record id="nf_helpdesk_tickets_view_tree" model="ir.ui.view">
+      <field name="name">helpdesk.ticket.tree</field>
+      <field name="model">helpdesk.ticket</field>
+      <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_tree"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="before">
+          <field name="tkt_number"/>
+        </xpath> 
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="team_id"/>
+        </xpath>       
+      </field>
+    </record>
+
+    <record id="helpdesk.helpdesk_ticket_view_kanban" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.kanban</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" class="o_kanban_small_column">
+                <field name="stage_id"/>
+                <field name="user_id"/>
+                <field name="color"/>
+                <field name="priority"/>
+                <field name="message_needaction_counter"/>
+                <field name="sla_name"/>
+                <field name="sla_fail"/>
+                <field name="sla_active"/>
+                <field name="tag_ids"/>
+                <field name="active"/>
+                <field name="deadline"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click">
+                            <div class="o_dropdown_kanban dropdown">
+                                <a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+                                    <span class="fa fa-bars fa-lg"/>
+                                </a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    <t t-if="widget.editable"><li><a type="edit">Edit</a></li></t>
+                                    <t t-if="widget.deletable"><li><a type="delete">Delete</a></li></t>
+                                    <li t-if="! record.active.value"><a name="toggle_active" type="object">Unarchive</a></li>
+                                    <li t-if="record.active.value"><a name="toggle_active" type="object">Archive</a></li>
+                                    <li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+                                </ul>
+                            </div>
+                            <div class="oe_kanban_content">
+                                <div>
+                                    <field name="tag_ids" invisible="1"/>
+                                    <strong><field name="tkt_number"/></strong>
+                                </div>
+                                <div>
+                                    <strong><field name="team_id"/></strong>
+                                </div>
+                                <div>
+                                    <strong><field name="name"/></strong>
+                                </div>
+                                <div t-if="record.deadline &amp;&amp; record.deadline.raw_value &amp;&amp; record.sla_active.raw_value"> <!-- here  -->
+                                <t t-if="new Date(record.deadline.raw_value) &lt; (new Date())" t-set="red">oe_kanban_text_red</t>
+                                    <span class="fa fa-clock-o"/> <span t-attf-class="#{red}"><i><field name="deadline"/></i></span>
+                                </div>
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="priority" widget="priority"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <t t-if="record.message_needaction_counter.raw_value">
+                                        <span class='oe_kanban_mail_new' title='Important Messages'><i class='fa fa-comments'/><t t-raw="record.message_needaction_counter.raw_value"/></span>
+                                    </t>
+                                    <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)" t-att-title="record.user_id.value" width="24" height="24" class="oe_kanban_avatar pull-right"/>
+                                    <span class="o_helpdesk_sla_failed pull-right fa fa-times-circle" style="margin: 6px" t-attf-title="Failed SLA: {{record.sla_name.raw_value}}" t-if="record.sla_fail &amp;&amp; record.sla_fail.raw_value"></span>
+                                    <div class="pull-left" groups="base.group_user">
+                                        <field name="kanban_state" widget="kanban_state_selection"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="oe_clear"></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="helpdesk.helpdesk_ticket_action_main_tree" model="ir.actions.act_window">
+        <field name="name">All Tickets</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="helpdesk.helpdesk_tickets_view_search"/>
+        <field name="view_id" ref="helpdesk.helpdesk_ticket_view_kanban"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p>
+                No tickets to display.
+            </p>
+        </field>
+    </record>
+
+    <record id="nf_helpdesk_team_view_form" model="ir.ui.view">
+      <field name="name">helpdesk.team.form</field>
+      <field name="model">helpdesk.team</field>
+      <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='description']" position="before">
+          <h2><field name="team_email" placeholder="Enter Team Email ID"/></h2>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="nf_helpdesk_tag_view_tree" model="ir.ui.view">
+      <field name="name">helpdesk.tag.tree</field>
+      <field name="model">helpdesk.tag</field>
+      <field name="inherit_id" ref="helpdesk.helpdesk_tag_view_tree"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="team_id" options="{'no_create': True,'no_open': True}"/>
+        </xpath>
+      </field>
+    </record>
+
+   </data>
+</openerp>                    

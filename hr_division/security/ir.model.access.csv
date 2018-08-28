@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_division,access_hr_division,model_hr_division,,1,1,1,1
+access_hr_branch,access_hr_branch,model_hr_branch,,1,1,1,1
+access_country_code,access_country_code,model_country_code,,1,1,1,1

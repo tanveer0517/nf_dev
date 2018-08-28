@@ -1,0 +1,266 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+   
+   <!-- =========== PIP Process Form =========== -->
+        
+    <record id="view_nf_pip_form" model="ir.ui.view">
+       <field name="name">PIP Process</field>
+       <field name="model">nf.pip</field>
+       <field name="type">form</field>
+       <field name="arch" type="xml">
+         <form string="PIP Process">
+         <header>
+            <field name="state" widget="statusbar"/>
+            </header>
+          <sheet>
+            <div style="text-align:center;font-weight:bold">
+              <label for="name"/>
+              <field name="name" readonly="1"/>
+            </div> 
+           <group>
+            <group>
+             <field name="employee_id" required="1" options="{'no_create': True}" attrs="{'readonly':[('state','not in',['Draft'])]}"/>
+             <field name="join_date" readonly="1"/>
+             <field name="branch_id" readonly="1" options="{'no_create': True}"/>
+             <field name="city_id" readonly="1" options="{'no_create': True}"/>
+             <field name="new_pip" invisible="1"/>
+             <field name="check_access" invisible="1"/>
+            </group>
+            <group>
+             <field name="emp_id" readonly="1"/>
+             <field name="designation" readonly="1" options="{'no_create': True}"/>
+             <field name="department_id" readonly="1" options="{'no_create': True}"/>
+             <field name="manager_id" readonly="1" options="{'no_create': True}"/>
+             <field name="reporting_manager" readonly="1" options="{'no_create': True}"/>
+            </group>
+           </group>
+           <group string="PERFORMANCE INFORMATION">
+                <field name="meetings" readonly="1"/>
+                <field name="leaves" readonly="1"/>
+          </group>
+          <p><b>Last 3 Months Revenue(Paid Revenue Only)</b></p>
+          <group>
+            <field name="first_month_revenue" readonly="1"/>
+            <field name="second_month_revenue" readonly="1"/>
+            <field name="third_month_revenue" readonly="1"/>
+          </group>
+          <separator string="PERFORMANCE REVIEW"/>
+           <div>
+            <b><label for="current_position" string="Description of Under Performance (Define the current issue of employee in detail and noticeable reasons for the same)"/></b>
+            <field name="current_position" required="1" attrs="{'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+          </div>
+          <group>
+            <group>
+              <field name="sales" invisible="1"/>
+              <field name="category" widget="many2many_checkboxes" attrs="{'invisible':[('sales','!=',True)],'required':[('sales','=',True)],'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+            </group>
+          </group>
+          <div>
+            <label for="category_comment" attrs="{'invisible':[('sales','!=',True)]}"/>
+            <field name="category_comment" attrs="{'invisible':[('sales','!=',True)],'required':[('sales','=',True)],'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+          </div>
+          <group>
+            <group>
+              <field name="disciplinary_issue" required="1" attrs="{'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+            </group>
+          </group>
+          <div>
+            <label for="disciplinary_comment" attrs="{'invisible':[('disciplinary_issue','!=','Yes')]}"/>
+            <field name="disciplinary_comment" attrs="{'invisible':[('disciplinary_issue','!=','Yes')],'required':[('disciplinary_issue','=','Yes')],'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+          </div>
+          <div>
+            <label for="pip_aim" string="Aim of the PIP (Define the overall aim of this improvement plan)"/>
+            <field name="pip_aim" required="1" attrs="{'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+          </div>
+          <group>
+            <group>
+              <field name="start_date" required="1" attrs="{'readonly':['|',('check_access','=','Emp'),('state','not in',('Draft'))]}"/>
+            </group>
+            <group>
+              <field name="end_date" required="1" attrs="{'readonly':['|',('check_access','=','Emp'),('state','not in',('Draft'))]}"/>
+            </group>
+          </group>
+           <separator string="Performance Improvement Opportunity"/>
+           <field name="pip_improvement" nolabel="1" attrs="{'invisible':[('new_pip','=',True)],'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft','Extended'])]}">
+            <tree>
+              <field name="improvement_needs" string="What Specific improvement/ development needs have been identified?"/>
+              <field name="action_steps" string="What improvement/ development actions are to be taken and by whom? What other support is needed?"/>
+              <field name="target_date" string="When should each action be completed?"/>
+              <field name="progress_reviews" string="How often to meet?"/>
+            </tree>
+            <form>
+              <sheet>
+                <div>
+                  <label for="improvement_needs" string="What Specific improvement/ development needs have been identified?"/>
+                  <field name="improvement_needs"/>
+                </div>
+                <div>
+                  <label for="action_steps" string="What improvement/ development actions are to be taken and by whom? What other support in needed?"/>
+                  <field name="action_steps"/>
+                </div>
+                <div>
+                  <label for="target_date" string="When should each action be completed?"/>
+                  <field name="target_date"/>
+                </div>
+                <div>
+                  <label for="progress_reviews" string="How often to meet?"/>
+                  <field name="progress_reviews"/>
+                </div>
+              </sheet>
+            </form>
+          </field>
+          <field name="improvement_opp" nolabel="1" attrs="{'invisible':[('new_pip','!=',True)],'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft','Extended'])]}">
+            <tree>
+              <field name="objective"/>
+              <field name="action_steps"/>
+              <field name="review_interval"/>
+              <field name="frequency"/>
+              <field name="feedback"/>
+            </tree>
+            <form>
+              <sheet>
+                <div>
+                  <label for="objective" string="Improvement Objective (What specific improvement must the individual show to impact their performance?)"/>
+                  <field name="objective" required="1"/>
+                </div>
+                <div>
+                  <label for="action_steps" string="Corrective Action (What corrective actions/tasks are to be taken to see improvement? What additional support is required?)"/>
+                  <field name="action_steps" required="1"/>
+                </div>
+                <div>
+                  <label for="review_interval" string="Review Day(When will progress against each improvement be reviewed?)"/>
+                  <field name="review_interval" required="1"/>
+                </div>
+                <div>
+                  <label for="frequency" string="Frequency (How often would you meet the employee for observing progress?)"/>
+                  <field name="frequency" required="1"/>
+                </div>
+                <div>
+                  <label for="feedback"/>
+                  <field name="feedback"/>
+                </div>
+              </sheet>
+            </form>
+          </field>
+          <group attrs="{'invisible':['|',('check_access','in',['Emp','Man'])]}">
+             <field name="show_pip_outcome" invisible="1"/>          
+             <field name="hr_comment" attrs="{'readonly':['|',('check_access','!=','HR'),('state','in',['Approved','Rejected'])]}" groups="hr.group_hr_user"/>
+           </group>
+          <separator string="PIP Outcome" attrs="{'invisible':['|',('check_access','=','Emp'), ('show_pip_outcome','!=',True)]}"/>
+          <group attrs="{'invisible':['|',('check_access','=','Emp'),('show_pip_outcome','!=',True)]}">
+            <field name="final_decision" attrs="{'readonly':['|',('check_access','=','Emp'), ('state','in',['Approved','Rejected'])]}"/>
+            <field name="extend_date" attrs="{'invisible':[('final_decision','!=','Extend PIP')],'required':[('final_decision','=','Extend PIP')],'readonly':['|',('check_access','=','Emp'), ('state','in',['Approved','Rejected'])]}"/>
+            <field name="employee_comment" attrs="{'readonly':['|',('check_access','=','Emp'),('state','in',['Approved','Rejected'])],'required':[('final_decision','in',['Extend PIP','Resume Employment','Terminate Employment'])]}"/>
+            <field name="final_recommendation" attrs="{'invisible':[('new_pip','=',True)], 'readonly':['|',('check_access','=','Emp'),('state','not in',['Draft'])]}"/>
+          </group>
+          <footer>
+           <button name="confirm" attrs="{'invisible':['|',('state','!=','Draft'),('final_decision','not in',['Resume Employment','Terminate Employment'])]}" type="object" string="Submit"/>
+            <button name="approved" states="Confirm,Extended" type="object" string="Approve" groups="hr.group_hr_manager" style="margin-left:15px;"/>
+            <button name="rejected" states="Draft,Confirm,Extended" type="object" string="Reject" groups="hr.group_hr_manager" style="margin-left:15px;"/>
+            <button name="reset_to_draft" type="object" states="Confirm,Approved,Rejected" string="Reset To Draft" groups="hr.group_hr_manager" style="margin-left:15px;"/>
+          </footer>
+          </sheet>
+
+           <div class="oe_chatter">
+                <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div> 
+          </form>
+        </field>
+    </record>
+
+   <!-- ============== PIP Process Tree ============== -->
+   
+       <record id="view_nf_pip_tree" model="ir.ui.view">
+           <field name="name">PIP Process</field>
+           <field name="model">nf.pip</field>
+           <field name="type">tree</field>
+           <field name="arch" type="xml">
+             <tree string="PIP Process">
+                 <field name="employee_id"/>
+                 <field name="emp_id"/>
+                 <field name="branch_id"/>
+                 <field name="manager_id"/>
+                 <field name="designation"/>
+                 <field name="department_id"/>
+                 <field name="start_date"/>
+                 <field name="end_date"/>
+                 <field name="state"/>
+             </tree>
+            </field>
+        </record>
+        
+        
+    <!-- ============== PIP Process Search ============== -->    
+        
+        <record id="view_nf_pip_search" model="ir.ui.view">
+           <field name="name">PIP Process</field>
+           <field name="model">nf.pip</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="PIP Process">
+                 <field name="employee_id"/>
+                 <field name="city_id" />
+                 <field name="branch_id" />
+                 <filter name="draft" string="Draft" domain="[('state','=','Draft')]"/>    
+                 <filter name="approved" string="Approved" domain="[('state','=','Approved')]"/>
+    			       <filter name="rejected" string="Rejected" domain="[('state','=','Rejected')]"/>
+             </search>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="action_nf_pip">
+        <field name="name">PIP Process</field>
+        <field name="res_model">nf.pip</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	      <field name="domain">[]</field>
+	      <field name="context">{}</field>
+        <field name="view_id" ref="view_nf_pip_tree"/>
+        <field name="search_view_id" ref="view_nf_pip_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          NowFloats PIP Process
+          </p>
+        </field>
+    </record>   
+  
+  <!-- ============ PIP Processs MENU ============ -->
+    
+    <menuitem name="PIP Process" id="menu_nf_pip" parent="hr.menu_hr_main" action="action_nf_pip" sequence="5" />
+
+    <record id="view_nf_pip_category_form" model="ir.ui.view">
+      <field name="name">nf.pip.category.form</field>
+      <field name="model">nf.pip.category</field>
+      <field name="arch" type="xml">
+        <form>
+         <sheet>
+              <group>
+                 <field name="name"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record id="view_nf_pip_category_tree" model="ir.ui.view">
+      <field name="name">nf.pip.category.tree</field>
+      <field name="model">nf.pip.category</field>
+      <field name="arch" type="xml">
+          <tree>
+              <field name="name"/>
+          </tree>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="nf_pip_category_action">
+        <field name="name">Category</field>
+        <field name="res_model">nf.pip.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="PIP Category" parent="hr.menu_human_resources_configuration" id="menu_nf_pip_category" action="nf_pip_category_action" sequence="5"/>
+
+    </data>
+</openerp>                    

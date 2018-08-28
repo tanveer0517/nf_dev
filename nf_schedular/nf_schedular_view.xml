@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record forcecreate="True" id="ir_cron_leave_allocation_schedular" model="ir.cron">
+            <field name="name">Leave Allocation</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field eval="True" name="doall"/>
+            <field eval="'nf.schedular'" name="model"/>
+            <field eval="'allocation_leave'" name="function"/>
+            <field eval="'()'" name="args"/>
+        </record>
+
+        <record forcecreate="True" id="ir_cron_scheduler_send_not_att_email" model="ir.cron">
+			<field name="name">Send Not Swipe BM Details</field>
+			<field eval="True" name="active" />
+			<field name="user_id" ref="base.user_root" />
+			<field name="interval_number">24</field>
+			<field name="interval_type">hours</field>
+			<field name="numbercall">-1</field>
+			<field eval="False" name="doall" />
+			<field eval="'nf.schedular'" name="model" />
+			<field eval="'send_non_swipe_bm'" name="function" />
+			<field eval="'()'" name="args" />
+		</record>
+        
+        </data>
+        </openerp>

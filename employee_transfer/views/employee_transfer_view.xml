@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		
+        <record id="employee_transfer_form" model="ir.ui.view">
+            <field name="name">Employee Transfer</field>
+            <field name="model">employee.transfer</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Employee Transfer">
+                  <header>
+                    <button name="submit_manager" string="Submit" states="Draft" type="object" class="oe_highlight" confirm="Are you sure, want to submit this?"/>
+                    <button name="approve_manager" string="Approve(By Current Manager)" states="Submitted" type="object" class="oe_highlight" confirm="Are you sure, want to approve this?"/>
+                    <button name="approve_new_manager" string="Approve(By New Manager)" states="Approved By Manager" type="object" class="oe_highlight" confirm="Are you sure, want to approve this?"/>
+                    <button name="reject_transfer" string="Reject" states="Submitted,Approved By Manager" type="object" class="oe_highlight" confirm="Are you sure, want to reject this?"/>
+                    <field name="state" widget="statusbar"/>
+                  </header>
+                  <sheet>
+                    <group col="4">
+                      <field name="employee_id" required="1" options="{'no_create':True}" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                      <field name="work_email" readonly="1"/>
+                      <field name='manager_id' readonly="1"/>
+                      <field name="new_manager_id" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                      <field name="document_name" invisible="1"/>
+                      <field name="document" filename="document_name" required="1" attrs="{'readonly':[('state','!=','Draft')]}"/>
+                    </group>
+                  </sheet>
+                </form>
+            </field>
+        </record> 
+
+    <record id="employee_transfer_tree" model="ir.ui.view">
+        <field name="name">Employee Transfer</field>
+        <field name="model">employee.transfer</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Employee Transfer">
+              <field name="employee_id"/>
+              <field name="work_email"/>
+              <field name='manager_id'/>
+              <field name="new_manager_id"/>
+              <field name="state"/>
+            </tree>
+        </field>
+       </record>
+
+     <record id="employee_transfer_filter" model="ir.ui.view">
+        <field name="name">Buddy and Candidate Feedback</field>
+        <field name="model">employee.transfer</field>
+        <field name="arch" type="xml">
+            <search>
+              <field name="employee_id"/>
+              <field name="work_email"/>
+              <field name='manager_id'/>
+              <field name="new_manager_id"/>
+              <field name="state"/>
+            </search>
+        </field>
+       </record>  
+
+    <record model="ir.actions.act_window" id="action_employee_transfer">
+        <field name="name">Employee Transfer</field>
+        <field name="res_model">employee.transfer</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+      <menuitem name="Employee Transfer" id="menu_employee_transfer" parent="hr.menu_hr_main" action="action_employee_transfer" sequence="15"/>    
+            
+    </data>
+              
+</openerp>

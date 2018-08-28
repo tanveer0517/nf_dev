@@ -1,0 +1,107 @@
+#-*- coding:utf-8 -*-
+##############################################################################
+#
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2009 Tiny SPRL (<http://tiny.be>). All Rights Reserved
+#    d$
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+
+import time
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from dateutil import relativedelta
+
+from openerp import api, tools
+from openerp.osv import fields, osv
+from openerp.tools.translate import _
+import openerp.addons.decimal_precision as dp
+
+from openerp.tools.safe_eval import safe_eval as eval
+
+class hr_misc_payment(osv.osv):
+    _name = 'hr.misc.payment'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'pay_mode':fields.selection([('1','1-Current Payment'),('2','2-Arrear Payment'),('4','4-Current Recovery'),('5','5-Arrear Recovery')],'Payment Mode',required="True"),
+                'salary_rule_id':fields.many2one('hr.salary.rule','Payment/Recovery'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'doc_no':fields.char('Reference Number'),
+                'amount':fields.float('Amount',required="True"),
+                'date':fields.date('Date'),
+                'date_from':fields.date('From Date'),
+                'date_to':fields.date('To Date',required="True"),
+                'company_id':fields.many2one('res.company','Zone'),
+                'active':fields.boolean('Active'),
+                'payslip_id':fields.many2one('hr.payslip','Payslip Reference',ondelete='cascade'),
+                'misc_pay_employee_id':fields.many2one('hr.misc.payment.employee','Pay Employee Wise'),
+                'misc_pay_head_id':fields.many2one('hr.misc.payment.head','Pay Head Wise')
+                }
+    _defaults = {
+                'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'hr.misc.payment', context=c),
+                'date': lambda *a: time.strftime('%Y-%m-%d'),
+                'active': True
+                }   
+
+    def onchange_amount(self, cr, uid, ids, amount, context=None):
+        if amount > 5000:
+            raise osv.except_osv(_('Warning!'), _('Are you Sure to enter amount more than 5000.'))
+        
+class hr_misc_payment_employee(osv.osv):
+    _name = 'hr.misc.payment.employee'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee',required="True"),
+                'misc_payment_line':fields.one2many('hr.misc.payment','misc_pay_employee_id','Misc Pay/Rec Lines')
+                }
+    def create(self, cr, uid, vals, context=None):
+        employee_id=vals['employee_id']
+        res = super(hr_misc_payment_employee,self).create(cr, uid, vals,context)
+        a=cr.execute("update hr_misc_payment set employee_id=(select employee_id from hr_misc_payment_employee where id=%d) where misc_pay_employee_id=%d" % (res,res));
+        return res
+    def write(self, cr, uid, ids, vals, context=None):
+        v=self.browse(cr, uid, ids,context=context)
+        super(hr_misc_payment_employee,self).write(cr, uid, ids, vals,context)
+        a=cr.execute("update hr_misc_payment set employee_id=(select employee_id from hr_misc_payment_employee where id=%d) where misc_pay_employee_id=%d" % (v.id,v.id));
+        return True
+    
+class hr_misc_payment_head(osv.osv):
+    _name = 'hr.misc.payment.head'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'salary_rule_id':fields.many2one('hr.salary.rule','Payment/Recovery',required="True"),
+                'misc_payment_line':fields.one2many('hr.misc.payment','misc_pay_head_id','Misc Pay/Rec Lines')
+                }
+    def create(self, cr, uid, vals, context=None):
+        salary_rule_id=vals['salary_rule_id']
+        res = super(hr_misc_payment_head,self).create(cr, uid, vals,context)
+        a=cr.execute("update hr_misc_payment set salary_rule_id=(select salary_rule_id from hr_misc_payment_head where id=%d) where misc_pay_head_id=%d" % (res,res));
+        return res
+    def write(self, cr, uid, ids, vals, context=None):
+        v=self.browse(cr, uid, ids,context=context)
+        super(hr_misc_payment_head,self).write(cr, uid, ids, vals,context)
+        a=cr.execute("update hr_misc_payment set salary_rule_id=(select salary_rule_id from hr_misc_payment_head where id=%d) where misc_pay_head_id=%d" % (v.id,v.id));
+        return True
+    
+    
+    
+
+
+

@@ -1,0 +1,795 @@
+#-*- coding:utf-8 -*-
+##############################################################################
+#
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2009 Tiny SPRL (<http://tiny.be>). All Rights Reserved
+#    d$
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+import os
+import csv
+import psycopg2
+import string
+import time
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from dateutil import relativedelta
+
+from openerp import api, tools
+from openerp.osv import fields, osv
+from openerp.tools.translate import _
+import openerp.addons.decimal_precision as dp
+
+from openerp.tools.safe_eval import safe_eval as eval
+
+class hr_payleave(osv.osv):
+    _name = 'hr.payleave'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'employee_no':fields.char('Employee Number'),
+                'leave_type':fields.many2one('hr.holidays.status','Leave Type'),
+                'from_date':fields.date('From Date'),
+                'to_date':fields.date('To Date'),
+                'reason':fields.char('Reason'),
+                'approving_authority':fields.char('Approving Authority'),
+                'remarks':fields.char('Remarks'),
+                'contact_address':fields.char('Contact Address'),
+                'no_of_days':fields.float('Number Of Days'),
+                'txn_type':fields.selection([('C','C'),('D','D')],'Type'),
+                'previous_balance':fields.float('Previous Balance'),
+                'new_balance':fields.float('New Balance'),
+                'record_type':fields.selection([('L','L'),('E','E'),('C','C')],'Record Type'),
+                'payroll_month':fields.date('Payroll Month'),
+                }
+    
+class hr_leave_credit(osv.osv):
+    _name = 'hr.leave.credit'
+    
+    _columns = {
+                'name':fields.char('Name'),
+
+                'filter':fields.selection([('R','Region Wise'),('E','Employee Wise')],'Filter' ),
+                'region_id':fields.many2one('employee.region','Region'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'leave_type':fields.selection([('EL','EL'),('HPL','HPL'),('CL','CL'),('RH','RH')],'Leave Type'),
+                'start_date':fields.date('Start Date',readonly=True),
+                'end_date':fields.date('End Date',readonly=True),
+                'data_generated':fields.boolean('Data Generated'),
+                'leave_credited':fields.boolean('Leave Credited'),
+                'credit_line':fields.one2many('hr.leave.credit.line','credit_id','Credit Line'),
+                'user':fields.many2one('res.users','USER'),
+                'user_company':fields.many2one('res.company','USER Company',default=lambda self: self.env['res.company'].browse(self.env['res.company']._company_default_get('salary.register.wizard'))),
+
+               }
+    _defaults = {
+        'start_date': '2016-07-01',
+        'end_date': '2016-12-31',
+        'user': lambda self, cr, uid, ctx: uid,
+    }
+    def unlink(self, cr, uid, ids, context=None):
+        for credit in self.browse(cr, uid, ids, context=context):
+            if credit.leave_credited==True:
+                raise osv.except_osv(_('Warning'), _('You can not delete record in leave credited state.'))
+        super(hr_leave_credit, self).unlink(cr, uid, ids, context=context)
+        return True
+    def generate_data(self,cr,uid,ids,context):
+        employee_pool=self.pool.get('hr.employee')
+        #pg connection
+        res={}
+        res1={}
+        temp=self.pool.get('hr.leave.credit').browse(cr,uid,ids,context)
+        '''Postgres Connection'''
+        con = psycopg2.connect("dbname='UAT' user='postgres' host='localhost' password='' ")
+        #con = psycopg2.connect("dbname='payroll_new' user='payroll' host='192.168.1.16' password='irctc' ")
+        cur = con.cursor()
+         
+        #oracle connection
+        #os.putenv('ORACLE_HOME', 'c:/app/admin/product/11.2.0/dbhome_1') 
+        #os.putenv('LD_LIBRARY_PATH', 'c:/app/admin/product/11.2.0/dbhome_1/lib') 
+        ''' Oracle Connection'''
+         
+        connection = cx_Oracle.connect('irctcpay/irctcpay@192.168.1.99:1529/UAT')
+        #connection = cx_Oracle.connect('irctcpay/irctcpay@localhost:1521/orcldb')
+        cursor = connection.cursor()
+        #cursor.execute(SQL)
+        #res = cursor.fetchall()
+        print ('connection on')
+        if temp.filter=='E' and temp.leave_type=='EL':
+            employee_id=temp.employee_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('id', '=', employee_id)], context=context):
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    data = 0
+                    a=cursor.execute("SELECT sum(no_of_days) from pay_leave_txn where emp_num='"+str(employee_no)+"' AND leave_type in ('EOLN','LWP','ABS') and txn_type='D' and record_type='L' and from_date>='01-JAN-2016' and to_date<='30-JUN-2016' and no_of_days>28");
+                    res = cursor.fetchall()
+                    print"res==",res
+                    #if res==[(None,)]
+                    list = [i[0] for i in res]
+                    print"list==",list[0]
+                    if list[0]== None:
+                        credit_days=15
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='EL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+                    else:
+                        list = [float(i[0]) for i in res]
+                        data = list[0]
+                        data1=round(data/30)*3
+                        print"data1=====",data1
+                        credit_days=0
+                        if data1>15:
+                            credit_days=0
+                        else:
+                            credit_days=15-data1
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='EL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+    
+        if temp.filter=='E' and temp.leave_type=='HPL':
+            employee_id=temp.employee_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('id', '=', employee_id)], context=context):
+                print"emp_num===",emp_num
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    print"emp_num1",emp_num1
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    data = 0
+                    a=cursor.execute("SELECT sum(no_of_days) from pay_leave_txn where emp_num='"+str(employee_no)+"' AND leave_type in ('EOLN','LWP','ABS') and txn_type='D' and record_type='L' and from_date>='01-JAN-2016' and to_date<='30-JUN-2016' and no_of_days>28");
+                    res = cursor.fetchall()
+                    print"res==",res
+                    #if res==[(None,)]
+                    list = [i[0] for i in res]
+                    print"list==",list[0]
+                    if list[0]== None:
+                        credit_days=10
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='HPL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+                    else:
+                        list = [float(i[0]) for i in res]
+                        data = list[0]
+                        data1=round(data/30)*2
+                        print"data1=====",data1
+                        credit_days=0
+                        if data1>10:
+                            credit_days=0
+                        else:
+                            credit_days=10-data1
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='HPL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+                        
+        if temp.filter=='E' and temp.leave_type=='CL':
+            employee_id=temp.employee_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('id', '=', employee_id)], context=context):
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    credit_days=12
+                    print"credit_days===",credit_days
+                    data_bal = 0
+                    new_bal=data_bal+credit_days
+                    leave_type=temp.leave_type
+                    print"leave_type====",leave_type
+                    print"data_bal===",data_bal
+                    print"new_bal===",new_bal
+                    cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                    print"successfull"
+                    
+        
+        if temp.filter=='E' and temp.leave_type=='RH':
+            employee_id=temp.employee_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('id', '=', employee_id)], context=context):
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    credit_days=2
+                    print"credit_days===",credit_days
+                    data_bal = 0
+                    new_bal=data_bal+credit_days
+                    leave_type=temp.leave_type
+                    print"leave_type====",leave_type
+                    print"data_bal===",data_bal
+                    print"new_bal===",new_bal
+                    cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                    print"successfull"
+        if temp.filter=='R' and temp.leave_type=='CL':
+            region_id=temp.region_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('region_id', '=', region_id)], context=context):
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    credit_days=12
+                    print"credit_days===",credit_days
+                    data_bal = 0
+                    new_bal=data_bal+credit_days
+                    leave_type=temp.leave_type
+                    print"leave_type=====",leave_type
+                    print"data_bal===",data_bal
+                    print"new_bal===",new_bal
+                    cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                    print"successfull"
+                    
+        if temp.filter=='R' and temp.leave_type=='RH':
+            region_id=temp.region_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('region_id', '=', region_id)], context=context):
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    credit_days=2
+                    print"credit_days===",credit_days
+                    data_bal = 0
+                    new_bal=data_bal+credit_days
+                    leave_type=temp.leave_type
+                    print"leave_type=====",leave_type
+                    print"data_bal===",data_bal
+                    print"new_bal===",new_bal
+                    cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                    print"successfull"
+
+        if temp.filter=='R' and temp.leave_type=='EL':
+            region_id=temp.region_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('region_id', '=', region_id)], context=context):
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    print"emp_num1",emp_num1.employee_no
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    data = 0
+                    a=cursor.execute("SELECT sum(no_of_days) from pay_leave_txn where emp_num='"+str(employee_no)+"' AND leave_type in ('EOLN','LWP','ABS') and txn_type='D' and record_type='L' and from_date>='01-JAN-2016' and to_date<='30-JUN-2016' and no_of_days>28");
+                    res = cursor.fetchall()
+                    print"res==",res
+                    #if res==[(None,)]
+                    list = [i[0] for i in res]
+                    print"list==",list[0]
+                    if list[0]== None:
+                        credit_days=15
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='EL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+                    else:
+                        list = [float(i[0]) for i in res]
+                        data = list[0]
+                        data1=round(data/30)*3
+                        print"data1=====",data1
+                        credit_days=0
+                        if data1>15:
+                            credit_days=0
+                        else:
+                            credit_days=15-data1
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='EL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+    
+        if temp.filter=='R' and temp.leave_type=='HPL':
+            region_id=temp.region_id.id
+            
+            for emp_num in employee_pool.search(cr, uid, [('region_id', '=', region_id)], context=context):
+                print"emp_num===",emp_num
+                for emp_num1 in employee_pool.browse(cr, uid, emp_num, context=context):
+                    print"emp_num1",emp_num1
+                    employee_no=emp_num1.employee_no
+                    empolyee_id=emp_num1.id
+                    data = 0
+                    a=cursor.execute("SELECT sum(no_of_days) from pay_leave_txn where emp_num='"+str(employee_no)+"' AND leave_type in ('EOLN','LWP','ABS') and txn_type='D' and record_type='L' and from_date>='01-JAN-2016' and to_date<='30-JUN-2016' and no_of_days>28");
+                    res = cursor.fetchall()
+                    print"res==",res
+                    #if res==[(None,)]
+                    list = [i[0] for i in res]
+                    print"list==",list[0]
+                    if list[0]== None:
+                        credit_days=10
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='HPL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+                    else:
+                        list = [float(i[0]) for i in res]
+                        data = list[0]
+                        data1=round(data/30)*2
+                        print"data1=====",data1
+                        credit_days=0
+                        if data1>10:
+                            credit_days=0
+                        else:
+                            credit_days=10-data1
+                        print"credit_days===",credit_days
+                        a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='HPL') and emp_num='"+str(employee_no)+"'");
+                        res1 = cursor.fetchall()
+                        list_bal = [float(i[0]) for i in res1]
+                        data_bal = list_bal[0]
+                        new_bal=data_bal+credit_days
+                        leave_type=temp.leave_type
+                        print"data_bal===",data_bal
+                        print"new_bal===",new_bal
+                        cr.execute("insert into hr_leave_credit_line(employee_id,leave_type,prev_bal,credit_days,new_bal,credit_id) values('"+str(empolyee_id)+"','"+str(leave_type)+"','"+str(data_bal)+"','"+str(credit_days)+"','"+str(new_bal)+"','"+str(temp.id)+"')");
+                        print"successfull"
+            
+        return self.write(cr,uid,ids,{'data_generated':True})
+    
+    def credit_leave(self,cr,uid,ids,context=None):
+        credit_line_pool=self.pool.get('hr.leave.credit.line')
+        #pg connection
+        res={}
+        res1={}
+        temp=self.pool.get('hr.leave.credit').browse(cr,uid,ids,context)
+        
+        if temp.data_generated==False:
+                raise osv.except_osv(_('Warning'), _('Please Generate Data First!'))
+        '''Postgres Connection'''
+        con = psycopg2.connect("dbname='UAT' user='postgres' host='localhost' password='' ")
+        #con = psycopg2.connect("dbname='payroll_new' user='payroll' host='192.168.1.16' password='irctc' ")
+        cur = con.cursor()
+         
+        #oracle connection
+        #os.putenv('ORACLE_HOME', 'c:/app/admin/product/11.2.0/dbhome_1') 
+        #os.putenv('LD_LIBRARY_PATH', 'c:/app/admin/product/11.2.0/dbhome_1/lib') 
+        ''' Oracle Connection'''
+         
+        connection = cx_Oracle.connect('irctcpay/irctcpay@192.168.1.99:1529/UAT')
+        #connection = cx_Oracle.connect('irctcpay/irctcpay@localhost:1521/orcldb')
+        cursor = connection.cursor()
+        #cursor.execute(SQL)
+        #res = cursor.fetchall()
+        print ('connection on')
+        row = ()
+        row1 = ()
+        rows = []
+        rows1 = []
+        pre_bal=0
+        new_bal=0
+        
+        for credit_line in credit_line_pool.search(cr, uid, [('credit_id', '=', temp.id)], context=context):
+            print"credit_line",credit_line
+            row = ()
+            row1 = ()
+            rows = []
+            rows1 = []
+            for credit_pool in credit_line_pool.browse(cr, uid, credit_line, context=context):
+                employee_no=credit_pool.employee_id.employee_no
+                print"employee_no",employee_no
+                leave_type=credit_pool.leave_type
+                credit_days=credit_pool.credit_days
+                print"credit_days",credit_days
+                id=credit_pool.id
+                pre_bal=credit_pool.prev_bal
+#                 a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='"+str(leave_type)+"' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(employee_no)+"' AND leave_type='"+str(leave_type)+"') and emp_num='"+str(employee_no)+"'");
+#                 res1 = cursor.fetchall()
+#                 list_bal = [float(i[0]) for i in res1]
+#                 pre_bal = list_bal[0]
+                print"pre_bal===",pre_bal
+                new_bal=pre_bal+credit_days
+                print"new_bal===",new_bal
+                start_date=temp.start_date
+                end_date=temp.end_date
+                row = (employee_no,leave_type,uid,new_bal,id)
+                rows.append(row)
+                print"rows=====",rows
+                if credit_pool.leave_type in ('CL','RH'):
+                    cursor.prepare("insert into pay_leave_dtl(emp_num,leave_type,from_date,to_date,arc_flag,user_id_created,created_site_id,created_time_stamp,init_leave_outstanding,total_leave_availed,id) values(:1,:2,'01-JAN-2016','31-DEC-2016','N',:3,'1',sysdate,:4,'0',:5)");
+                    cursor.executemany(None, rows)
+                    row1 = (employee_no,leave_type,uid,credit_days, pre_bal, new_bal)
+                    rows1.append(row1)
+                    print"rows1=====",rows1
+                    cursor.prepare("insert into pay_leave_txn(emp_num,leave_type,from_date,to_date,arc_flag,user_id_created,created_site_id,created_time_stamp,id,no_of_days,txn_type,prev_balance,new_balance,record_type) values(:1,:2,'01-JAN-2016','31-DEC-2016','N',:3,100,sysdate,0,:4,'C',:5,:6,'L')");
+                    cursor.executemany(None, rows1)
+                    print"successfull"
+                else:
+                    cursor.prepare("insert into pay_leave_dtl(emp_num,leave_type,from_date,to_date,arc_flag,user_id_created,created_site_id,created_time_stamp,init_leave_outstanding,total_leave_availed,id) values(:1,:2,'01-JUL-2016','31-DEC-2016','N',:3,'1',sysdate,:4,'0',:5)");
+                    cursor.executemany(None, rows)
+                    row1 = (employee_no,leave_type,uid,credit_days, pre_bal, new_bal)
+                    rows1.append(row1)
+                    print"rows1=====",rows1
+                    cursor.prepare("insert into pay_leave_txn(emp_num,leave_type,from_date,to_date,arc_flag,user_id_created,created_site_id,created_time_stamp,id,no_of_days,txn_type,prev_balance,new_balance,record_type) values(:1,:2,'01-JUL-2016','31-DEC-2016','N',:3,100,sysdate,0,:4,'C',:5,:6,'L')");
+                    cursor.executemany(None, rows1)
+                    print"successfull"
+        connection.commit()
+        return self.write(cr,uid,ids,{'leave_credited':True})
+            
+        
+    
+class hr_leave_credit_line(osv.osv):
+    _name = 'hr.leave.credit.line'
+    
+    _columns = {
+                'name':fields.char('Name'),
+
+                'employee_id':fields.many2one('hr.employee','Employee',readonly=True),
+                'leave_type':fields.selection([('EL','EL'),('HPL','HPL'),('CL','CL'),('RH','RH')],'Leave Type',readonly=True),
+                'prev_bal':fields.float('Previous Balance',readonly=True),
+                'credit_days':fields.float('Credit Days'),
+                'new_bal':fields.float('New Balance'),
+                'credit_id':fields.many2one('hr.leave.credit', 'Credit Id',readonly=True)
+               }
+    
+class hr_leave_balance_entry(osv.osv):
+    _name = 'hr.leave.balance.entry'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'leave_type':fields.selection([('EL','EL'),('CL','CL'),('RH','RH'),('HPL','HPL')],'Leave Type'),
+                'remarks':fields.char('Remarks'),
+                'current_balance':fields.float('Current Balance'),
+                'new_balance':fields.float('New Balanace'),
+                'done':fields.boolean('Done')
+                }
+    def unlink(self, cr, uid, ids, context=None):
+        for encash in self.browse(cr, uid, ids, context=context):
+            if encash.done==True:
+                raise osv.except_osv(_('Warning'), _('You can not delete record in done state.'))
+        super(hr_leave_balance_entry, self).unlink(cr, uid, ids, context=context)
+        return True
+    
+    def get_balance(self,cr,uid,ids,context=None):
+        #SQL="SELECT * FROM  pay_leave_txn";
+        res={}
+        temp=self.pool.get('hr.leave.balance.entry').browse(cr,uid,ids,context)
+        data=0
+        current_balance=0
+        emp_num=temp.employee_id.employee_no
+        a=[]
+        #pg connection
+        '''Postgres Connection'''
+        
+        con = psycopg2.connect("dbname='UAT' user='postgres' host='localhost' password='' ")
+        #con = psycopg2.connect("dbname='payroll_new' user='payroll' host='192.168.1.16' password='irctc' ")
+        cur = con.cursor()
+        
+        #oracle connection
+        #os.putenv('ORACLE_HOME', 'c:/app/admin/product/11.2.0/dbhome_1') 
+        #os.putenv('LD_LIBRARY_PATH', 'c:/app/admin/product/11.2.0/dbhome_1/lib') 
+        ''' Oracle Connection'''
+        
+        connection = cx_Oracle.connect('irctcpay/irctcpay@192.168.1.99:1529/UAT')
+        #connection = cx_Oracle.connect('irctcpay/irctcpay@localhost:1521/orcldb')
+        cursor = connection.cursor()
+        #cursor.execute(SQL)
+        #res = cursor.fetchall()
+        print ('connection on')
+       
+        
+        if temp.leave_type=='EL':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='EL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            if res==[]:
+                raise osv.except_osv(_('Warning'), _('No Data Found'))
+            else:
+                list = [float(i[0]) for i in res]
+                data = list[0]
+        elif temp.leave_type=='CL':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='CL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='CL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            if res==[]:
+                raise osv.except_osv(_('Warning'), _('No Data Found'))
+            else:
+                list = [float(i[0]) for i in res]
+                data = list[0]
+        elif temp.leave_type=='HPL':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='HPL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            if res==[]:
+                raise osv.except_osv(_('Warning'), _('No Data Found'))
+            else:
+                list = [float(i[0]) for i in res]
+                data = list[0]
+        elif temp.leave_type=='RH':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='RH' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='RH') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            if res==[]:
+                raise osv.except_osv(_('Warning'), _('No Data Found'))
+            else:
+                list = [float(i[0]) for i in res]
+                data = list[0]
+        current_balance = self.write(cr,uid,ids,{'current_balance':data})
+        return current_balance
+    
+    
+    def update_balance(self,cr,uid,ids,context=None):
+        #SQL="SELECT * FROM  pay_leave_txn";
+        res={}
+        temp=self.pool.get('hr.leave.balance.entry').browse(cr,uid,ids,context)
+        data=0
+        current_balance=0
+        emp_num=temp.employee_id.employee_no
+        new_bal=temp.new_balance
+        day = time.strftime("%d-%B-%Y")
+        a=[]
+        #pg connection
+        con = psycopg2.connect("dbname='UAT' user='postgres' host='localhost' password='' ")
+        #con = psycopg2.connect("dbname='payroll_new' user='payroll' host='192.168.1.16' password='irctc' ")
+        cur = con.cursor()
+        
+        #oracle connection
+        #os.putenv('ORACLE_HOME', 'c:/app/admin/product/11.2.0/dbhome_1') 
+        #os.putenv('LD_LIBRARY_PATH', 'c:/app/admin/product/11.2.0/dbhome_1/lib') 
+        connection = cx_Oracle.connect('irctcpay/irctcpay@192.168.1.99:1529/UAT')
+        #connection = cx_Oracle.connect('irctcpay/irctcpay@localhost:1521/orcldb')
+        cursor = connection.cursor()
+        #cursor.execute(SQL)
+        #res = cursor.fetchall()
+        print ('connection on')
+        data1=temp.new_balance-temp.current_balance
+        data2=temp.new_balance
+        data3=temp.remarks
+        rows = []
+        #if  temp.new_balance<temp.current_balance:
+           # raise osv.except_osv(_('Warning'), _('New balance should be greater than current balance.'))
+        
+        
+        if temp.leave_type=='EL':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='EL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            list = [float(i[0]) for i in res]
+            data = list[0]
+            row = (uid, data3, data2, data)
+            rows.append(row)
+            cursor.prepare("insert into pay_leave_dtl_log(emp_num,leave_type,arc_flag,modify_emp_num,last_mod_time_stamp,reason,new_balance,prev_balance) values('"+str(emp_num)+"','EL','N',:1,sysdate,:2,:3,:4)");
+            cursor.executemany(None, rows)
+            
+            cursor.execute("SELECT init_leave_outstanding from pay_leave_dtl WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='EL') and emp_num='"+str(emp_num)+"'");
+            res1 = cursor.fetchall()
+            list1 = [float(i[0]) for i in res1]
+            data_init = list1[0]
+            print"data_init=======",data_init
+            outstanding=data_init+data1
+            print"outstanding--====",outstanding
+            statement="update pay_leave_dtl set  init_leave_outstanding = :v WHERE leave_type='EL' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='EL') and emp_num='"+str(emp_num)+"'"
+            cursor.execute(statement, {'v': outstanding})
+            connection.commit()
+            
+        elif temp.leave_type=='CL':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='CL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='CL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            list = [float(i[0]) for i in res]
+            data = list[0]
+            row = (uid, data3, data2, data)
+            rows.append(row)
+            cursor.prepare("insert into pay_leave_dtl_log(emp_num,leave_type,arc_flag,modify_emp_num,last_mod_time_stamp,reason,new_balance,prev_balance) values('"+str(emp_num)+"','CL','N',:1,sysdate,:2,:3,:4)");
+            cursor.executemany(None, rows)
+            
+            cursor.execute("SELECT init_leave_outstanding from pay_leave_dtl WHERE leave_type='CL' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='CL') and emp_num='"+str(emp_num)+"'");
+            res1 = cursor.fetchall()
+            list1 = [float(i[0]) for i in res1]
+            data_init = list1[0]
+            print"data_init=======",data_init
+            outstanding=data_init+data1
+            print"outstanding--====",outstanding
+            statement="update pay_leave_dtl set  init_leave_outstanding = :v WHERE leave_type='CL' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='CL') and emp_num='"+str(emp_num)+"'"
+            cursor.execute(statement, {'v': outstanding})
+            connection.commit()            
+        elif temp.leave_type=='HPL':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='HPL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            list = [float(i[0]) for i in res]
+            data = list[0]
+            row = (uid, data3, data2, data)
+            rows.append(row)
+            cursor.prepare("insert into pay_leave_dtl_log(emp_num,leave_type,arc_flag,modify_emp_num,last_mod_time_stamp,reason,new_balance,prev_balance) values('"+str(emp_num)+"','HPL','N',:1,sysdate,:2,:3,:4)");
+            cursor.executemany(None, rows)
+            
+            cursor.execute("SELECT init_leave_outstanding from pay_leave_dtl WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='HPL') and emp_num='"+str(emp_num)+"'");
+            res1 = cursor.fetchall()
+            list1 = [float(i[0]) for i in res1]
+            data_init = list1[0]
+            print"data_init=======",data_init
+            outstanding=data_init+data1
+            print"outstanding--====",outstanding
+            statement="update pay_leave_dtl set  init_leave_outstanding = :v WHERE leave_type='HPL' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='HPL') and emp_num='"+str(emp_num)+"'"
+            cursor.execute(statement, {'v': outstanding})
+            connection.commit()
+        elif temp.leave_type=='RH':
+            a=cursor.execute("SELECT NVL(init_leave_outstanding + leaves_credited - total_leave_availed,'0') FROM PAY_LEAVE_DTL WHERE leave_type='RH' and from_date=(select max(from_date) from pay_leave_dtl where emp_num='"+str(emp_num)+"' AND leave_type='RH') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            list = [float(i[0]) for i in res]
+            data = list[0]
+            row = (uid, data3, data2, data)
+            rows.append(row)
+            cursor.prepare("insert into pay_leave_dtl_log(emp_num,leave_type,arc_flag,modify_emp_num,last_mod_time_stamp,reason,new_balance,prev_balance) values('"+str(emp_num)+"','RH','N',:1,sysdate,:2,:3,:4)");
+            cursor.executemany(None, rows)
+            
+            cursor.execute("SELECT init_leave_outstanding from pay_leave_dtl WHERE leave_type='RH' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='RH') and emp_num='"+str(emp_num)+"'");
+            res1 = cursor.fetchall()
+            list1 = [float(i[0]) for i in res1]
+            data_init = list1[0]
+            print"data_init=======",data_init
+            outstanding=data_init+data1
+            print"outstanding--====",outstanding
+            statement="update pay_leave_dtl set  init_leave_outstanding = :v WHERE leave_type='RH' and from_date=(select max(from_date) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='RH') and emp_num='"+str(emp_num)+"'"
+            cursor.execute(statement, {'v': outstanding})
+            connection.commit()
+        status = self.write(cr,uid,ids,{'done':True})
+        return status
+        
+        
+
+class hr_payleave_encash(osv.osv):
+    _name = 'hr.payleave.encash'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'encashment_days':fields.float('Encashment days'),
+                'remarks':fields.text('Remarks',required=True),
+                'tax_exempted':fields.boolean('Tax Exempted?'),
+                'done':fields.boolean('Done')
+                }
+    def unlink(self, cr, uid, ids, context=None):
+        for encash in self.browse(cr, uid, ids, context=context):
+            if encash.done==True:
+                raise osv.except_osv(_('Warning'), _('You can not delete record in done state.'))
+        super(hr_payleave_encash, self).unlink(cr, uid, ids, context=context)
+        return True
+    
+    def encash_leave(self, cr, uid, ids, context):
+        con = psycopg2.connect("dbname='UAT' user='postgres' host='localhost' password='' ")
+        #con = psycopg2.connect("dbname='payroll_new' user='payroll' host='192.168.1.16' password='irctc' ")
+        cur = con.cursor()
+        
+        #oracle connection
+        #os.putenv('ORACLE_HOME', 'c:/app/admin/product/11.2.0/dbhome_1') 
+        #os.putenv('LD_LIBRARY_PATH', 'c:/app/admin/product/11.2.0/dbhome_1/lib') 
+        
+        connection = cx_Oracle.connect('irctcpay/irctcpay@192.168.1.99:1529/UAT')
+        #connection = cx_Oracle.connect('irctcpay/irctcpay@localhost:1521/orcldb')
+        cursor = connection.cursor()
+        #cursor.execute(SQL)
+        #res = cursor.fetchall()
+        print ('connection on')
+        
+        
+        
+        
+        day = time.strftime("%d-%B-%Y")
+        print"day======",day
+        res={}
+        misc_pay = self.pool.get('hr.misc.payment')
+        temp=self.pool.get('hr.payleave.encash').browse(cr,uid,ids,context)
+        emp_num=temp.employee_id.employee_no
+        da_rates = 0
+        a=cr.execute("SELECT rate from da_rates WHERE effective_from = (SELECT MAX(effective_from) from da_rates)");
+        res = cr.fetchall()
+        list = [float(i[0]) for i in res]
+        data = list[0]
+        basic=0.0
+        da=0.0
+        for val in temp:
+            basic=temp.employee_id.contract_id.wage+temp.employee_id.contract_id.grade_pay
+            da=(temp.employee_id.contract_id.wage+temp.employee_id.contract_id.grade_pay)*data/100
+            get=cursor.execute("SELECT new_balance,prev_balance,created_time_stamp from pay_leave_txn WHERE leave_type='EL' and created_time_stamp = (SELECT MAX(created_time_stamp) from pay_leave_txn WHERE emp_num='"+str(emp_num)+"' and leave_type='EL') and emp_num='"+str(emp_num)+"'");
+            res = cursor.fetchall()
+            list = [float(i[0]) for i in res]
+            data = list[0]
+            data1=temp.encashment_days
+            data2=data-temp.encashment_days
+            print"data2====",data2
+	    if temp.employee_id.pattern=='CDA':
+                raise osv.except_osv(_('Warning'), _('You Can Not Encash Leave For CDA employees'))
+            if data<temp.encashment_days:
+                raise osv.except_osv(_('Warning'), _('Current Balance is less Than Encashment days.'))
+            if temp.encashment_days>30 and temp.tax_exempted==False:
+                raise osv.except_osv(_('Warning'), _('You Can Not Encash More Than 30 Days'))
+	    if temp.encashment_days>300 and temp.tax_exempted==True:
+                raise osv.except_osv(_('Warning'), _('You Can Not Encash More Than 300 Days'))
+            if val.tax_exempted is False:
+                res={
+                     'employee_id':temp.employee_id.id,
+                     'amount': round((basic+da)/30*temp.encashment_days),
+                     'pay_mode':'1',
+                     'doc_no':temp.remarks,
+                     'salary_rule_id':'504',
+                     'date_to':str(datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10],
+                     'company_id':'1'
+                     }
+            else:
+                res={
+                     'employee_id':temp.employee_id.id,
+                     'amount': round((basic+da)/30*temp.encashment_days),
+                     'pay_mode':'1',
+                     'doc_no':temp.remarks,
+                     'salary_rule_id':'505',
+                     'date_to':str(datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10],
+                     'company_id':'1'
+                     }
+            rows = [] 
+            row = (day,day,uid,day,data1, data, data2)
+            rows.append(row)
+            print"rows=====",rows
+            cursor.prepare("insert into pay_leave_txn(emp_num,leave_type,from_date,to_date,reason,arc_flag,user_id_created,created_site_id,created_time_stamp,id,no_of_days,txn_type,prev_balance,new_balance,record_type) values('"+str(emp_num)+"','EL',:1,:2,'Leave Encashment','N',:3,100,:4,0,:5,'D',:6,:7,'E')");
+            cursor.executemany(None, rows)
+            print"successfull"
+            cursor.execute("SELECT init_leave_outstanding from pay_leave_dtl WHERE leave_type='EL' and created_time_stamp = (SELECT MAX(created_time_stamp) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='EL') and emp_num='"+str(emp_num)+"'");
+            res1 = cursor.fetchall()
+            list1 = [float(i[0]) for i in res1]
+            data_init = list1[0]
+            print"data_init=======",data_init
+            outstanding=data_init-temp.encashment_days
+            print"outstanding--====",outstanding
+            statement="update pay_leave_dtl set  init_leave_outstanding = :v WHERE leave_type='EL' and created_time_stamp = (SELECT MAX(created_time_stamp) from pay_leave_dtl WHERE emp_num='"+str(emp_num)+"' and leave_type='EL') and emp_num='"+str(emp_num)+"'"
+            cursor.execute(statement, {'v': outstanding})
+            connection.commit()
+            print"successfull"
+            misc_id=misc_pay.create(cr,uid,res,context=context)
+            misc_pay_rec = misc_pay.browse(cr,uid,misc_id)
+            status = self.write(cr,uid,ids,{'done':True})
+        return status
+
+

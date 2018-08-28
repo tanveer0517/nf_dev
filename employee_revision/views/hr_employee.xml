@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		
+		 <record id="hr_employee_custom_inherit" model="ir.ui.view">
+            <field name="name">hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+            
+             <xpath expr="//page[3]" position="after">
+                 <page string=" History" groups="hr.group_hr_user">
+             		
+             		<separator string="Status"/>
+		             <field name="states_lines" readonly="1">
+		               <tree editable="top">
+		                <field name="states"/>
+		                <field name="start_date"/>
+		                <field name="till_date"/>
+		                <field name="attach_doc" filename="filename"/>
+		                <field name="filename" invisible="1"/>
+	                 </tree>
+	                 </field>
+	                 	                 
+             		<separator string="Designation"/>
+             		 <field name="designation_lines" readonly="1">
+		                 <tree editable="top">
+			                 <field name="desig_id"/>
+			                 <field name="start_date"/>
+			                 <field name="till_date"/>
+			                 <field name="attach_doc" filename="filename"/>
+		                     <field name="filename" invisible="1"/>
+		                 </tree>
+	                 </field>
+
+	                 <separator string="Internal Designation"/>
+             		 <field name="inter_desig_lines" readonly="1">
+		                 <tree editable="top">
+			                 <field name="internal_desig"/>
+			                 <field name="start_date"/>
+			                 <field name="till_date"/>
+			                 <field name="attach_doc" filename="filename"/>
+		                     <field name="filename" invisible="1"/>
+		                 </tree>
+	                 </field>
+	                 
+	                <separator string="Grade"/>
+             		 <field name="grade_lines" readonly="1">
+		                 <tree editable="top">
+			                 <field name="grade"/>
+			                 <field name="start_date"/>
+			                 <field name="till_date"/>
+			                 <field name="attach_doc" filename="filename"/>
+		                     <field name="filename" invisible="1"/>
+		                 </tree>
+	                 </field>
+	                 
+	                 <separator string="Level"/>
+             		 <field name="level_lines" readonly="1">
+		                 <tree editable="top">
+			                 <field name="level"/>
+			                 <field name="start_date"/>
+			                 <field name="till_date"/>
+			                 <field name="attach_doc" filename="filename"/>
+		                     <field name="filename" invisible="1"/>
+		                 </tree>
+	                 </field>
+	               	                 
+	                 <separator string="Division"/> 
+	             		 <field name="department_lines" readonly="1">
+			                 <tree editable="top">
+				                 <field name="department_id"/>
+				                 <field name="start_date"/>
+				                 <field name="till_date"/>
+				                 <field name="attach_doc" filename="filename"/>
+		                         <field name="filename" invisible="1"/>
+			                 </tree>
+	                     </field>
+	                 
+	                <separator string="Branch"/> 
+	                 <field name="branch_lines" readonly="1">
+	                  <tree editable="top">
+	                    <field name="branch_id"/>
+	                    <field name="start_date"/>
+	                    <field name="till_date"/>
+	                    <field name="attach_doc" filename="filename"/>
+		                <field name="filename" invisible="1"/>
+	                  </tree>
+	                 </field>
+	                 
+	                 <separator string="Reporting Manager"/> 
+	                 <field name="reporting_head_lines" readonly="1">
+	                  <tree editable="top">
+	                    <field name="reporting_head"/>
+	                    <field name="start_date"/>
+	                    <field name="till_date"/>
+	                    <field name="attach_doc" filename="filename"/>
+		                <field name="filename" invisible="1"/>
+	                  </tree>
+	                 </field>
+	                 	             
+	             </page>
+	         </xpath>
+	          
+	        <xpath expr="//field[@name='job_id']" position="after">
+	                 <field name="dept_date" invisible="1" />
+	                 <field name="desig_date" invisible='1'/>
+	                 <field name="state_date" invisible='1'/>
+	         </xpath>     
+            </field>
+            </record>
+           
+        </data>
+              
+</openerp>

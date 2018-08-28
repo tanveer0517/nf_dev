@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<openerp>
+	<data noupdate="1">
+        
+        <record id="group_dincharya" model="res.groups">
+            <field name="name">Dincharya</field>
+        </record>
+    </data>
+
+    <data noupdate="1">
+
+        <record id="nf_dincharya_rule" model="ir.rule">
+            <field name="name">Dincharya Rules</field>
+            <field ref="model_nf_biz" name="model_id"/>
+            <field name="domain_force">['|',('user_id','=',user.id),('user_id','=',False)]</field>
+            <field name="groups" eval="[(4, ref('group_dincharya'))]"/>
+        </record>
+
+    </data>
+</openerp>
+		

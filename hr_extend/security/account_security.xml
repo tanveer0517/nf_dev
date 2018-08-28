@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="0">
+
+    <!-- <record id="base.group_hr_manager" model="res.groups">
+        <field name="name">HR Manager</field>
+        <field name="category_id" ref="base.group_hr_manager"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record> -->
+
+    <record id="employee_deputation_access_rule_id" model="ir.rule">
+        <field name="name">Employee Deputation</field>
+        <field name="model_id" ref="model_nf_deputation"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            ['|','|',('c_user_id','=',user.id),('c_man_user_id','=',user.id),('c_rep_mngr_user','=',user.id)]
+        </field>
+    </record>
+    
+    <record id="nf_employee_probation_access_rule_id" model="ir.rule">
+        <field name="name">Probation HR</field>
+        <field name="model_id" ref="model_nf_employee_probation"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            [(1,'=',1)]
+        </field>
+    </record>
+
+    <record id="nf_employee_probation_access_rule_id" model="ir.rule">
+        <field name="name">Probation Manager</field>
+        <field name="model_id" ref="model_nf_employee_probation"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            ['|',('employee_id.parent_id.user_id.id','=',user.id),('employee_id.coach_id.user_id.id','=',user.id)]
+        </field>
+    </record>
+    
+    <record id="employee_officer_deputation_access_rule_id" model="ir.rule">
+        <field name="name">Officer Deputation</field>
+        <field name="model_id" ref="model_nf_deputation"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            [(1,'=',1)]
+        </field>
+    </record>
+
+    <record id="hr_payroll_employee_access_rule_id" model="ir.rule">
+        <field name="name">Payroll Employee HR</field>
+        <field name="model_id" ref="model_nf_payroll_employee"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            [(1,'=',1)]
+        </field>
+    </record>
+
+    <record id="man_payroll_employee_access_rule_id" model="ir.rule">
+        <field name="name">Payroll Employee Manager</field>
+        <field name="model_id" ref="model_nf_payroll_employee"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            ['|','|',('employee_id.user_id','=',user.id),('employee_id.parent_id.user_id','=',user.id),('employee_id.coach_id.user_id','=',user.id)]
+        </field>
+    </record>
+
+    <record id="man_buddy_candidate_feedback_access_rule_id" model="ir.rule">
+        <field name="name">Buddy Feedback Manager</field>
+        <field name="model_id" ref="model_nf_buddy_candidate_feedback"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            [(1,'=',1)]
+        </field>
+    </record>
+
+    <record id="emp_buddy_candidate_feedback_access_rule_id" model="ir.rule">
+        <field name="name">Buddy Feedback Employee</field>
+        <field name="model_id" ref="model_nf_buddy_candidate_feedback"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+        <field name="domain_force">
+            ['|',('employee_id.user_id','=',user.id),('buddy_id.user_id','=',user.id)]
+        </field>
+    </record>
+
+    <record id="group_paathshala" model="res.groups">
+        <field name="name">Paathshala</field>
+    </record>
+
+</data>
+</odoo>

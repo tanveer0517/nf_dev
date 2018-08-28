@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+	<menuitem
+            name="Income Tax"
+            parent="hr_payroll.menu_hr_payroll_root"
+            id="menu_employee_tds_main" sequence="35" groups="hr_payroll.group_hr_payroll_user"/>
+        <!-- Tax Slab Master Start -->
+		<record model="ir.ui.view" id="view_income_tax_form">
+				<field name="name">income.tax.form</field>
+				<field name="model">income.tax</field>
+				<field name="type">form</field>
+				<field name="arch" type="xml">
+					<form string="Income Tax">
+						<sheet>
+							<group colspan="4" cols="4">
+								<group>
+									<field name="name" required="1"/>
+								</group>
+								<group>
+									<field name="fin_year_id" required="1"/>
+								</group>
+							</group>
+							<notebook>
+								<page string="Tax Slabs">
+									<separator string="Tax Slabs"/>
+										<field name="tax_slabs" colspan="4" string="Tax" nolabel="1">
+										<tree string="Tax" editable="top">
+											<field name="name" required="1" />
+											<field name="amount_from" required="1"/>
+											<field name="amount_to" required="1"/>
+											<field name="income_tax" required="1"/>
+											<field name="minimum_tax" required="1"/>
+											<field name="surcharge" required="1"/>
+											<field name="education_cess" required="1"/>
+										</tree>
+										</field>
+								</page>
+							</notebook>
+						</sheet>
+					</form>
+				</field>
+			</record>
+
+			<record model="ir.ui.view" id="view_income_tax_tree">
+				<field name="name">income.tax.tree</field>
+				<field name="model">income.tax</field>
+				<field name="type">tree</field>
+				<field name="arch" type="xml">
+					<tree string="Income Tax">
+						<field name="name" required="1"/>
+						<field name="fin_year_id" required="1"/>
+					</tree>
+				</field>
+			</record>
+
+			<record model="ir.actions.act_window" id="action_income_tax">
+				<field name="name">Income Tax</field>
+				<field name="res_model">income.tax</field>
+				<field name="view_type">form</field>
+				<field name="view_mode">tree,form</field>
+			</record>
+
+			<menuitem name="Tax Slabs" action="action_income_tax" id="menu_tax_slabs" parent="hr_payroll.menu_hr_payroll_configuration" groups="hr_payroll.group_hr_payroll_user"/>
+
+        <!-- Employee Tax start -->
+        <record id="view_employee_tds_form" model="ir.ui.view">
+            <field name="name">employee.tds.form</field>
+            <field name="model">employee.tds</field>
+            <field name="arch" type="xml">
+            <form>
+            	<header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+             <sheet>
+              <group>
+               <group>
+        	      <field name="employee_id"/>
+                  <field name="tds_gross_amount"/>
+                  <field name="tds_net_salary_taxable"/>
+               </group>
+               <group>
+               	<field name="net_tds_paid"/>
+                  <field name="net_tds_amount"/>
+                  <field name="date_from"/>
+                  <field name="date_to"/>
+            </group>
+            <group>
+                  <field name="professional_tax_paid"/>
+                  <field name="cpf_paid"/>
+                  <field name="gis_paid"/>
+                  <field name="fin_year_id"/>
+                  <field name="unit_id"/>
+
+            </group>
+            <group>
+		  		 <field name="eps_paid"/>
+		  		 <field name="lic_paid"/>
+		  		 <field name="vpf_paid"/>
+		  		 <field name="company_id"/>
+		  		 <field name="region_id"/>
+		  		
+            </group>
+            <group>
+		  		 <field name="professional_tax_monthly"/>
+		  		 <field name="cpf_monthly"/>
+		  		 <field name="gis_monthly"/>
+		  		 <field name="total_taxable_amount"/>
+		  		
+            </group>
+            <group>
+		  		 <field name="lic_monthly"/>
+		  		 <field name="vpf_monthly"/>
+		  		 <field name="medical_expense_monthly"/>
+		  		  <field name="medical_expense_paid"/>
+		  		
+            </group>
+            </group>
+            <notebook> 
+	        <page string="Income Tax Details">
+            <field name="tds_line_ids"/>
+            </page>
+            </notebook>
+            </sheet>
+            </form>
+		</field>
+        </record>
+       
+          
+        <record id="view_employee_tds_tree" model="ir.ui.view">
+            <field name="name">employee.tds.tree</field>
+            <field name="model">employee.tds</field>
+            <field name="arch" type="xml">
+            <tree>
+        	      <field name="employee_id"/>
+                  <field name="tds_gross_amount"/>
+                  <field name="tds_net_salary_taxable"/>
+                  <field name="net_tds_amount"/>
+                  <field name="net_tds_paid"/>
+                  
+                  <field name="date_from"/>
+                  <field name="date_to"/>
+            </tree>
+		</field>
+        </record>
+        <record id="view_employee_tds_filter" model="ir.ui.view">
+            <field name="name">employee.tds.filter</field>
+            <field name="model">employee.tds</field>
+            <field name="arch" type="xml">
+                <search string="Income Tax">
+                    <field name="employee_id" string="Employees"/> 
+                     <group expand="0" string="Group By">
+                        <filter string="Employee" icon="terp-personal" domain="[]" context="{'group_by':'employee_id'}"/>
+                        <filter string="Month" icon="terp-personal+" domain="[]" context="{'group_by':'date_from'}"/>
+                        <filter string="Region" icon="terp-personal+" domain="[]" context="{'group_by':'region_id'}"/>
+                    </group>                  
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="employee_tds">
+            <field name="name">Income Tax </field>
+            <field name="res_model">employee.tds</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Income Tax"
+            parent="menu_employee_tds_main"
+            id="menu_employee_tds" action="employee_tds" sequence="35"/>
+        
+       <record id="view_employee_tds_line_tree" model="ir.ui.view">
+            <field name="name">employee.tds.line.tree</field>
+            <field name="model">employee.tds.line</field>
+            <field name="arch" type="xml">
+            <tree>
+                  <field name="name"/>
+        	      <field name="total_amount"/>
+                  <field name="exempted_amount"/>
+                  <field name="taxable_amount"/>
+                  <field name="employee_no" invisible='1'/>
+            </tree>
+		</field>
+        </record>
+        
+       <!-- Income Tax Run start -->
+        <record id="view_employee_tds__run_form" model="ir.ui.view">
+            <field name="name">employee.tds.run.form</field>
+            <field name="model">employee.tds.run</field>
+            <field name="arch" type="xml">
+            <form>
+             <header>
+                    <button name="compute_tax" type="object" string="Compute Income Tax" states="draft" class="oe_highlight"/>
+                    <button name="confirm_sheet" string="Confirm" type="object" states="draft" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                    <group col="4">
+                        <label for="date_start" string="Period"/>
+                         <div>
+                               <field name="date_from" class="oe_inline"/> - <field name="date_to" class="oe_inline"/>
+                         </div>
+                        <field name="company_id" required='1' widget="selection"/>
+                    </group>
+                    <label for="message" class="oe_edit_only"/>
+                    <h3 align="center" style="color:green;">
+                        <field name="message"/>
+                    </h3>
+                    <!-- <notebook>
+                  <page string="Income Tax Lines">
+                    <field name="tds_ids">
+                        <tree string="Income Tax" editable="bottom">
+                        <field name="employee_id"/>
+                        <field name="tds_gross_amount"/>
+                        <field name="tds_net_salary_taxable"/>
+          	            <field name="net_tds_amount"/>
+          	            </tree>
+                  	  </field>   
+                  </page>
+                </notebook> -->
+                    
+                </sheet>
+            </form>
+		</field>
+        </record>
+       
+          
+        <record id="view_employee_tds_run_tree" model="ir.ui.view">
+            <field name="name">employee.tds.run.tree</field>
+            <field name="model">employee.tds.run</field>
+            <field name="arch" type="xml">
+            <tree>
+        	      <field name="name"/>
+                  <field name="date_from"/>
+                  <field name="date_to"/>
+                  <field name="state"/>
+                  <field name="company_id"/>
+
+
+            </tree>
+		</field>
+        </record>
+        
+
+        <record model="ir.actions.act_window" id="employee_tds_run">
+            <field name="name">Income Tax Computation </field>
+            <field name="res_model">employee.tds.run</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Income Tax Computation"
+            parent="menu_employee_tds_main"
+            id="menu_employee_tds_run" action="employee_tds_run" sequence="35" groups="hr_payroll.group_hr_payroll_user"/>
+            
+        
+</data>
+</openerp>
+        

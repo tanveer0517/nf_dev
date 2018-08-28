@@ -1,0 +1,17 @@
+<openerp>
+    <data>
+    <record id="seq_lead" model="ir.sequence">
+        <field name="name">sequence number</field>
+        <field name="code">sequence</field>
+        <field name="prefix">NFL-</field>
+        <field name="padding">6</field>
+    </record>
+
+        <record id="seq_package_extension" model="ir.sequence">
+            <field name="name">sequence number</field>
+            <field name="code">package_sequence</field>
+            <field name="prefix">PE-</field>
+            <field name="padding">6</field>
+        </record>
+</data>
+</openerp>

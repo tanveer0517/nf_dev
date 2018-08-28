@@ -1,0 +1,1692 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+         <menuitem action="hr_contract.action_hr_contract" id="hr_contract.hr_menu_contract" parent="hr_payroll.menu_hr_payroll_root" name="Employee Salary Details" sequence="4" groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>
+        
+        <record id="view_pro_tax_rates_form" model="ir.ui.view">
+            <field name="name">pro.tax.form</field>
+            <field name="model">hr.professional.tax</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="state_id" required='True' domain="[('country_id.name','=','India')]"/>
+                     <field name="amount_from" required='True'/>
+                     <field name="amount_to" required='True'/>
+                     <field name="pro_tax_amount" required='True'/>
+                     </group>
+                     <group>
+		     		<field name="month_from" required='True'/>
+		     		<field name="month_to" required='True'/>
+		     		<field name="half_yearly"/>
+		     		<field name="gross_annual"/>
+		     		</group>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_pro_tax_rates_tree" model="ir.ui.view">
+            <field name="name">pro.tax.tree</field>
+            <field name="model">hr.professional.tax</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="state_id"/>
+                <field name="amount_from"/>
+                <field name="amount_to"/>
+                <field name="pro_tax_amount"/>
+		       <field name="month_from"/>
+		       <field name="month_to"/>
+		       <field name="half_yearly"/>
+		       <field name="gross_annual"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="pro_tax_rates">
+            <field name="name">Professional Tax Rates</field>
+            <field name="res_model">hr.professional.tax</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Professional Tax Rates"
+            parent="hr_payroll.menu_hr_payroll_configuration"
+            id="menu_pro_tax_rates" action="pro_tax_rates" sequence="5"/>
+
+           <record id="view_hr_location" model="ir.ui.view">
+            <field name="name">hr.location.form</field>
+            <field name="model">hr.location</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                   <group>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="type" required="1"/>
+                     <field name="hra_rates" required="1"/>
+                    <field name="state_id" required="1"/>
+                    <field name="type_for_conveyance"/>
+                    <field name="region_id" invisible="1"/>
+                    </group>
+                    <group>
+                    <field name="is_metro" widget="radio"/>
+                    <field name="professional_tax" invisible="1"/>
+                    <field name="professional_tax_type" attrs="{'invisible': [('professional_tax', '=', False)]}" invisible="1"/>
+                    <field name="pro_tax_amount" attrs="{'invisible': [('professional_tax', '=', False)]}" invisible="1"/>
+                    </group>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_hr_location_tree" model="ir.ui.view">
+            <field name="name">hr.location.tree</field>
+            <field name="model">hr.location</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="type"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="hr_location">
+            <field name="name">Location</field>
+            <field name="res_model">hr.location</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- <menuitem
+            name="Location"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_hr_location" action="hr_location" sequence="2"/> -->
+            
+        <record id="view_da_rates_form" model="ir.ui.view">
+            <field name="name">da.rates.form</field>
+            <field name="model">da.rates</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="name"/>
+                     <field name="effective_from"/>
+                     <field name="effective_to"/>
+                     </group>
+                     <group>
+		     		<field name="pattern"/>
+		     		<field name="rate"/>
+		     		<field name="active"/>
+		     		</group>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_da_rates_tree" model="ir.ui.view">
+            <field name="name">da.rates.tree</field>
+            <field name="model">da.rates</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="effective_from"/>
+                <field name="effective_to"/>
+                <field name="pattern"/>
+		       <field name="rate"/>
+		       <field name="active"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="da_rates">
+            <field name="name">DA Rates</field>
+            <field name="res_model">da.rates</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="DA Rates"
+            parent="hr_payroll.menu_hr_payroll_configuration"
+            id="menu_da_rates" action="da_rates" sequence="5"/>
+        
+
+
+     <record id="view_con_recovery_rates_form" model="ir.ui.view">
+            <field name="name">con.recovery.form</field>
+            <field name="model">con.recovery.rates</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="grade_id"/>
+                     <field name="max_journey"/>
+                     </group>
+                     <group>
+		     		<field name="pattern"/>
+		     		<field name="amount"/>
+		     		</group>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_con_recovery_rates_tree" model="ir.ui.view">
+            <field name="name">con.recovery.tree</field>
+            <field name="model">con.recovery.rates</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="grade_id"/>
+                <field name="max_journey"/>
+                <field name="pattern"/>
+		       <field name="amount"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="con_recovery_rates">
+            <field name="name">Conveyance Recovery Rates</field>
+            <field name="res_model">con.recovery.rates</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Conveyance Recovery Rates"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_con_recovery_rates" action="con_recovery_rates" sequence="5"/>
+
+ <record id="view_hrr_rates_form" model="ir.ui.view">
+            <field name="name">hrr.rates.form</field>
+            <field name="model">hrr.rates</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="area_from" required='True'/>
+                     <field name="area_to" required='True'/>
+                     </group>
+                     <group>
+		     		<field name="amount" required='True'/>
+		     		</group>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_hrr_rates_tree" model="ir.ui.view">
+            <field name="name">hrr.rates.tree</field>
+            <field name="model">hrr.rates</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="area_from"/>
+                <field name="area_to"/>
+                <field name="amount"/>
+                
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="hrr_rates">
+            <field name="name">House Rent Recovery Rates</field>
+            <field name="res_model">hrr.rates</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="House Rent Recovery Rates"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_hrr_rates" action="hrr_rates" sequence="5"/>
+
+        
+        <record id="view_employee_region" model="ir.ui.view">
+            <field name="name">employee.region.form</field>
+            <field name="model">employee.region</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  
+                     <field name="name"/>
+                     <field name="code"/>
+                     <field name="company_id"/>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_employee_region_tree" model="ir.ui.view">
+            <field name="name">employee.region.tree</field>
+            <field name="model">employee.region</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="employee_region">
+            <field name="name">Region</field>
+            <field name="res_model">employee.region</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Region"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_employee_region" action="employee_region" sequence="2"/>
+            
+            
+            
+        <record id="view_employee_unit" model="ir.ui.view">
+            <field name="name">employee.unit.form</field>
+            <field name="model">employee.unit</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  
+                     <field name="name"/>
+                     <field name="code"/>
+                     <field name="region_id"/>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_employee_unit_tree" model="ir.ui.view">
+            <field name="name">employee.unit.tree</field>
+            <field name="model">employee.unit</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="region_id"/>
+            </tree>
+		</field>
+        </record>
+
+	<record id="view_employee_unit_filter" model="ir.ui.view">
+            <field name="name">employee.unit.filter</field>
+            <field name="model">employee.unit</field>
+            <field name="arch" type="xml">
+                <search string="Unit">
+                    <field name="name" string="Name"/>
+                    <field name="code" string="Code"/>
+                    <field name="region_id" string="Region"/>
+                    
+                </search>
+             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="employee_unit">
+            <field name="name">Unit</field>
+            <field name="res_model">employee.unit</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- <menuitem
+            name="Unit"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_employee_unit" action="employee_unit" sequence="2"/> -->
+
+
+
+           <record id="view_hr_grade" model="ir.ui.view">
+            <field name="name">hr.grade.form</field>
+            <field name="model">hr.grade</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                    <field name="name"/>
+                    <field name="level"/>
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_hr_grade_tree" model="ir.ui.view">
+            <field name="name">hr.grade.tree</field>
+            <field name="model">hr.grade</field>
+            <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="level"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="hr_grade">
+            <field name="name">Grade</field>
+            <field name="res_model">hr.grade</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Grade"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_hr_grader" action="hr_grade" sequence="2"/>
+        
+
+        <record id="hr_employee_form_inherit" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="//form/sheet/notebook/page[1]" position="after">
+                 <!-- <page string="Other Infomation" >
+                  <group>
+                   <group>
+	                <field name="grade_id"/>
+	                <field name="benefits_grade_id"/>
+	                <field name="doj"/>
+	                <field name="employee_no"/>
+	                <field name="father_name"/>
+		      		<field name="pan_number"/>
+		      		<field name="retire_date"/>
+		      	</group>
+		      			      	
+		      	<group>
+		      	    <field name="employee_type_id"/>
+	               	<field name="passport_id" invisible = '1' />
+					<field name="pf_account"/>
+					<field name="uan" invisible="1"/>
+					<field name="bank_name"/>
+					<field name="bank_account"/>
+					<field name="ifsc_code"/>
+					<field name="pattern"/>
+					<field name="mode_of_pay"/>
+				</group>
+				</group>
+				</page> -->
+           	 </xpath>
+           	 
+           	 <xpath expr="//field[@name='address_id']" position="attributes">
+		      	<attribute name="invisible">1</attribute>
+		     </xpath>
+		     <xpath expr="//field[@name='calendar_id']" position="attributes">
+		      	<attribute name="invisible">1</attribute>
+		     </xpath>
+           	 <!-- <xpath expr="//field[@name='address_home_id']" position="attributes">
+		      	<attribute name="invisible">1</attribute>
+		     </xpath> -->
+           	 <xpath expr="//field[@name='category_ids']" position="before">
+		      	<group>
+		      	<group>
+		      	<field name="employee_no" readonly="1" invisible="1"/>
+		      	<field name="nf_emp"/>
+		      	<field name="anniversary" invisible="1"/>
+		      	<field name="paternity" invisible="1"/>
+		      	<field name="maternity" invisible="1"/>
+		      	<field name="pattern" invisible="1"/>
+		      	</group>
+		      	</group>
+		     </xpath>
+		     
+		     <xpath expr="//field[@name='job_id']" position="attributes">
+		       <attribute name="options">{'no_create': True}</attribute>
+		     </xpath>
+		     
+		     <xpath expr="//field[@name='job_id']" position="attributes">
+		       <attribute name="domain">[('parent','=',True)]</attribute>
+		     </xpath>
+           	 
+           	 <xpath expr="//field[@name='parent_id']" position="after">
+		     <field name="hr" invisible="1"/>
+		     </xpath>
+              <!--  <xpath expr="//field[@name='state_id']"  position="attributes">
+                    <attribute name="required">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='country_id1']"  position="attributes">
+                    <attribute name="required">0</attribute>
+                </xpath>   -->
+
+
+           	            	 
+           	 <xpath expr="//field[@name='work_email']" position="before">
+		      	<field name="branch_id" options="{'no_create': True}" required="1"/>
+                <field name="virtual_branch_id" options="{'no_create': True}"/>
+		      	<label for="street" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" placeholder="Street..." class="o_address_street" />
+                                <field name="street2" placeholder="Street 2..." class="o_address_street" />
+                                <field name="q_city_id" placeholder="City" class="o_address_city" options="{'no_create': True, 'no_open': True}"/>
+                               <div>
+                                <field name="state_id" placeholder="state" readonly="1"  class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                 <span attrs="{'invisible':[('q_city_id','=',False)]}">, </span>
+                                <field name="country_id1"  placeholder="country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                            </div>
+
+                               <!--<field name="state_id" domain="[('country_id','=',country_id1)]" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" />-->
+                                <field name="zip" placeholder="ZIP" class="o_address_zip" />
+
+                               <!--<field name="country_id1" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" />-->
+                            </div>
+                            
+                <field name="sub_dep" domain="[('parent_id','!=',False)]" options="{'no_create': True}" required="1"/>
+                <field name="sub_division" domain="[('parent_id','=',sub_dep)]" options="{'no_create': True}" />
+		      	<field name="division_id" invisible="1"/>
+                <field name="region_id" invisible="1"/>
+                <field name="location_id" invisible="1"/>
+		      </xpath>
+		      
+		      <!--<xpath expr="//field[@name='mobile_phone']" position="attributes">-->
+		       <!--<attribute name="invisible">1</attribute>-->
+		      <!--</xpath>-->
+		      
+		      <xpath expr="//field[@name='work_location']" position="attributes">
+		       <attribute name="invisible">0</attribute>
+		      </xpath>
+		      
+		      <xpath expr="//field[@name='visibility']" position="attributes">
+		       <attribute name="invisible">1</attribute>
+		      </xpath>
+		      
+		      		      
+             <xpath expr="//field[@name='work_phone']" position="after">
+                    <field name="cost_centr" readonly="1"/>
+                    <field name="old_location_id" invisible="1"/>
+                    <field name="last_transfer_date" invisible="1"/>
+	            	
+	            	<field name="unit" invisible="1"/>
+					<field name="catering_unit" invisible="1"/>
+	            	
+             </xpath>
+              <xpath expr="//field[@name='job_id']" position="after">
+                    <field name="last_promotion_date" invisible="1"/>
+              </xpath>
+              
+             <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="string">Zone</attribute>
+                </xpath> 
+                
+             <xpath expr="//field[@name='anniversary_date']" position="after">
+                    <field name="disability"/>
+                    
+             </xpath>
+             
+             <xpath expr="//page[1]" position="after">
+                 <page string="Previous Employment" groups="base.group_hr_user">
+                  <group>
+                   <group>
+	                
+		      	</group>
+		      	<group>
+		      	    <field name="desig_in_railway" invisible="1"/>
+	               	    <field name="gl_region" invisible="1"/>
+			    <field name="lob"/>
+				</group>
+				</group>
+				</page>
+           	 </xpath>
+           	 
+            <xpath expr="//field[@name='active']" position="after">
+                        <field name="salary_done"/>
+                    <field name="status"/>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
+                    
+            </xpath>
+            
+            <xpath expr="//field[@name ='department_id']" position="attributes">
+               <attribute name="invisible">1</attribute>
+             </xpath>
+            
+          <xpath expr="//field[@name ='c_pathsala_batch']" position="after">
+               <field name="paathshala_feedback"/>
+             </xpath>
+ 		  </field>
+	    </record>
+		
+        
+       <record id="view_employee_tree_inherit" model="ir.ui.view">
+            <field name="name">hr.employee.tree</field>
+            <field name="model">hr.employee</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+
+              <xpath expr="//field[@name='name']" position="after">
+                    <field name="nf_emp"/>
+                    <field name="region_id" invisible="1"/>
+           	 </xpath>
+             <xpath expr="//field[@name='department_id']" position="replace">
+                    <field name="department_id" invisible="1"/>
+                    <field name="sub_dep"/>
+             </xpath>
+             <xpath expr="//field[@name='work_phone']" position="replace">
+                    <field name="work_phone" invisible="1"/>
+                    <field name="mobile_phone"/>
+             </xpath>
+             <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="c_nf_buddy" groups="hr_extend.group_paathshala,hr.group_hr_manager"/>
+             </xpath>
+ 			</field>
+		</record>
+		
+		
+		<record id="view_employee_filter_inherit" model="ir.ui.view">
+            <field name="name">Employees</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">
+               
+              <xpath expr="//field[@name='name']" position="after">
+                    <field name="nf_emp"/>
+                    <!-- <field name="employee_no"/> -->
+           	 </xpath>
+           	  
+           	  
+           	 <xpath expr="//group[1]" position="inside">
+               <filter string="Region" icon="terp-go-home" domain="[]" context="{'group_by':'region_id'}"/>
+           	   <filter string="Employee Type" icon="terp-go-home" domain="[]" context="{'group_by':'employee_type_id'}"/>
+               <filter string="Location" icon="terp-go-home" domain="[]" context="{'group_by':'location_id'}"/>
+
+			
+				</xpath>
+ 			</field>
+		</record>
+		
+
+      <record id="view_irctc_contract_form" model="ir.ui.view">
+	            <field name="name">hr.contract.form</field>
+	            <field name="model">hr.contract</field>
+	            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+	            <field name="arch" type="xml">
+	              
+                  
+	              <xpath expr="/form/sheet/notebook/page[@name='information']/group/group[@name='duration_group']" position="replace">
+                       <group name="duration_group" string="Duration">
+                        <label for="date_start" string="Duration"/>
+                        <div>
+                            <field name="date_start" class="oe_inline"/> - <field name="date_end" class="oe_inline"/>
+                        </div>
+                        <field name="working_hours"/>
+                        </group>
+                  </xpath>
+                  <xpath expr="//field[@name ='department_id']" position="after">
+                   <field name="division" invisible="1"/>
+                  </xpath>
+	            
+	             <xpath expr="//field[@name ='wage']" position="before">
+	             	<field name="old_wage" invisible="1"/> 
+					<field name="grade_pay" invisible="1"/>
+					<field name="last_mth_wage" invisible="1"/>
+					<field name="new_wage" invisible="1"/>
+					
+				</xpath>
+				 
+	              <xpath expr="//page[1]" position="after">
+	             	<page string='Allowance'>
+	                <group string="Allowance">
+	                	<group>
+		                     <field name="child_ed_allow"/>
+		                     <field name="electricity_allow" invisible="1" />
+		                     <field name="entertain_allow" />
+		                     <field name="vehi_conveyence_allow" />
+		                     <field name="hard_soft_fur" />
+		                     <field name="lunch_dinner_coup" invisible="1"/>
+
+		                    
+		               </group>
+		               <group>
+		                     <field name="prof_up_allow" invisible="1"/>
+		                     <field name="medical_allow" />
+		                     <field name="uniform_fit_allow" />
+		                     <field name="meal_coupon_allow" />
+		                     <field name="washing_allow" invisible="1"/> 
+		                </group> 
+				<group>
+				<field name="cafeteria_aggregate" invisible="1"/>
+				</group>
+	                 </group>
+	                 	<group string="Other">
+	                 	  <group>
+		                    
+		                     <field name="vpf_amount" invisible="1"/>
+				     <field name="nps" invisible="1"/>
+		                     <field name="increment_month" placeholder="Select Month"/>
+		                  </group>
+		                  <group>
+		                  	<field name="increment_status" />
+		                   <field name="monthly_inc_amount" />
+						    <field name="ne_increment_month" />
+		                  </group>
+	                 	</group>
+	                 	</page>
+	                 	<page string='Lease Details' invisible="1">
+	                <group string="Lease Details"> 
+                      <group>
+		                     <field name="hra_hrr_lease"/>
+		                     <field name="lease_type" />
+		                     <field name="ownership_type" />
+		                     <field name="lease_amount" />
+		                     <field name="flat_area" />
+		               </group>
+		               <group>
+		               		 <field name="address" />
+		                     <field name="lease_start_date" />
+		                     <field name="lease_end_date" />
+		                    
+		                </group> 
+	                 </group>
+	                 <field name="lease_notes" placeholder="Notes..."/>
+
+	                </page>
+	                 	
+	                 <page string='Extra Information' invisible="1">
+	                <group string="Extra Information"> 
+                      <group>
+		                     <field name="deputed_from_same_station" invisible="1"/>
+		                     <field name="eligible_for_deputaion" invisible="1"/>
+		                     <field name="eligible_for_conveyance"/>
+		                     <field name="eligible_for_hra"/>
+		                     <field name="opted_for_medical"/>
+		                     <field name="opted_for_furnishing" invisible="1"/>
+		                     <field name="pf_stop_flag"/>
+		                </group>
+		               <group>
+		                    
+		                     <field name="spouse_opting_rly_medical" invisible="1"/>
+		                      <field name="previous_railway_employee" invisible="1"/>
+		                       <field name="opted_for_washing" invisible="1"/>
+                             <field name="nha_worked"/>
+                              <field name="nda_hours" invisible="1"/>
+                              <field name="monthly_rent_paid"/>
+                              <field name="special_pf_amount"/>
+		               </group>      
+		              
+	                 </group>
+
+	                </page> 
+	                 </xpath>
+	            	</field>
+	        </record>  
+
+        <record id="view_fin_year_form" model="ir.ui.view">
+            <field name="name">fin.year.mst.form</field>
+            <field name="model">fin.year.mst</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="name" required='1'/>
+                     </group>
+                     <group>
+                     <field name="start_date" required='1'/>
+                     <field name="end_date" required='1'/>
+                     </group>
+                     
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_fin_year_tree" model="ir.ui.view">
+            <field name="name">fin.year.mst.tree</field>
+            <field name="model">fin.year.mst</field>
+            <field name="arch" type="xml">
+            <tree>
+                	 <field name="name"/>
+                     <field name="start_date"/>
+                     <field name="end_date"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="fin_year">
+            <field name="name">Financial Year</field>
+            <field name="res_model">fin.year.mst</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Financial Year"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_fin_year" action="fin_year" sequence="6"/>
+            
+        <record id="view_bank_mst_form" model="ir.ui.view">
+            <field name="name">bank.mst.form</field>
+            <field name="model">bank.mst</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="name" required='1'/>
+                     </group>
+                     <group>
+                     <field name="code" required='1'/>
+                     </group>
+                     
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_bank_mst_tree" model="ir.ui.view">
+            <field name="name">bank.mst.tree</field>
+            <field name="model">bank.mst</field>
+            <field name="arch" type="xml">
+            <tree>
+                	 <field name="name"/>
+                	 <field name="code"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="bank_mst">
+            <field name="name">Bank</field>
+            <field name="res_model">bank.mst</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Bank"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_bank_mst" action="bank_mst" sequence="7"/>
+            
+            
+           <record id="view_account_analytic_account_form" model="ir.ui.view">
+            <field name="name">analytic.analytic.account.form</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+            <field name="arch" type="xml"> 
+             <xpath expr="//field[@name='partner_id']" position="after">
+              <field name="branch_id"/>
+              <field name="sub_dep" />
+              <field name="division_id" invisible="1"/>
+             </xpath>
+            </field>
+            </record>
+            
+            <!-- 
+         <record id="view_railway_division_form" model="ir.ui.view">
+            <field name="name">railway.division.form</field>
+            <field name="model">railway.division</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group>
+                  <group>
+                     <field name="name" required='1'/>
+                     </group>
+                     <group>
+                     <field name="code" required='1'/>
+                     </group>
+                     
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_railway_division_tree" model="ir.ui.view">
+            <field name="name">railway.division.tree</field>
+            <field name="model">railway.division</field>
+            <field name="arch" type="xml">
+            <tree>
+                	 <field name="name"/>
+                	 <field name="code"/>
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="railway_division">
+            <field name="name">Railway Division</field>
+            <field name="res_model">railway.division</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Railway division"
+            parent="hr.menu_human_resources_configuration"
+            id="menu_railway_division" action="railway_division" sequence="8"/> -->
+
+    <record model="ir.ui.view" id="nf_deputation_view_form">
+      <field name="name">Business Travel Form</field>
+      <field name="model">nf.deputation</field>
+      <field name="arch" type="xml">
+        <form string="Business Travel Form">
+          <header>
+             <button name="approve" states="Draft" string="Approve" type="object" groups="hr.group_hr_manager"/>
+              <button name="reject" states="Draft" string="Reject" type="object" class="oe_stat_button"/>
+             <button name="reset_to_draft" states="Reject" string="Reset to Draft" type="object" groups="hr.group_hr_manager"/>
+             <field name="state" widget="statusbar"/>
+          </header>
+          <sheet>
+            <group>
+              <group>
+                <field name="name" required="1" options="{'no_create': True}" attrs="{'readonly':[('state','in',['Approve','Reject'])]}"/>
+                <field name="emp_id" readonly="1"/>
+                  <field name="work_mobile" readonly="1"/>
+                  <label for="travel_date" string="Duration"/>
+                  <div>
+                        <field name="travel_date" required="1" attrs="{'readonly':[('state','in',['Approve','Reject'])]}" class="oe_inline"/>
+                        <label string="  - " class="oe_inline"/>
+                        <field name="till_date" required="1" attrs="{'readonly':[('state','in',['Approve','Reject'])]}" class="oe_inline"/>
+                      </div>
+                  <field name="reason_id" options="{'no_create_edit': True}" required="1" attrs="{'readonly':[('state','in',['Approve','Reject'])]}"/>
+
+              </group>
+              <group>
+                <field name="designation" readonly="1"/>
+                <field name="c_user_id" invisible="1"/>
+                <field name="branch_id" options="{'no_create': True}" readonly="1"/>
+                <field name="c_man_user_id" readonly="1"/>
+                <field name="c_rep_mngr_user" readonly="1"/>
+                <field name="approve_date" readonly="1" attrs="{'invisible':[('state','!=','Approve')]}"/>
+                <field name="reject_date" readonly="1" attrs="{'invisible':[('state','!=','Reject')]}"/>
+              </group>
+            </group>
+            
+          </sheet>
+            <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+              <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_deputation_view_tree">
+          <field name="name">Business Travel</field>
+          <field name="model">nf.deputation</field>
+          <field name="arch" type="xml">
+            <tree string="Business Travel">
+              <field name="name"/>
+              <field name="emp_id"/>
+              <field name="designation"/>
+              <field name="branch_id"/>
+              <field name="travel_date"/>
+              <field name="till_date"/>
+              <field name="state"/>
+            </tree>
+          </field>
+      </record>
+
+      <record id="nf_deputation_action" model="ir.actions.act_window">
+          <field name="name">Business Travel Form</field>
+          <field name="res_model">nf.deputation</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="view_id" ref="nf_deputation_view_tree"/>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to setup a new Deputation Data.
+            </p>
+          </field>
+      </record>
+
+      <menuitem name="Business Travel" id="menu_nf_deputation" sequence="175" web_icon="hr_extend,static/description/deput.png"/>
+      <!-- <menuitem name="Deputation" id="submenu_nf_deputation" parent="menu_nf_deputation" /> -->
+
+        <menuitem
+        sequence="1"
+        id="nf_deputation_action_menu"
+        name="Business Travel"
+        parent="menu_nf_deputation"
+        action="nf_deputation_action"/>
+
+        <record id="view_nf_deputation_type_form" model="ir.ui.view">
+            <field name="name">nf.deputation.type.form</field>
+            <field name="model">nf.deputation.type</field>
+            <field name="arch" type="xml">
+            <form>
+             <sheet>
+                  <group col="4" colspan="4">
+                     <field name="code" required='1'/>
+                     <field name="name" required='1'/>
+                     <field name="active" />
+                </group>
+              </sheet>
+            </form>
+		</field>
+        </record>
+        <record id="view_nf_deputation_type_tree" model="ir.ui.view">
+            <field name="name">nf.deputation.type.tree</field>
+            <field name="model">nf.deputation.type</field>
+            <field name="arch" type="xml">
+            <tree>
+                   <field name="code" />
+                   <field name="name" />
+                   <field name="active" />
+            </tree>
+		</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_nf_deputation_type">
+            <field name="name">Business Travel Type</field>
+            <field name="res_model">nf.deputation.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Business Travel Type"
+            parent="menu_nf_deputation"
+            id="menu_nf_deputation_type" action="action_nf_deputation_type" sequence="10" groups="hr.group_hr_manager"/>
+
+    <record model="ir.ui.view" id="nf_paathshala_feedback_form">
+      <field name="name">Paathshala Feedback</field>
+      <field name="model">nf.paathshala.feedback</field>
+      <field name="arch" type="xml">
+        <form string="Paathshala Feedback Form">
+          <header>
+            <button name="submit_feedback" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':[('submit','=',True)]}"/>
+          </header>
+          <sheet>
+            <group>
+              <group>
+                <field name="name" required="1" attrs="{'readonly':[('submit','=',True)]}"/>
+                <field name="date_from" required="1" attrs="{'readonly':[('submit','=',True)]}"/>
+                <field name="no_attendees" required="1" attrs="{'readonly':[('submit','=',True)]}"/>
+              </group>
+              <group>
+                <field name="pathsala_city" options="{'no_create': True,'no_create_edit': True,'no_open': True}" required="1" attrs="{'readonly':[('submit','=',True)]}"/>
+                <field name="date_to" required="1" attrs="{'readonly':[('submit','=',True)]}"/>
+                <field name="trainer_name" options="{'no_create': True,'no_create_edit': True}" attrs="{'readonly':[('submit','=',True)]}" required="1"/>
+                <field name="submit" invisible="1"/>
+              </group>
+            </group>
+            <separator string='Feedback Details'/>
+            <field name="feedback_line" nolabel="1" attrs="{'readonly':[('submit','=',True)]}">
+              <tree editable="bottom">
+                <field name="employee_id" options="{'no_create': True,'no_create_edit': True}" required="1"/>
+                <field name="emp_id" required="1"/>
+                <field name="branch_id" required="1"/>
+                <field name="designation" required="1"/>
+                <field name="paathshala_score" required="1"/>
+                <field name="low_score"/>
+                <field name="feedback" required="1"/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <group>
+                      <field name="employee_id"/>
+                      <field name="emp_id"/>
+                      <field name="feedback"/>
+                    </group>
+                    <group>
+                      <field name="branch_id"/>
+                      <field name="designation"/>
+                      <field name="paathshala_score"/>
+                    </group>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+          </sheet>
+            <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+              <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_paathshala_feedback_tree">
+          <field name="name">Paathshala Feedback</field>
+          <field name="model">nf.paathshala.feedback</field>
+          <field name="arch" type="xml">
+            <tree string="Paathshala Feedback">
+              <field name="name"/>
+              <field name="date_from"/>
+              <field name="date_to"/>
+              <field name="pathsala_city"/>
+              <field name="no_attendees"/>
+            </tree>
+          </field>
+      </record>
+
+      <record id="nf_paathshala_feedback_action" model="ir.actions.act_window">
+          <field name="name">Paathshala Feedback</field>
+          <field name="res_model">nf.paathshala.feedback</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="view_id" ref="nf_paathshala_feedback_tree"/>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to setup a new Paathshala Feedback Data.
+            </p>
+          </field>
+      </record>
+
+        <menuitem
+        sequence="10"
+        id="nf_paathshala_feedback_action_menu"
+        name="Paathshala Feedback"
+        parent="hr.menu_hr_main"
+        action="nf_paathshala_feedback_action" groups="hr_extend.group_paathshala,hr.group_hr_manager"/>
+
+      <record model="ir.ui.view" id="nf_paathshala_feedback_line_form">
+      <field name="name">Review Paathshala Feedback</field>
+      <field name="model">nf.paathshala.feedback.line</field>
+      <field name="arch" type="xml">
+        <form string="Review Paathshala Feedback">
+          <header>
+            <button name="confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible':[('reviewed','=',True)]}"/>
+          </header>
+          <sheet>
+            <group string="Feedback Details">
+              <group>
+                <field name="employee_id" readonly="1"/>
+                <field name="emp_id" readonly="1"/>
+                <field name="branch_id" readonly="1"/>
+                <field name="designation" readonly="1"/>
+              </group>
+              <group>
+                <field name="paathshala_score" readonly="1"/>
+                <field name="low_score" readonly="1"/>
+                <field name="paathshala_feedback" readonly="1"/>
+              </group>
+            </group>
+            <group>
+                <field name="feedback" readonly="1"/>
+            </group>
+            <group string="Review Details">
+              <group>
+                <field name="review_date" readonly="1"/>
+                <field name="reviewed" invisible="1"/>
+                <field name="review_status" attrs="{'readonly':[('reviewed','=',True)]}"/>
+                <field name="final_score" attrs="{'readonly':[('reviewed','=',True)],'required':[('review_status','!=',False)]}"/>
+              </group>
+            </group>
+            <group>
+              <field name="review_comment" attrs="{'readonly':[('reviewed','=',True)],'required':[('review_status','!=',False)]}"/>
+            </group>
+
+          </sheet>
+            <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+              <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_paathshala_feedback_line_tree">
+          <field name="name">Review Paathshala Feedback</field>
+          <field name="model">nf.paathshala.feedback.line</field>
+          <field name="arch" type="xml">
+            <tree string="Review Paathshala Feedback" colors="red:reviewed==False;">
+              <field name="employee_id"/>
+                <field name="emp_id"/>
+                <field name="branch_id"/>
+                <field name="designation"/>
+                <field name="paathshala_score"/>
+                <field name="low_score"/>
+                <field name="final_score"/>
+                <field name="reviewed" invisible="1"/>
+            </tree>
+          </field>
+      </record>
+
+      <record id="nf_paathshala_feedback_line_action" model="ir.actions.act_window">
+          <field name="name">Review Paathshala Feedback</field>
+          <field name="res_model">nf.paathshala.feedback.line</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="domain">[('low_score','=',True)]</field>
+          <field name="view_id" ref="nf_paathshala_feedback_line_tree"/>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to setup a new Paathshala Feedback Data.
+            </p>
+          </field>
+      </record>
+
+        <menuitem
+        sequence="10"
+        id="nf_paathshala_feedback_line_action_menu"
+        name="Review Paathshala Feedback"
+        parent="hr.menu_hr_main"
+        action="nf_paathshala_feedback_line_action" groups="hr_extend.group_paathshala,hr.group_hr_manager"/>
+
+    <record model="ir.ui.view" id="nf_employee_probation_form">
+      <field name="name">Employee Probation</field>
+      <field name="model">nf.employee.probation</field>
+      <field name="arch" type="xml">
+        <form string="Employee Probation">
+          <header>
+            <button name="confirm" string="Confirm" states="Draft,Extend" type="object" class="oe_highlight"/>
+            <button name="extend" string="Extend" states="Draft,Confirm,RM Approve" type="object" class="oe_highlight"/>
+            <button name="manager_approve" string="RM Approve" states="Confirm,Extend" type="object" class="oe_highlight"/>
+            <button name="hr_approve" string="HR Approve" states="RM Approve" type="object" class="oe_highlight" groups="hr.group_hr_manager"/>
+            <button name="reject" string="Reject" states="Draft,Confirm,Extend,RM Approve" type="object" class="oe_highlight"/>
+            <field name="state" widget="statusbar"/>
+          </header>
+          <sheet>
+            <group>
+              <group>
+                <field name="employee_id" attrs="{'readonly':[('state','in',['RM Approve','HR Approve','Reject'])]}"/>
+                <field name="emp_id" readonly="1"/>
+                <field name="doj" readonly="1"/>
+                <field name="manager_id" readonly="1"/>
+              </group>
+              <group>
+                <field name="reporting_manager" readonly="1"/>
+                <field name="probation_completed" invisible="1"/>
+                <field name="extend_date" attrs="{'readonly':[('state','in',['RM Approve','HR Approve','Reject'])]}"/>
+                <field name="review_status" attrs="{'readonly':[('state','in',['HR Approve','Reject'])]}"/>
+              </group>
+              <group string = "Last 3 months Revenue">
+                <field name="first_month_revenue" readonly="1"/>
+                <field name="second_month_revenue" readonly="1"/>
+                <field name="third_month_revenue" readonly="1"/>
+              </group>
+            </group>
+            <separator string="Comments"/>
+            <field name="comments_ids">
+              <tree editable="bottom">
+                <field name="comments" attrs="{'readonly':[('submit','=',True)]}"/>
+                <field name="comment_date" readonly="1"/>
+                <field name="comment_by" readonly="1"/>
+                <field name="submit" invisible="1"/>
+              </tree>
+              <form>
+                <sheet>
+                  <group>
+                    <field name="comment_date"/>
+                    <field name="comment_by"/>
+                    <field name="comments"/>
+                  </group>
+                </sheet>
+              </form>
+            </field>
+
+          </sheet>
+            <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+              <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_employee_probation_tree">
+          <field name="name">Employee Probation</field>
+          <field name="model">nf.employee.probation</field>
+          <field name="arch" type="xml">
+            <tree string="Employee Probation" colors="blue:state=='Draft';orange:state=='Extend';green:state=='Confirm';red:state=='Reject'">
+              <field name="employee_id"/>
+                <field name="emp_id"/>
+                <field name="doj"/>
+                <field name="manager_id"/>
+                <field name="reporting_manager"/>
+                <field name="state"/>
+                <field name="probation_completed" invisible="1"/>
+            </tree>
+          </field>
+      </record>
+
+      <record id="nf_employee_probation_action" model="ir.actions.act_window">
+          <field name="name">Employee Probation</field>
+          <field name="res_model">nf.employee.probation</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="view_id" ref="nf_employee_probation_tree"/>
+      </record>
+
+        <menuitem
+        sequence="15"
+        id="nf_employee_probation_action_menu"
+        name="Employee Probation"
+        parent="hr.menu_hr_main"
+        action="nf_employee_probation_action"/>
+
+
+      <record model="ir.ui.view" id="nf_pareeksha_score_form">
+        <field name="name">Pareeksha Score</field>
+        <field name="model">nf.pareeksha.score</field>
+        <field name="arch" type="xml">
+          <form string="Pareeksha Score">
+            <sheet>
+              <group>
+                <group>
+                  <field name="employee_id"/>
+                  <field name="employee_name"/>
+                  <field name="start_date"/>
+                  <field name="score"/>
+                  <field name="percent_score"/>
+                </group>
+                <group>
+                  <field name="name"/>
+                  <field name="email_id"/>
+                  <field name="end_date"/>
+                  <field name="max_score"/>
+                  <field name="series_name"/>
+                </group>
+              </group>
+            </sheet>
+            <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+              <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+        </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_pareeksha_score_tree">
+          <field name="name">Pareeksha Score</field>
+          <field name="model">nf.pareeksha.score</field>
+          <field name="arch" type="xml">
+            <tree string="Pareeksha Score">
+              <field name="name"/>
+                <field name="employee_name"/>
+                <field name="email_id"/>
+                <field name="start_date" invisible="1"/>
+                <field name="end_date"/>
+                <field name="percent_score"/>
+                <field name="score"/>
+                <field name="max_score"/>
+            </tree>
+          </field>
+      </record>
+
+      <record id="nf_pareeksha_score_action" model="ir.actions.act_window">
+          <field name="name">Pareeksha Score</field>
+          <field name="res_model">nf.pareeksha.score</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="view_id" ref="nf_pareeksha_score_tree"/>
+      </record>
+
+        <!-- <menuitem
+        sequence="20"
+        id="nf_pareeksha_score_action_menu"
+        name="Pareeksha Score"
+        parent="hr.menu_hr_main"
+        action="nf_pareeksha_score_action" groups="base.group_erp_manager"/> -->
+
+      <record id="nf_payroll_employee_form" model="ir.ui.view">
+        <field name="name">Payroll Confirmation</field>
+        <field name="model">nf.payroll.employee</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Confirmation">
+              <header>
+                <button name="submit" string="Submit" type="object" states='Draft' class="oe_highlight"/>
+                <button name="cancel" string="Cancel" type="object" states='Draft' class="oe_highlight"/>
+                <field name="state" widget="statusbar"/>
+              </header>
+              <sheet>
+                <group>
+                  <field name="name" readonly="1"/>
+                  <field name="payroll_date" readonly="1"/>
+                  <field name="employee_id" readonly="1" string="Manager/Reporting Manager"/>
+                </group>
+                  <field name="employee_line" attrs="{'readonly':[('state','!=','Draft')]}">
+                    <tree editable='bottom' create="false">
+                      <field name="payroll_employee_id" invisible="1"/>
+                      <field name="submitted_by" invisible="1"/>
+                      <field name='employee_id' options="{'no_create': True}" domain="['|',('parent_id.user_id','=',uid),('coach_id.user_id','=',uid)]" readonly="1"/>
+                      <field name='status' required="1"/>
+                      <field name="reason" attrs="{'required':[('status','=','Hold')]}"/>
+                    </tree>
+                  </field>
+              </sheet>
+            </form>
+        </field>
+      </record>
+
+      <record id="nf_payroll_employee_tree" model="ir.ui.view">
+        <field name="name">Payroll Confirmation</field>
+        <field name="model">nf.payroll.employee</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll Confirmation">
+              <field name="name"/>
+              <field name="payroll_date"/>
+              <field name="state"/>
+            </tree>
+        </field>
+       </record>
+
+    <record model="ir.actions.act_window" id="action_nf_payroll_employee">
+        <field name="name">Payroll Confirmation</field>
+        <field name="res_model">nf.payroll.employee</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+      <menuitem name="Payroll Confirmation" id="menu_nf_payroll_employee" parent="hr.menu_hr_main" action="action_nf_payroll_employee" sequence="10"/>
+
+
+    <record id="nf_payroll_employee_line_form" model="ir.ui.view">
+        <field name="name">Payroll Confirmation List</field>
+        <field name="model">nf.payroll.employee.line</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Confirmation List" create="false" edit="false">
+              <sheet>
+                <group>
+                  <field name="payroll_employee_id" readonly="1"/>
+                  <field name="submitted_by" readonly="1"/>
+                  <field name='employee_id' options="{'no_create': True}" readonly="1"/>
+                  <field name='status' readonly="1"/>
+                  <field name="reason" readonly="1"/>
+                </group>
+              </sheet>
+            </form>
+        </field>
+      </record>
+
+      <record id="nf_payroll_employee_line_tree" model="ir.ui.view">
+        <field name="name">Payroll Confirmation List</field>
+        <field name="model">nf.payroll.employee.line</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll Confirmation List" create="false" edit="false">
+              <field name="payroll_employee_id"/>
+              <field name="employee_id"/>
+              <field name="status"/>
+              <field name="submitted_by"/>
+            </tree>
+        </field>
+       </record>
+
+     <record id="nf_payroll_employee_line_filter" model="ir.ui.view">
+        <field name="name">Payroll Confirmation Search</field>
+        <field name="model">nf.payroll.employee.line</field>
+        <field name="arch" type="xml">
+            <search>
+              <field name="employee_id"/>
+              <field name="status"/>
+              <field name="submitted_by"/>
+              <filter string="Hold" name="hold" icon="terp-go-home" domain="[('status','=','Hold')]"/>
+              <filter string="Process" name="process" icon="terp-go-home" domain="[('status','=','Process')]"/>
+            </search>
+        </field>
+       </record>  
+
+    <record model="ir.actions.act_window" id="action_nf_payroll_employee_line">
+        <field name="name">Payroll Confirmation</field>
+        <field name="res_model">nf.payroll.employee.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('payroll_employee_id.state','=','Submitted')]</field>
+    </record>
+
+      <menuitem name="Payroll Confirmation List" id="menu_nf_payroll_employee_line" parent="hr.menu_hr_main" action="action_nf_payroll_employee_line" sequence="10" groups="hr.group_hr_manager"/>
+
+    <record model="ir.ui.view" id="nf_hr_employee_image_form">
+      <field name="name">Employee Image</field>
+      <field name="model">hr.employee</field>
+      <field name="priority" eval="20"/>
+      <field name="arch" type="xml">
+        <form string="Employee Image">
+          <sheet>
+            <group>
+              <group>
+                <field name="name" readonly="1"/>
+                <field name="nf_emp" readonly="1"/>
+                <field name="work_email" readonly="1"/>
+                <field name="image" readonly="1"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+      <record model="ir.ui.view" id="nf_hr_employee_image_tree">
+          <field name="name">Employee Image</field>
+          <field name="model">hr.employee</field>
+          <field name="arch" type="xml">
+            <tree string="Employee Image">
+              <field name="name"/>
+              <field name="nf_emp"/>
+              <field name="work_email"/>
+            </tree>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="nf_hr_employee_image_search">
+            <field name="name">Employee Image</field>
+            <field name="model">hr.employee</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="nf_emp"/>
+                    <field name="work_email"/>
+                </search>
+            </field>
+        </record>
+
+      <record id="nf_hr_employee_image_action" model="ir.actions.act_window">
+          <field name="name">Employee Image</field>
+          <field name="res_model">hr.employee</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="view_id" ref="nf_hr_employee_image_tree"/>
+          <field name="search_view_id" ref="nf_hr_employee_image_search"/>
+      </record>
+
+        <record model="ir.actions.act_window.view" id="nf_hr_employee_image_form_action">
+            <field name="sequence" eval="5"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="nf_hr_employee_image_form"/>
+            <field name="act_window_id" ref="nf_hr_employee_image_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="nf_hr_employee_image_tree_action">
+            <field name="sequence" eval="4"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="nf_hr_employee_image_tree"/>
+            <field name="act_window_id" ref="nf_hr_employee_image_action"/>
+        </record>
+
+        <menuitem
+        sequence="15"
+        id="nf_hr_employee_image_action_menu"
+        name="Employee Image"
+        parent="hr.menu_hr_main"
+        action="nf_hr_employee_image_action" groups="employee_master.group_employee_image_upload,hr.group_hr_manager"/>
+
+    <record id="hr.open_view_employee_list_my" model="ir.actions.act_window">
+        <field name="name">Employees</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="view_id" eval="False"/>
+        <field name="search_view_id" ref="hr.view_employee_filter"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to add a new employee.
+          </p><p>
+            With just a quick glance on the Odoo employee screen, you
+            can easily find all the information you need for each person;
+            contact data, job position, availability, etc.
+          </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="nf_hr_employee_form_action">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="hr.view_employee_form"/>
+            <field name="act_window_id" ref="hr.open_view_employee_list_my"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="nf_hr_employee_tree_action">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="hr.view_employee_tree"/>
+            <field name="act_window_id" ref="hr.open_view_employee_list_my"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="nf_hr_employee_kanban_action">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="hr.hr_kanban_view_employees"/>
+            <field name="act_window_id" ref="hr.open_view_employee_list_my"/>
+        </record>
+
+    <record id="nf_buddy_candidate_feedback_form" model="ir.ui.view">
+        <field name="name">Buddy and Candidate Feedback</field>
+        <field name="model">nf.buddy.candidate.feedback</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Buddy and Candidate Feedback" create="false">
+              <sheet>
+                <group>
+                  <field name="employee_id" readonly="1"/>
+                  <field name="buddy_id" readonly="1"/>
+                  <field name='training_start_date' readonly="1"/>
+                  <field name="training_end_date" readonly="0"/>
+                  <field name="buddy_submit" invisible="1"/>
+                  <field name="candidate_submit" invisible="1"/>
+                  <field name="check_access" invisible="1"/>
+                </group>
+                <notebook>
+                  <page string="Candidate Feedback" attrs="{'invisible':[('check_access','=','Buddy')]}">
+                    <group>
+                      <field name="buddy_aware" attrs="{'readonly':['|',('candidate_submit','=',True),('check_access','!=','Candidate')]}"/>
+                    </group>
+                    <field name="candidate_feedback" attrs="{'readonly':['|',('candidate_submit','=',True),('check_access','!=','Candidate')]}">
+                      <tree editable="bottom" create="false" delete="false">
+                        <field name="name" readonly="1"/>
+                        <field name="rating"/>
+                      </tree>
+                      <form>
+                        <sheet>
+                          <group>
+                            <field name="name"/>
+                            <field name="rating"/>
+                          </group>
+                        </sheet>
+                      </form>
+                    </field>
+                    <group>
+                      <field name="candidate_score" readonly="1" string="Buddy Score (Rated By Candidate)"/>
+                    </group>
+                    <button name="submit_candidate" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|',('candidate_submit','=',True),('check_access','!=','Candidate')]}"/>
+                  </page>
+                  <page string="Buddy Feedback" attrs="{'invisible':[('check_access','=','Candidate')]}">
+                    <field name="buddy_feedback" attrs="{'readonly':['|',('buddy_submit','=',True),('check_access','!=','Buddy')]}">
+                      <tree editable="bottom" create="false" delete="false">
+                        <field name="name" readonly="1"/>
+                        <field name="rating"/>
+                      </tree>
+                      <form>
+                        <sheet>
+                          <group>
+                            <field name="name"/>
+                            <field name="rating"/>
+                          </group>
+                        </sheet>
+                      </form>
+                    </field>
+                    <group>
+                      <field name="buddy_score" readonly="1" string="Candidate Score (Rated By Buddy)"/>
+                    </group>
+                    <button name="submit_buddy" string="Submit" type="object" class="oe_highlight" attrs="{'invisible':['|',('buddy_submit','=',True),('check_access','!=','Buddy')]}"/>
+                  </page>
+                </notebook>
+              </sheet>
+            </form>
+        </field>
+      </record> 
+
+    <record id="nf_buddy_candidate_feedback_tree" model="ir.ui.view">
+        <field name="name">Buddy and Candidate Feedback</field>
+        <field name="model">nf.buddy.candidate.feedback</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Buddy and Candidate Feedback" create="false" colors="orange:candidate_submit != True or buddy_submit != True;red:candidate_score &lt;=2 or buddy_score &lt;=2">
+              <field name="employee_id"/>
+              <field name="buddy_id"/>
+              <field name='training_start_date'/>
+              <field name="training_end_date"/>
+              <field name="buddy_submit" invisible="1"/>
+              <field name="candidate_submit" invisible="1"/>
+              <field name="candidate_score" string="Buddy Score (Rated By Candidate)"/>
+              <field name="buddy_score" string="Candidate Score (Rated By Buddy)"/>
+            </tree>
+        </field>
+       </record>
+
+     <record id="nf_buddy_candidate_feedback_filter" model="ir.ui.view">
+        <field name="name">Buddy and Candidate Feedback</field>
+        <field name="model">nf.buddy.candidate.feedback</field>
+        <field name="arch" type="xml">
+            <search>
+              <field name="employee_id"/>
+              <field name="buddy_id"/>
+              <field name='training_start_date'/>
+              <field name="training_end_date"/>
+            </search>
+        </field>
+       </record>  
+
+    <record model="ir.actions.act_window" id="action_nf_buddy_candidate_feedback">
+        <field name="name">Buddy and Candidate Feedback</field>
+        <field name="res_model">nf.buddy.candidate.feedback</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+      <menuitem name="Buddy and Candidate Feedback" id="menu_nf_buddy_candidate_feedback" parent="hr.menu_hr_main" action="action_nf_buddy_candidate_feedback" sequence="15"/>
+
+    <record id="nf_buddy_feedback_question_form" model="ir.ui.view">
+        <field name="name">Buddy and Candidate Feedback Questions</field>
+        <field name="model">nf.buddy.feedback.question</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Buddy and Candidate Feedback Questions">
+              <sheet>
+                <group>
+                  <field name="name" required="1"/>
+                  <field name="type" required="1"/>
+                </group>
+              </sheet>
+            </form>
+        </field>
+      </record> 
+
+    <record id="nf_buddy_feedback_question_tree" model="ir.ui.view">
+        <field name="name">Buddy and Candidate Feedback Questions</field>
+        <field name="model">nf.buddy.feedback.question</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Buddy and Candidate Feedback Questions">
+              <field name="name"/>
+              <field name="type"/>
+            </tree>
+        </field>
+       </record>
+
+    <record model="ir.actions.act_window" id="action_nf_buddy_feedback_question">
+        <field name="name">Buddy and Candidate Feedback Questions</field>
+        <field name="res_model">nf.buddy.feedback.question</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+      <menuitem name="Buddy and Candidate Feedback Questions" id="menu_nf_buddy_feedback_question" parent="hr.menu_human_resources_configuration" action="action_nf_buddy_feedback_question" sequence="15"/>  
+            
+</data>
+</openerp>

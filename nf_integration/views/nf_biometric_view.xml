@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="view_nf_biometric_form" model="ir.ui.view">
+        <field name="name">nf_biometric</field>
+        <field name="model">nf.biometric</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="NF Biometric" version="7.0" create="false" edit="false">
+              <sheet>
+                <group col="4">
+                 <field name="index_no"/>
+                 <field name="io_type"/>
+                 <field name="device_name"/>
+                 <field name="name" />
+                 <field name="emp_id" />
+                 <field name="bmtc_emp_id" />
+                 <field name="attendance_date" />
+                 <field name="erp_att_date"/>
+                 <field name="branch"/>
+               </group>
+              </sheet>
+              </form>
+        </field>
+    </record>
+
+      <record id="view_nf_biometric_tree" model="ir.ui.view">
+        <field name="name">nf_biometric</field>
+        <field name="model">nf.biometric</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="NF Biometric" version="7.0" create="false" edit="false">
+                 <field name="index_no" invisible="1"/>
+                 <field name="device_name" invisible="1"/>
+                 <field name="emp_id" />
+                 <field name="bmtc_emp_id" invisible="1"/>
+                 <field name="name" />
+                 <field name="io_type"/>
+                 <field name="attendance_date" invisible="1"/>
+                 <field name="erp_att_date" string="Attendance"/>
+                 <field name="branch"/>
+            </tree>
+        </field>
+       </record>
+
+
+        <record id="view_nf_biometric_search" model="ir.ui.view">
+           <field name="name">nf_biometric</field>
+           <field name="model">nf.biometric</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="NF Biometric">
+                 <field name="name" />
+                 <field name="emp_id" />
+                 <field name="branch"/>
+                 <field name="bmtc_emp_id" />
+                 <field name="erp_att_date"/>
+                 <field name="attendance_date"/>
+                 <field name="index_no"/>
+                 <field name="device_name"/>
+
+                <filter name="entry_type" string="Entry" domain="[('io_type','=',0)]"/>
+                <filter name="exit_type" string="Exit" domain="[('io_type','=',1)]"/>
+             <group string="Group By">
+              <filter name="entry_exit_type" string="Entry/Exit" context="{'group_by':'io_type'}"/>
+              <filter name="emp_id" string="Employee ID" context="{'group_by':'emp_id'}"/>
+              <filter name="attendance_date" string="Biometric Attendance" context="{'group_by':'attendance_date'}"/>
+              <filter name="erp_att_date" string="ERP Attendance" context="{'group_by':'erp_att_date'}"/>
+              <filter name="device_name" string="Device Name" context="{'group_by':'device_name'}"/>
+              <filter name="branch" string="Branch" context="{'group_by':'branch'}"/>
+              </group>
+             </search>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="action_nf_biometric">
+        <field name="name">Attendance</field>
+        <field name="res_model">nf.biometric</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nf_biometric_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          Attendance
+          </p>
+        </field>
+    </record>
+
+      <menuitem name="Attendance" id="menu_nf_biometric_attendance" parent="hr.menu_hr_main" action="action_nf_biometric" sequence="5" groups="nf_integration.group_nf_biometric"/>
+
+      <!-- ======================Meeting Reason====================-->
+
+      <record id="nf_meeting_reason_form" model="ir.ui.view">
+            <field name="name">NF Meeting Reason</field>
+            <field name="model">nf.meeting.reason</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Meeting Comment">
+                    <sheet>
+                        <group>
+                            <field name="comment" required="1" placeholder="Update Reason"/>
+                        </group>
+                        <footer>
+                            <button name="submit_comment" string="Submit" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_nf_meeting_reason" model="ir.actions.act_window">
+            <field name="name">Update Reason</field>
+            <field name="res_model">nf.meeting.reason</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+      <!-- ======================================================================== -->
+
+      <record id="view_nf_leave_swipe_form" model="ir.ui.view">
+        <field name="name">NF Leave Swipe</field>
+        <field name="model">nf.leave.swipe</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="NF Leave Swipe" create="false">
+              <sheet>
+                  <header>
+                      <button name="%(action_nf_meeting_reason)d" type="action" string="Update Reason" class="oe_highlight" attrs="{'invisible':['|', ('updated_on', '!=', False), ('eligible_to_update', '!=', True)]}"/>
+                  </header>
+                <group col="4">
+                 <field name="employee_id" readonly="1"/>
+                 <field name="date" readonly="1"/>
+                 <field name="user_id" readonly="1"/>
+                 <field name="swipe_status" />
+                 <field name="branch_id" readonly="1"/>
+                 <field name="attendance_status" />
+                 <field name="division_id" readonly="1"/>
+                 <field name="internal_desig" readonly="1"/>
+                 <field name="emp_db_id" invisible="1"/>
+                 <field name="hr_emp_id" readonly="1"/>
+                 <field name="number_of_meeting" readonly="1"/>
+                 <field name="designation_type" readonly="1"/>
+                 <field name="updated_on" readonly="1"/>
+                 <field name="eligible_to_update" invisible="1"/>
+               </group>
+                  <separator name="Meeting Reaosn">
+                      <field name="meeting_reason" readonly="1"/>
+                  </separator>
+              </sheet>
+              </form>
+        </field>
+    </record>
+
+      <record id="view_nf_leave_swipe_tree" model="ir.ui.view">
+        <field name="name">NF Leave Swipe</field>
+        <field name="model">nf.leave.swipe</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="NF Leave Swipe" colors="green:attendance_status=='P'; orange:attendance_status=='L';red:attendance_status=='A';blue:attendance_status=='H'" create="false">
+                 <field name="employee_id"/>
+                 <field name="user_id" />
+                 <field name="date"/>
+                 <field name="swipe_status" />
+                 <field name="attendance_status" />
+                 <field name="branch_id" />
+                 <field name="division_id"/>
+                 <field name="internal_desig"/>
+                 <field name="emp_db_id" invisible="1"/>
+            </tree>
+        </field>
+       </record>
+
+
+        <record id="view_nf_leave_swipe_search" model="ir.ui.view">
+           <field name="name">NF Leave Swipe</field>
+           <field name="model">nf.leave.swipe</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+             <search string="NF Biometric">
+                 <field name="hr_emp_id"/>
+                 <field name="user_id" />
+                 <field name="employee_id"/>
+                 <field name="date"/>
+                 <field name="swipe_status" />
+                 <field name="attendance_status" />
+                 <field name="branch_id" />
+                 <field name="division_id"/>
+                 <field name="internal_desig"/>
+
+                <filter name="p_swipe_status" string="Swipe P" domain="[('swipe_status','=','P')]"/>
+                <filter name="a_swipe_status" string="Swipe A" domain="[('swipe_status','=','A')]"/>
+                <filter name="h_swipe_status" string="Swipe H" domain="[('swipe_status','=','H')]"/>
+
+                <filter name="p_attendance_status" string="Attendance P" domain="[('attendance_status','=','P')]"/>
+                <filter name="a_attendance_status" string="Attendance A" domain="[('attendance_status','=','A')]"/>
+                <filter name="H_attendance_status" string="Attendance H" domain="[('attendance_status','=','H')]"/>
+
+             <group string="Group By">
+              <filter name="Date" string="Date" context="{'group_by':'date'}"/>
+              <filter name="user_id" string="Employee" context="{'group_by':'user_id'}"/>
+              <filter name="employee_id" string="Emp ID" context="{'group_by':'employee_id'}"/>
+              <filter name="swipe_status" string="Swipe Status" context="{'group_by':'swipe_status'}"/>
+              <filter name="attendance_status" string="Attendance Status" context="{'group_by':'attendance_status'}"/>
+
+              <filter name="branch_id" string="Branch" context="{'group_by':'branch_id'}"/>
+              <filter name="division_id" string="Division" context="{'group_by':'division_id'}"/>
+              <filter name="internal_desig" string="Internal desig" context="{'group_by':'internal_desig'}"/>
+              </group>
+             </search>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="action_nf_leave_swipe">
+        <field name="name">NF Attendance</field>
+        <field name="res_model">nf.leave.swipe</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nf_leave_swipe_search"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+          Attendance
+          </p>
+        </field>
+    </record>
+
+      <menuitem name="NF Attendance" id="menu_nf_leave_swipe_attendance" parent="hr.menu_hr_main" action="action_nf_leave_swipe" sequence="5"/>
+
+      <record id="nf_jibble_attendance_form" model="ir.ui.view">
+        <field name="name">Jibble Attendance</field>
+        <field name="model">nf.jibble.attendance</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+              <sheet>
+                  <div style="text-align:left; color:blue;">
+                      <h2>
+                        <field name="name" readonly="1"/>
+                      </h2>
+                  </div>
+                  <group col="4" colspan="4">
+                        <field name="attendance_date" required="1"/>
+                        <field name="filename" invisible="1"/>
+                  </group>
+                
+		<group col="4">
+                  <field name="attendance_file" filename="filename"/>
+                  <button name="import_attendance" type="object" string="Sync" class="oe_highlight" attrs="{'invisible': [('synced', '=', True)]}"/>
+                  <div></div>
+                  <field name="synced" invisible="1"/>
+                </group>
+
+                <notebook>
+                 <page string="Attendance Lines">
+                  <field name="attendance_line">
+                    <tree editable='bottom' colors="green:status=='P';red:status=='A'" >
+                      <field name='employee_id' options="{'no_create': True}"/>
+                      <field name='status' readonly="1"/>
+                    </tree>
+                  </field>
+                 </page>
+                </notebook>
+
+              </sheet>
+            </form>
+        </field>
+      </record>
+
+      <record id="nf_jibble_attendance_tree" model="ir.ui.view">
+        <field name="name">Jibble Attendance</field>
+        <field name="model">nf.jibble.attendance</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Jibble Attendance">
+              <field name="name"/>
+              <field name="attendance_date"/>
+            </tree>
+        </field>
+       </record>
+
+
+
+    <record model="ir.actions.act_window" id="action_nf_jibble_attendance">
+        <field name="name">Jibble Attendance</field>
+        <field name="res_model">nf.jibble.attendance</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+      <menuitem name="Jibble Attendance" id="menu_nf_jibble_attendance" parent="hr.menu_hr_main" action="action_nf_jibble_attendance" sequence="10"/>
+
+  </data>
+</openerp>

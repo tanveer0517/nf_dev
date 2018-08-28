@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+            
+   <!-- =================================Wizard to update Employee Info========================-->
+   
+      <!-- Employee -->
+        <record id="wiz_employee_information_form" model="ir.ui.view">
+            <field name="name">wiz.employee.information.form</field>
+            <field name="model">wiz.employee.information</field>
+            <field name="arch" type="xml">
+                <form string="Employee's Information">
+                    <group>
+                        <group string="Personal Details">
+                            <field name="employee_id" invisible="1"/>
+                            <field name="pan_updated" invisible="1"/>
+                            <field name="resume_updated" invisible="1"/>
+                            <field name="aadhar_updated" invisible="1"/>
+                            <field name="cheque_updated" invisible="1"/>
+                            <field name="salary_slip_updated" invisible="1"/>
+                            <field name="salary_slip1_updated" invisible="1"/>
+                            <field name="salary_slip2_updated" invisible="1"/>
+                            <field name="certificate_updated" invisible="1"/>
+                            <field name="resignation_updated" invisible="1"/>
+                            <field name="name" required="1"/>
+                            <field name="full_name" required="1"/>
+                            <field name="gender" required="1"/>
+                            <field name="birth_date" required="1"/>
+                            <field name="religion"/>
+                            <field name="other_religion" attrs="{'invisible':[('religion','!=','Other')], 'required':[('religion','=','Other')]}"/>
+                            <field name="disability" required="1"/>
+                            <field name="blood_group"/>
+                            <field name="marital_status" required="1"/>
+                            <field name="anniversary_date" attrs="{'invisible':[('marital_status','!=','married')], 'required':[('marital_status','=','married')]}"/>
+                            <field name="father_name" required="1"/>
+                            <field name="emp_size"/>
+                        </group>
+                        <group string="Citizenship">
+                            <field name="nationality" required="1"/>
+                            <field name="aadhar_no" attrs="{'readonly':[('aadhar_updated','=',True)], 'required':[('aadhar_updated','!=',True)]}"/>
+                            <field name="pan_no" attrs="{'readonly':[('pan_updated','=',True)], 'required':[('pan_updated','!=',True)]}"/>
+                            <field name="voter_id"/>
+                            <field name="passport_no"/>
+                            <field name="driving_license_no"/>
+                            <field name="previous_uan"/>
+                            <field name="previous_pf"/>
+                        </group>
+                        <group string="Contact Information">
+                            <field name="contact_no" required="1"/>
+                            <field name="alternate_contact"/>
+                            <field name="personal_email" required="1"/>
+                            <label for="current_street1" string="Current Address"/>
+                            <div class="o_address_format">
+                                <field name="current_street1" placeholder="Street..." class="o_address_street" required="1"/>
+                                <field name="current_street2" placeholder="Street 2..." class="o_address_street"/>
+                                 <div>
+                                <field name="current_city" placeholder="City" options="{'no_create': True, 'no_open': True}" required="1"/>
+                            </div>
+                            <div>
+                                <field name="current_state" placeholder="State" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                 <span attrs="{'invisible':[('current_city','=',False)]}">, </span>
+                                 <field name="current_country"  placeholder="Country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                            </div>
+                                <field name="current_zip" placeholder="ZIP" required="1"/>
+                            </div>
+
+                            <field name="is_address_same"/>
+                        </group>
+                        <group string="Permanent Address">           
+                            <label for="permanent_street1" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="permanent_street1" placeholder="Street..." class="o_address_street" required="1"/>
+                                <field name="permanent_street2" placeholder="Street 2..." class="o_address_street"/>
+                                <div>
+                                <field name="permanent_city" placeholder="City" options="{'no_create': True, 'no_open': True}" required="1"/>
+                            </div>
+                            <div>
+                                <field name="permanent_state" placeholder="State" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                                 <span attrs="{'invisible':[('permanent_city','=',False)]}">, </span>
+                                 <field name="permanent_country"  placeholder="Country" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                            </div>
+                             <field name="permanent_zip" placeholder="ZIP" required="1"/>
+                           </div>
+                        </group>
+                        <group string="Emergency Contact Information">
+                            <field name="emegency_person_name" string="Name" required="1"/>
+                            <field name="emergency_contact_no" string="Contact Number" required="1"/>
+                            <field name="emergency_contact_relation" string="Relation" required="1"/>
+                        </group>
+                    </group>
+                    <separator string="Family Details"/>
+                    <field name="family_details" nolabel="1">
+                        <tree editable="bottom">
+                            <field name="name" required="1"/>
+                            <field name="dob"/>
+                            <field name="relation" required="1"/>
+                            <field name="gender" required="1"/>
+                            <field name="c_cont_num"/>
+                        </tree>
+                        <form>
+                            <field name="name"/>
+                            <field name="dob"/>
+                            <field name="relation"/>
+                            <field name="gender"/>
+                            <field name="c_cont_num"/>
+                        </form>
+                    </field>
+                    <group>
+                        <group string="Education Details">
+                            <field name="highest_education" required="1"/>
+                            <field name="degree_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="other_degree" attrs="{'invisible':[('degree_id','!=',71)], 'required':[('degree_id','=',71)]}"/>
+                            <field name="college_name" required="1"/>
+                            <field name="university_name" required="1"/>
+                            <field name="unviversity_city" required="1"/>
+                            <field name="graduation_year" required="1"/>
+                        </group>
+                    </group>
+                    <group string="Previous Employment Details(starting with the latest)">
+                        <label for="total_experience_years" string="Total Experience"/>
+                        <div name="total_experience_years" class="o_row">
+                            <field name="total_experience_years" placeholder="Years" required="1"/>year(s) 
+                            <field name="total_experience_months" placeholder="Months" required="1"/>month(s)
+                        </div>
+                        <label for="relevant_experience_years" string="Relevant Experience"/>
+                        <div name="relevant_experience" class="o_row">
+                            <field name="relevant_experience_years" placeholder="Years" attrs="{'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')]}"/>year(s) 
+                            <field name="relevant_experience_months" placeholder="Months" attrs="{'required':['|',('total_experience_months','!=','0'),('total_experience_years','!=','0')]}"/>month(s)
+                        </div>
+                        <field name="previous_employment">
+                            <tree editable="bottom">
+                                <field name="name" required="1"/>
+                                <field name="designation" required="1"/>
+                                <field name="doj" required="1"/>
+                                <field name="currently_working" required="1"/>
+                                <field name="dol" attrs="{'invisible':[('currently_working','=',True)],'required':[('currently_working','!=',True)],'readonly':[('currently_working','=',True)]}"/>
+                                <field name="ctc" required="1"/>
+                                <field name="reason_leaving" required="1"/>
+                            </tree>
+                            <form>
+                                <field name="name"/>
+                                <field name="designation"/>
+                                <field name="doj"/>
+                                <field name="currently_working"/>
+                                <field name="dol"/>
+                                <field name="ctc"/>
+                                <field name="reason_leaving"/>
+                            </form>
+                        </field>
+                    </group>
+                    <group string="Documents (Accepted file formats: jpeg, png, pdf)">
+                        <group>                            
+                            <field name="resume_filename" invisible="1"/>
+                            <field name="resume" filename="resume_filename" attrs="{'invisible':[('resume_updated','=',True)]}"/>
+                            <field name="education_certificate_filename" invisible="1"/>
+                            <field name="education_certificate" filename="education_certificate_filename" attrs="{'invisible':[('certificate_updated','=',True)],'required':[('certificate_updated','!=',True)]}"/>
+                            <field name="pan_card_filename" invisible="1"/>
+                            <field name="pan_card" filename="pan_card_filename" attrs="{'invisible':[('pan_updated','=',True)],'required':[('pan_updated','!=',True)]}"/>
+                            <field name="aadhar_card_filename" invisible="1"/>
+                            <field name="aadhar_card" filename="aadhar_card_filename" attrs="{'invisible':[('aadhar_updated','=',True)],'required':[('aadhar_updated','!=',True)]}"/>
+                            <field name="cancel_cheque_filename" invisible="1"/>
+                            <field name="cancel_cheque" filename="cancel_cheque_filename" attrs="{'invisible':[('cheque_updated','=',True)]}"/>
+                        </group>
+                        <group>
+                            <field name="salary_slip_filename" invisible="1"/>
+                            <field name="salary_slip" filename="salary_slip_filename" attrs="{'invisible':['|',('salary_slip_updated','=',True),'&amp;',('total_experience_months','=','0'),('total_experience_years','=','0')],'required':[('salary_slip_updated','!=',True),'|',('total_experience_months','!=','0'),('total_experience_years','!=','0')]}"/>
+                            <field name="salary_slip_filename1" invisible="1"/>
+                            <field name="salary_slip1" filename="salary_slip_filename1" attrs="{'invisible':['|',('salary_slip1_updated','=',True),'&amp;',('total_experience_months','=','0'),('total_experience_years','=','0')],'required':[('salary_slip1_updated','!=',True),'|',('total_experience_months','!=','0'),('total_experience_years','!=','0')]}"/>
+                            <field name="salary_slip_filename2" invisible="1"/>
+                            <field name="salary_slip2" filename="salary_slip_filename2" attrs="{'invisible':['|',('salary_slip2_updated','=',True),'&amp;',('total_experience_months','=','0'),('total_experience_years','=','0')],'required':[('salary_slip2_updated','!=',True),'|',('total_experience_months','!=','0'),('total_experience_years','!=','0')]}"/>
+                            <field name="resignation_acceptance_filename" invisible="1"/>
+                            <field name="resignation_acceptance" filename="resignation_acceptance_filename" attrs="{'invisible':['|',('resignation_updated','=',True),'&amp;',('total_experience_months','=','0'),('total_experience_years','=','0')],'required':[('resignation_updated','!=',True),'|',('total_experience_months','!=','0'),('total_experience_years','!=','0')]}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="update_info" type="object" string="Update" class="oe_highlight"/> or 
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>	         
+             </field>
+        </record>
+             
+        <!-- action to open wizard to update employee info -->
+        <record id="wiz_employee_information_action" model="ir.actions.act_window">
+            <field name="name">Employee Information</field>
+            <field name="res_model">wiz.employee.information</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wiz_employee_information_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Employee -->
+        <record id="wiz_upload_image_form" model="ir.ui.view">
+            <field name="name">wiz.upload.image.form</field>
+            <field name="model">wiz.upload.image</field>
+            <field name="arch" type="xml">
+                <form string="Upload Image">
+                    <separator string="Upload Image"/>
+                    <group>
+                        <group>
+                          <field name="employee_id" invisible="1"/>
+                          <field name="image"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="upload_image" type="object" string="Update" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>          
+             </field>
+        </record>
+             
+        <!-- action to open wizard to update employee image -->
+        <record id="wiz_upload_image_action" model="ir.actions.act_window">
+            <field name="name">Upload Image</field>
+            <field name="res_model">wiz.upload.image</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wiz_upload_image_form"/>
+            <field name="target">new</field>
+        </record>
+
+      <!-- Employee -->
+        <record id="wiz_upload_photo_idcard_form" model="ir.ui.view">
+            <field name="name">wiz.upload.photo.idcard.form</field>
+            <field name="model">wiz.upload.photo.idcard</field>
+            <field name="arch" type="xml">
+                <form string="Upload Photo">
+                    <separator string="Upload Photo"/>
+                    <group>
+                        <group>
+                          <field name="employee_id" invisible="1"/>
+                          <field name="photo_filename" invisible="1"/>
+                          <field name="photo" filename="photo_filename" required="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="upload_photo" type="object" string="Upload" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>          
+             </field>
+        </record>
+             
+        <!-- action to open wizard to update employee image -->
+        <record id="wiz_upload_photo_idcard_action" model="ir.actions.act_window">
+            <field name="name">Upload Photo</field>
+            <field name="res_model">wiz.upload.photo.idcard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wiz_upload_photo_idcard_form"/>
+            <field name="target">new</field>
+        </record>
+      
+      <!-- Employee -->
+        <record id="wiz_reject_photo_idcard_form" model="ir.ui.view">
+            <field name="name">wiz.reject.photo.idcard.form</field>
+            <field name="model">wiz.reject.photo.idcard</field>
+            <field name="arch" type="xml">
+                <form string="Reject Photo">
+                    <separator string="Reject Photo"/>
+                    <group>
+                        <group>
+                          <field name="employee_id" invisible="1"/>
+                          <field name="reason" required="1"/>
+                          <field name="reject_reason" attrs="{'invisible':[('reason','!=','Other')],'required':[('reason','=','Other')]}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="reject_photo" type="object" string="Reject" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>          
+             </field>
+        </record>
+             
+        <!-- action to open wizard to update employee image -->
+        <record id="wiz_reject_photo_idcard_action" model="ir.actions.act_window">
+            <field name="name">Reject Photo</field>
+            <field name="res_model">wiz.reject.photo.idcard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wiz_reject_photo_idcard_form"/>
+            <field name="target">new</field>
+        </record>  
+            
+    </data>      
+</openerp>

@@ -1,0 +1,330 @@
+from openerp.osv import fields, osv
+class hrr_rates(osv.Model):
+    _name = 'hrr.rates'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'area_from':fields.float('Area From'),
+                'area_to':fields.float('Area To'),
+                'amount':fields.float('Amount'),
+                }
+class fin_year_mst(osv.Model):
+    _name = 'fin.year.mst'
+    
+    _columns = {
+                'name':fields.char('Code'),
+                'start_date':fields.date('Start Date'),
+                'end_date':fields.date('End Date'),
+                }
+class bank_mst(osv.Model):
+    _name = 'bank.mst'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'code':fields.char('Code')
+                }
+class con_recovery_rates(osv.Model):
+    _name = 'con.recovery.rates'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'grade_id':fields.many2one('hr.grade','Grade'),
+                'max_journey':fields.float('Maximum Journey'),
+                'amount':fields.float('Amount'),
+                'pattern': fields.selection([('IDA','IDA'),('CDA','CDA')],"Pattern"),
+                }
+
+class hr_grade(osv.Model):
+    _name = 'hr.grade'
+    
+    _columns = {
+                'name':fields.char('Grade',required='True'),
+                'cadre_id':fields.many2one('emp.cadre','Cadre'),
+                'payscale_id':fields.many2one('hr.payscale','Payscale'),
+                'level':fields.char('Level'),
+                'new_payscale_id':fields.many2one('hr.payscale','New Payscale'),
+                }
+    
+class hr_professional_tax(osv.Model):
+    _name = 'hr.professional.tax'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'state_id':fields.many2one('state.mst','State'),
+                'amount_from':fields.float('Amount From'),
+                'amount_to':fields.float('Amount To'),
+                'pro_tax_amount':fields.float('Tax Amount'),
+                'month_from': fields.selection([('1','JAN'),('2','FEB'),('3','MAR'),('4','APR'),('5','MAY'),('6','JUN'),('7','JUL'),('8','AUG'),('9','SEP'),('10','OCT'),('11','NOV'),('12','DEC')],'Month From'),
+                'month_to': fields.selection([('1','JAN'),('2','FEB'),('3','MAR'),('4','APR'),('5','MAY'),('6','JUN'),('7','JUL'),('8','AUG'),('9','SEP'),('10','OCT'),('11','NOV'),('12','DEC')],'Month To'),
+                'half_yearly':fields.boolean('Half Yearly'),
+                'gross_annual':fields.boolean('Gross Annual'),
+                }
+
+class da_rates(osv.Model): 
+    _name = 'da.rates'
+    
+    _columns = {
+                'name':fields.char('Description',required='True'),
+                'effective_from':fields.date('Effective From Date',required='True'),
+                'effective_to':fields.date('Effective End Date'),
+                'pattern':fields.selection([('IDA','IDA'),('CDA','CDA')],"DA Pattern",required='True'),
+                'rate':fields.float('Rate(%)',required='True'),
+                'active':fields.boolean('Active')
+                }
+class hr_location(osv.Model):
+    _name = 'hr.location'
+    
+    _columns = {
+                'code':fields.char('Code'),
+                'name':fields.char('Name',required='True'),
+                'state_id':fields.many2one('state.mst','State'),
+                'type':fields.selection([('X','X'),('Y','Y'),('Z','Z')],'Type'),
+                'hra_rates':fields.float('HRA Rates(%)'),
+                'type_for_conveyance':fields.selection([('X','X'),('Y','Y'),('Z','Z')],'Type For Conveyance'),
+                'region_id':fields.many2one('employee.region','Region'),
+                'is_metro':fields.selection([('Y','YES'),('N','NO')],'Is Metro' ),
+                'professional_tax':fields.boolean('Professional Tax'),
+                'professional_tax_type':fields.selection([('F','Fixed'),('V','Variable')],'Tax Type' ),
+                'pro_tax_amount':fields.float('Amount')
+                }
+class emp_cadre(osv.Model):
+    _name = 'emp.cadre'
+    _columns = {
+                'name' : fields.char('Name',required='True')
+                }
+class state_mst(osv.Model):
+    _name = 'state.mst'
+    _columns = {
+                'name' : fields.char('Name',required='True'),
+                'code' : fields.char('Code',required='True')
+                }
+    
+class employee_unit(osv.Model):
+    _name = 'employee.unit'
+    _columns = {
+                'name' : fields.char('Name',required='True'),
+                'code' : fields.char('Code',required='True'),
+                'region_id':fields.many2one('employee.region','Region')
+                }
+class employee_region(osv.Model):
+    _name = 'employee.region'
+    
+    _columns = {
+                'name':fields.char('Name',required='True'),
+                'code':fields.char('Code',required='True'),
+                'company_id':fields.many2one('res.company','Zone'),
+                }
+class employee_type(osv.Model):
+    _name = 'employee.type'
+    
+    _columns = {
+                'name':fields.char('Name',required='True'),
+                }
+    
+class hr_employee(osv.Model):
+    _inherit = 'hr.employee'
+    _order = 'employee_no'
+    
+       
+    def name_get(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        if isinstance(ids, (int, long)):
+            ids = [ids]
+        res = []
+        for record in self.browse(cr, uid, ids, context=context):
+            name = record.name
+            employee_no = record.employee_no
+            if employee_no:
+                name =  "[%s] %s" % (employee_no ,name)
+            else:
+                name =  "%s" % (name)
+            res.append((record.id, name))
+        return res
+    def name_search(self, cr, user, name='', args=None, operator='ilike', context=None, limit=100):
+        if not args:
+            args = []
+        if name:
+            ids = self.search(cr, user, [('employee_no','=',name)]+ args, limit=limit, context=context)
+            if not ids:
+                ids = self.search(cr, user, [('name','=',name)]+ args, limit=limit, context=context)
+                
+            if not ids:
+                # Do not merge the 2 next lines into one single search, SQL search performance would be abysmal
+                # on a database with thousands of matching products, due to the huge merge+unique needed for the
+                # OR operator (and given the fact that the 'name' lookup results come from the ir.translation table
+                # Performing a quick memory merge of ids in Python will give much better performance
+                ids = set()
+                ids.update(self.search(cr, user, args + [('employee_no',operator,name)], limit=limit, context=context))
+                if len(ids) < limit:
+                    # we may underrun the limit because of dupes in the results, that's fine
+                    ids.update(self.search(cr, user, args + [('name',operator,name)], limit=(limit-len(ids)), context=context))
+                ids = list(ids)
+#            if not ids:
+#                ptrn = re.compile('(\[(.*?)\])')
+#                res = ptrn.search(name)
+#                if res:
+#                    ids = self.search(cr, user, [('name','=', res.group(2))] + args, limit=limit, context=context)
+        else:
+            ids = self.search(cr, user, args, limit=limit, context=context)
+        result = self.name_get(cr, user, ids, context=context)
+        return result
+    def _check_ifsc_code(self,cr,uid,ids,context=None):
+        str="^-?[a-zA-Z0-9]+$"
+        obj=self.browse(cr, uid, ids)[0]
+        name=obj.ifsc_code
+        if name and len(name) != 11:
+            raise osv.except_osv(_('Invalid IFSC Code'), _('IFSC Code must contain 11 Alphanumeric only.')) 
+        if name and re.match(str,name) == None:
+            return False
+        else:
+            return True
+        
+    _columns = {
+                'company_id':fields.many2one('res.company','Company'),
+                'grade_id':fields.many2one('hr.grade','Grade'),
+                'benefits_grade_id':fields.many2one('hr.grade','Benefits Grade'),
+                'doj':fields.date('Joining Date'),
+                'employee_no':fields.char('Employee No.'),
+                'father_name': fields.char('Father Name', size=32, ),
+        		'bank_account': fields.char('Bank Account', size=32,),
+        		'ifsc_code': fields.char('IFSC Code', size=32,),
+        		'date_of_birth' : fields.date('Date of Birth'),
+        		'retire_date' : fields.date('Retirement Date'),
+        		'pf_account' : fields.char('PF Account No'),
+        		'pan_number' : fields.char('Pan Number'),
+        		'bank_name' : fields.char('Bank Name'),
+        		'bank_address' : fields.char('Bank Address'),
+		        'region_id' : fields.many2one('employee.region','Region'),
+                'unit' : fields.char('Place Of Appointment'),
+		'catering_unit' : fields.many2one('employee.unit','Catering Unit'),
+                'pattern': fields.selection([('IDA','IDA'),('CDA','CDA')],"DA Pattern"),
+                'mode_of_pay' : fields.selection([('Bank','Bank'),('Cheque','Cheque'),('NEFT','NEFT'),('Cash','Cash')],'Mode of Pay'),
+                'location_id':fields.many2one('hr.location','Location'),
+                'old_location_id':fields.many2one('hr.location','Old Location'),
+                'last_transfer_date':fields.date('Last Transfer Date'),
+                'last_promotion_date':fields.date('Last Promotion Date'),
+                'employee_type_id':fields.many2one('employee.type','Employee Type'),
+                'disability': fields.selection([('P','YES-Partial Disable'),('F','YES-Fully Disable'),('N','No')],"Disability"),
+                
+                'pf_sent_to':fields.many2one('railway.division','PF Sent To'),
+                'gis_sent_to':fields.many2one('railway.division','GIS Sent To'),
+                'desig_in_railway':fields.char('Designation In Railway'),
+		'gl_region':fields.char('GL Region'),
+		'lob':fields.char('Line Of Bussiness'),
+        'status':fields.char('Status'),
+        'from_date':fields.date('From Date'),
+        'to_date':fields.date('To Date'),
+        'uan':fields.char('UAN'),
+        'salary_done':fields.boolean('Salary Done'),
+        
+        
+        'location_hist_line':fields.one2many('emp.location.hist','employee_id','Location History'),
+        'department_hist_line':fields.one2many('emp.department.hist','employee_id','Department History'),
+        'position_hist_line':fields.one2many('emp.position.hist','employee_id','Position History'),
+        'status_hist_line':fields.one2many('emp.status.hist','employee_id','Status History'),
+                }
+
+class hr_contract(osv.Model):
+    _inherit = 'hr.contract'
+    _columns = {
+                'grade_pay':fields.float('Grade Pay'),
+                'old_wage':fields.float('Old Basic'),
+                'last_mth_wage':fields.float('Last Month Wage'),
+                'hra_hrr_lease': fields.boolean('Lease'),
+                'lease_type' : fields.selection([('1','Individual'),('2','Company'),('3','Partnership')],'Landlord Type'),
+                'ownership_type' : fields.selection([('N','Self Lease'),('NR','Near Relative'),('C','Company Accomodation'),('Y','Company Lease')],'Ownership Type'),
+                'flat_area':fields.float('Flat Area'),
+                'address':fields.char('Address'),
+                'lease_amount':fields.float('Actual Rent Amount'),
+                'lease_start_date':fields.date('Lease Start Date'),
+                'lease_end_date':fields.date('Lease End Date'),
+                'lease_notes':fields.text('Notes'),
+                'monthly_inc_amount': fields.float('Monthly Increment Amount'),
+                'ne_increment_month':fields.date('Next Increment Date'),
+                'increment_month': fields.selection([('1','JAN'),('2','FEB'),('3','MAR'),('4','APR'),('5','MAY'),('6','JUN'),('7','JUL'),('8','AUG'),('9','SEP'),('10','OCT'),('11','NOV'),('12','DEC')],'Increment Month'),
+                'increment_status':fields.char('Increment Status'),
+                'vpf_amount': fields.float('VPF Amount'),
+                'child_ed_allow':fields.boolean('Child Education Allowance'),
+                'electricity_allow':fields.boolean('Electricity Allowance'),
+                'entertain_allow':fields.boolean('Entertainment Allowance'),
+                'vehi_conveyence_allow':fields.boolean('Vehicle Conveyance Allowance'),
+                'hard_soft_fur':fields.boolean('Hard And Soft Furnishing'),
+                'lunch_dinner_coup':fields.boolean('Lunch Dinner Coupon'),
+                'prof_up_allow':fields.boolean('Professional Updation Allowance'),
+                'medical_allow':fields.boolean('Medical Allowance'),
+                'uniform_fit_allow':fields.boolean('Uniform Allowance'),
+                'meal_coupon_allow':fields.boolean('Meal Coupon'),
+                'washing_allow':fields.boolean('Washing Allowance'),
+		        'nps':fields.boolean('NPS'),
+ 		        'cafeteria_aggregate':fields.float('Cafeteria Percentage Aggregate'),
+                'deputed_from_same_station':fields.boolean('Deputed From same Station'),
+                'eligible_for_deputaion':fields.boolean('Eligible For Deputation Allowance'),
+                'eligible_for_conveyance':fields.boolean('Eligible For Conveyance Allowance'),
+                'eligible_for_hra':fields.boolean('Eligible For HRA'),
+                'opted_for_medical':fields.boolean('Opted For Medical Allowance'),
+                'opted_for_furnishing':fields.boolean('Opted For Furnishing Allowance'),
+                'opted_for_washing':fields.boolean('Opted For Washing Allowance'),              
+                'nha_worked':fields.float('National Holiday Worked Days'),
+                'nda_hours':fields.integer('Night Duty Hours'),
+                'monthly_rent_paid':fields.float('Monthly Quarter Rent'),
+                'spouse_opting_rly_medical':fields.boolean('Spouse Opting Railway/PSU Medical Allowance'),
+                'previous_railway_employee':fields.boolean('Previous Railway Employee'),
+                'special_pf_amount':fields.float('Special PF Amount'),
+                'pf_stop_flag':fields.boolean('PF Stop'),
+                'new_wage':fields.float('New Basic(CDA)'),
+            }
+
+
+
+class railway_division(osv.Model):
+    _name = 'railway.division'
+    
+    _columns = {
+                'name':fields.char('Name',required='True'),
+                'code':fields.char('Code',required='True'),
+                }
+    
+
+    
+class emp_location_hist(osv.Model):
+    _name = 'emp.location.hist'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'location':fields.char('Location'),
+                'start_date':fields.date('Start Date'),
+                'end_date':fields.date('End Date'),
+                }
+class emp_department_hist(osv.Model):
+    _name = 'emp.department.hist'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'department':fields.char('Department'),
+                'start_date':fields.date('Start Date'),
+                'end_date':fields.date('End Date'),
+                }
+class emp_position_hist(osv.Model):
+    _name = 'emp.position.hist'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'position':fields.char('Position'),
+                'start_date':fields.date('Start Date'),
+                'end_date':fields.date('End Date'),
+                }
+class emp_status_hist(osv.Model):
+    _name = 'emp.status.hist'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee'),
+                'status':fields.char('Status'),
+                'start_date':fields.date('Start Date'),
+                'end_date':fields.date('End Date'),
+                }
+

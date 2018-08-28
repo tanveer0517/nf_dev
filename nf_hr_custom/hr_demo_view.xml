@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+    <data noupdate="1">
+        <!-- sending a mail for employee  on submit -->
+   <record id="example_email_template_id2" model="mail.template">
+          <field name="name">emailtemplate for submit to employee</field>
+          <field name="email_from">${object.company_id and object.company_id.email or ''|safe}</field>
+          <field name="subject">Expense ${object.c_seq_number} submitted</field>
+          <field name="email_to">${object.employee_id.work_email|safe}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
+          <field name="auto_delete" eval="True"/>
+	      <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.employee_id.name},<br></br>
+            <br></br>
+            Your expense report No. ${object.c_seq_number} - ( ${object.name} ) is submitted for approval to ${object.c_approval_manager.name}.
+<br></br>
+<br></br>
+Note: This is system generated mail, please do not reply
+
+
+</p>
+	    ]]>
+	  </field>
+        </record>
+                <!-- sending a mail for approvalmanager on submit -->
+
+
+        <record id="example_email_template_id" model="mail.template">
+          <field name="name">emailtemplate for submit</field>
+          <field name="email_from">${object.company_id and object.company_id.email or ''|safe}</field>
+          <field name="subject">Expense ${object.c_seq_number} submitted by ${object.employee_id.name}</field>
+          <field name="email_to">${object.c_approval_manager.work_email|safe}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
+          <field name="auto_delete" eval="True"/>
+	      <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.c_approval_manager.name},<br></br>
+            <br></br>
+                  ${object.employee_id.name} has submitted expense report No.${object.c_seq_number} - ( ${object.name} ) for your approval.<br></br>
+       <br></br>
+        Please <a href="http://www.erp.nowfloats.com/web#id=${object.id}&view_type=form&model=hr.expense.sheet&menu_id=518" style="background-color: #1abc9c; padding: 8px; text-decoration: none; color: #fff; border-radius: 3px; font-size: 12px;" class="o_default_snippet_text">click here</a> to check and approve expenses.
+
+
+
+</p>
+	    ]]>
+	  </field>
+        </record>
+
+
+        <record id="example_email_template_id5" model="mail.template">
+          <field name="name">emailtemplate for submit to budget manager</field>
+          <field name="email_from">${object.company_id and object.company_id.email or ''|safe}</field>
+          <field name="subject">Expense ${object.c_seq_number} submitted by ${object.employee_id.name}</field>
+          <field name="email_to">${object.c_approval_manager.work_email|safe}, ${object.c_approval_manager.parent_id and object.c_approval_manager.parent_id.work_email or ''}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
+          <field name="auto_delete" eval="True"/>
+	      <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.c_approval_manager.name},<br></br>
+            <br></br>
+                  ${object.employee_id.name} has submitted expense report No.${object.c_seq_number} - ( ${object.name} ) for approval.<br></br>
+                  <br></br>
+                   Total amount : is Rs. ${object.total_amount}.<br></br>
+
+
+       <br></br>
+
+
+</p>
+	    ]]>
+	  </field>
+        </record>
+
+
+
+        <!-- sending a mail for employee  on approve -->
+
+
+
+        <record id="example_email_template_id1" model="mail.template">
+          <field name="name">emailtemplate for approve</field>
+          <field name="email_from">${object.company_id and object.company_id.email or ''|safe}</field>
+          <field name="subject">Expense ${object.c_seq_number} approved</field>
+          <field name="email_to">${object.employee_id.work_email|safe}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
+          <field name="auto_delete" eval="True"/>
+	      <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.employee_id.name},<br></br>
+              <br></br>
+               Your expense No.${object.c_seq_number} - ( ${object.name} ) has been approved by ${object.responsible_id.name}.<br></br>
+               <br></br>
+               The amount approved is Rs. ${object.total_amount}.<br></br>
+               <br></br>
+               If you find any discrepancy in approved amount,<a href="http://www.erp.nowfloats.com/web#id=${object.id}&view_type=form&model=hr.expense.sheet&menu_id=518" style="background-color: #1abc9c; padding: 8px; text-decoration: none; color: #fff; border-radius: 3px; font-size: 12px;" class="o_default_snippet_text">click here</a> to check details.
+
+</p>
+	    ]]>
+	  </field>
+        </record>
+
+
+
+        <!-- sending a mail for employee  on posted-->
+        <record id="example_email_template_id3" model="mail.template">
+          <field name="name">emailtemplatefor postjournal entries </field>
+          <field name="email_from">${object.company_id and object.company_id.email or ''|safe}</field>
+          <field name="subject">Expense ${object.c_seq_number} posted</field>
+          <field name="email_to">${object.employee_id.work_email|safe}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
+          <field name="auto_delete" eval="True"/>
+	      <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.employee_id.name},<br></br>
+            <br></br>
+            Your expense report No.${object.c_seq_number} -( ${object.name} ) has been approved by Finance for amount Rs.${object.total_amount}<br></br>
+            <br></br>
+            If you find any discrepancy in approved amount, <a href="http://www.erp.nowfloats.com/web#id=${object.id}&view_type=form&model=hr.expense.sheet&menu_id=518" style="background-color: #1abc9c; padding: 8px; text-decoration: none; color: #fff; border-radius: 3px; font-size: 12px;" class="o_default_snippet_text">click here</a> to check details.
+
+
+
+
+</p>
+	    ]]>
+	  </field>
+        </record>
+                <!-- sending a mail for employee  on paid -->
+
+        <record id="example_email_template_id4" model="mail.template">
+          <field name="name">emailtemplatefor paid </field>
+          <field name="email_from">${object.company_id and object.company_id.email or ''|safe}</field>
+          <field name="subject">Expense ${object.c_seq_number} paid</field>
+          <field name="email_to">${object.employee_id.work_email|safe}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
+          <field name="auto_delete" eval="True"/>
+	      <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.employee_id.name},Your expense report No.${object.c_seq_number} -( ${object.name} ) has been paid
+
+</p>
+	    ]]>
+	  </field>
+        </record>
+
+
+
+
+
+    </data>
+</openerp>

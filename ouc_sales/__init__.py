@@ -1,0 +1,17 @@
+import sales
+import crm_leads
+import crm_lead2opportunity
+import product_product
+import product_template
+import res_partner
+import calender_event
+import account_invoice
+import c_modules
+import sale_subscription
+import wizard
+import account_payment
+import package_extension
+import hr_department
+import account_asset
+import account_analytic
+

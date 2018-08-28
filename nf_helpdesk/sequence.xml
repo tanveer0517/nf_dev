@@ -1,0 +1,15 @@
+<openerp>
+
+<data noupdate="1">
+
+	<record id="seq_for_helpdesk" model="ir.sequence">
+		<field name="name">NF Helpdesk</field>
+		<field name="code">helpdesk_sequence_no</field>
+		<field name="prefix">NF-TKT-</field>
+		<field name="padding">4</field>
+		<field name="number_increment">1</field>
+	</record>
+
+</data>
+
+</openerp>

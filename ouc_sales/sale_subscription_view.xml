@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+
+    <record id="action_contract_sales" model="ir.actions.act_window">
+        <field name="name">Sales Documents</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="website_contract.sale_order_view_tree_subscription"/>
+        <field name="domain">[('subscription_id', '=', active_id),('subscription_id', '!=', False)]</field>
+        <field name="context">{'create':False}</field>
+        <field name="help" type="html">
+          <p>
+            You will find here all the quotations and sales orders related to this subscription.
+          </p>
+        </field>
+    </record>
+    			           <!--   Subscription Details    -->
+		<record id="c_sale_subscription_form_view" model="ir.ui.view">
+            <field name="name">sale.subscription.form</field>
+            <field name="model">sale.subscription</field>
+            <field name="inherit_id" ref="sale_contract.sale_subscription_view_form"/>
+            <field name="arch" type="xml">
+				<header>
+            		<button name="action_send_rta" type="object" string="MIB Confirm" class="oe_highlight" attrs="{'invisible': ['|', ('c_rta_sent_status', '=', True), ('c_rta_hold_issue', '!=', 'No Issue')]}"/>
+            		<button name="action_hold_rta" type="object" string="MIB Hold" class="oe_highlight" attrs="{'invisible': [('c_rta_hold_issue', '=', 'No Issue')]}"/>
+            	</header>
+            	<!-- <xpath expr="//button[@name='%(website_contract.action_contract_sales_all)d']" position="replace">
+	            	<button class="oe_stat_button" name="action_subscription_sale_order" type="object" icon="fa-credit-card">
+	                    <field name="sale_order_count" widget="statinfo" string="Sales"/>
+	                </button>
+                </xpath> -->
+				<xpath expr="//field[@name='code']" position="after">
+					<field name="c_invoice_status" readonly="1"/>
+					<field name="c_rta_done_date" readonly="1"/>
+					<field name="c_sales_order_id" readonly="1"/>
+					<field name="c_tc_manager_hierarchy" invisible="1"/>
+					<field name="c_mangers_hierarchy" invisible="1"/>
+					<label  attrs="{'invisible': ['|', ('c_rta_hold_issue', '=', 'No Issue'), ('c_rta_hold_issue', '=', False)]}" string="MIB Status" />
+                    	<span attrs="{'invisible': ['|', ('c_rta_hold_issue', '=', 'No Issue'), ('c_rta_hold_issue', '=', False)]}">
+                    		MIB is on Hold
+                    	</span>
+					<field name="c_rta_hold_issue"/>
+					<field name="c_rta_hold_description" string="Details for holding MIB" attrs="{'invisible': [('c_rta_hold_issue', 'in', ('No Issue','Revise Payment Received'))], 'required': [('c_rta_hold_issue', 'not in', ('No Issue','Revise Payment Received'))]}"/>
+					<field name="c_auto_create_fptag" readonly="1"/>
+					<field name="is_corporate_website" invisible="1"/>
+					<field name="is_la_case" invisible="1"/>
+                </xpath>
+                
+				           <!--    Customised standard fields and buttons    -->
+
+				<xpath expr="//field[@name='template_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='user_id']" position="after">
+					<field name="c_team_id" readonly="1"/>
+				</xpath>
+				<xpath expr="//field[@name='user_id']" position="attributes">
+					<!-- <attribute name="options">{'no_open': True,'no_create': True}</attribute> -->
+					<attribute name="attrs">{'readonly':[('c_sales_order_id','!=','False')]}</attribute>
+				</xpath>
+				<xpath expr="//label[@for='recurring_next_date']" position="replace">
+                 	<label for="recurring_next_date" string="Earlier Renewal Date"/>
+				</xpath>
+				<xpath expr="//button[@name='recurring_invoice']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//button[@name='prepare_renewal_order']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+				<!-- <xpath expr="//button[@name='%(website_contract.wizard_action)d']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath> -->
+				           <!--    Removed Create & Edit    -->
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
+					<!-- <attribute name="options">{'no_open': True,'no_create': True}</attribute> -->
+					<attribute name="readonly">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='price_unit']" position="attributes">
+					<attribute name="readonly">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='discount']" position="attributes">
+					<attribute name="readonly">1</attribute>
+				</xpath>
+				<!-- <xpath expr="//page[2]/group/field[@name='tag_ids']" position="attributes">
+					<attribute name="options">{'no_open': True,'no_create': True}</attribute>
+				</xpath> -->
+				<!-- <xpath expr="//page[2]/group/field[@name='payment_token_id']" position="attributes">
+					<attribute name="options">{'no_open': True,'no_create': True}</attribute>
+				</xpath> -->
+				<xpath expr="//field[@name='partner_id']" position="attributes">
+					<!-- <attribute name="options">{'no_open': True,'no_create': True}</attribute> -->
+					<attribute name="attrs">{'readonly':[('c_sales_order_id','!=','False')]}</attribute>
+				</xpath>
+				<xpath expr="//field[@name='pricelist_id']" position="attributes">
+					<attribute name="attrs">{'readonly':[('c_sales_order_id','!=','False')]}</attribute>
+				</xpath>
+				<xpath expr="//field[@name='code']" position="attributes">
+					<attribute name="attrs">{'readonly':[('c_sales_order_id','!=','False')]}</attribute>
+				</xpath>
+				<xpath expr="//field[@name='date_start']" position="attributes">
+					<attribute name="attrs">{'readonly':[('c_sales_order_id','!=','False')]}</attribute>
+				</xpath>
+				
+				
+				<xpath expr="//page[2]/group/field[@name='analytic_account_id']" position="attributes">
+                    <attribute name="string">Cost Centre</attribute>
+
+
+			</xpath>
+
+			<!--   Subscription lines   -->
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='product_id']" position="before">
+					<field name="c_sale_order_id" readonly="1"/>
+                	<field name="c_sale_date" readonly="1"/>
+                	<field name="c_invoice_id" readonly="1"/>
+                	<field name="c_invoice_date" readonly="1"/>
+				</xpath>
+
+                <xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='name']" position="replace">
+                	<field name="c_status" readonly="1"/>
+                	<field name="c_auto_create_fptag" invisible="1"/>
+		        	<field name="c_fptags_id" attrs="{'readonly':['|',('c_auto_create_fptag','=',False),('c_status','=','new')]}" domain="[('customer_id','=', parent.partner_id)]" options="{'no_create_edit':True,'no_create': True}"/>
+                	<field name="c_product_template_id" invisible="1"/>
+                	<field name="c_validity" readonly="1"/>
+					<field name="c_inv_cancel_date" readonly="1"/>
+                	<field name="c_sales_person_id" readonly="1"/>
+                	<field name="c_cost_center" readonly="1" string="Cost Centre"/>
+                	<field name="c_sp_branch" readonly="1"/>
+				</xpath>
+
+			<!--    Verification Call Status    -->
+                <notebook position="inside">
+                    <page string="Verification Call Status" attrs="{'invisible': [('c_rta_sent_status', '=', False)]}">
+                        <group col="4">
+							<field name="c_verified_by_id" readonly="1"/>
+							<field name="c_verification_call_status" invisible="1" />
+							<field name="c_phone_number" readonly="1"/>
+							<field name="c_vc_cl_all" invisible="1" modifiers="{'invisible': true}"/>
+							<field name="c_verification_status" readonly="1" modifiers="{'readonly': true}"/>
+							<field name="c_rta_sent_status" readonly="1" modifiers="{'readonly': true}"/>
+							<field name="vc_followup_status"/>
+							<field name="cfc_contract_id" attrs="{'invisible': [('c_auto_create_fptag', '=', True)]}" domain="[('contract_id', '=', active_id), ('type', '!=', 'MLC')]" options="{'no_create':True, 'no_edit':True, 'no_open':True}"/>
+							<field name="mlc_onboarding_form" invisible="1"/>
+						</group>
+						<button name="open_mlc_onboarding_form" type="object" string="MLC Onboarding Form" class="oe_highlight" attrs="{'invisible':[('mlc_onboarding_form','=',False)]}"/>
+						<button name="generate_la_invoice" type="object" string="GENERATE INVOICE AND PAY" class="oe_highlight" attrs="{'invisible': [('is_la_case', '=', False)]}"/>
+
+                        <group col="2" attrs="{'invisible': [('is_la_case', '=', True)]}">
+					        <field name="c_call_links" attrs="{'required':[('c_auto_create_fptag','=',False),('c_vc_cl1','=',True), ('c_vc_cl2','=',True), ('c_vc_cl3','=',True), ('c_vc_cl4','=',True), ('c_vc_cl5','=',True)], 'readonly':[('c_verification_call_status','=',True)]}"/>
+					        <field name="c_verification_remarks" placeholder="Verification Call Remarks" attrs="{'readonly': [('c_verification_call_status', '=', True)]}"/>
+					        <field name="c_no_of_fps" readonly="1" attrs="{'required':[('c_vc_cl1','=',True), ('c_vc_cl2','=',True), ('c_vc_cl3','=',True), ('c_vc_cl4','=',True), ('c_vc_cl5','=',True)], 'readonly':[('c_verification_call_status','=',True)]}"/>
+					    </group>
+                    	<group col="4" attrs="{'invisible': ['|',('c_auto_create_fptag','=',True),('is_la_case', '=', True)]}">
+							<field name="c_onboard_time" attrs="{'readonly':[('c_verification_call_status','=',True)],'required':[('c_auto_create_fptag','=',False),('c_vc_cl1','=',True), ('c_vc_cl2','=',True), ('c_vc_cl3','=',True), ('c_vc_cl4','=',True), ('c_vc_cl5','=',True)]}"/>
+							<field name="c_onboarding_type" attrs="{'readonly':[('c_verification_call_status','=',True)], 'required':[('c_auto_create_fptag','=',False),('c_vc_cl1','=',True), ('c_vc_cl2','=',True), ('c_vc_cl3','=',True), ('c_vc_cl4','=',True), ('c_vc_cl5','=',True)]}"/>
+                            <field name="c_onboard_local_time" invisible="1"/>
+						</group>
+					    <group col="4" attrs="{'invisible': ['|',('c_auto_create_fptag','=',True),('is_la_case', '=', True)]}">
+                            <field name="c_acc_mngr" readonly="1"/>
+                            <field name="c_acc_mngr_email" readonly="1"/>
+                        </group>
+                        <group col="2" attrs="{'invisible': ['|',('c_auto_create_fptag','=',True),('is_la_case', '=', True)]}">
+                            <field name="c_calendar_link" readonly="1" widget="url"/>
+                        </group>
+                        <group col="6" string="Verification Call Status" attrs="{'invisible': [('is_la_case', '=', True)]}">
+                        	<field name="c_rta_case1" attrs="{'readonly': [('c_verification_call_status', '=', True)]}"/>
+                        	<field name="c_rta_case2" attrs="{'readonly': [('c_verification_call_status', '=', True)]}"/>
+                        	<field name="c_rta_case3" attrs="{'readonly': [('c_verification_call_status', '=', True)]}"/>
+                        </group>
+                        <group col="4" attrs="{'invisible':['|', ('is_la_case', '=', True), ('c_rta_case2','=',False)]}">
+                            <field name="c_call_hold_reason" attrs="{'readonly':[('c_verification_call_status','=',True)], 'required':[('c_rta_case2','=',True)]}"/>
+                            <field name="c_escalation_remarks" attrs="{'readonly':[('c_verification_call_status','=',True)]}"/>
+                        </group>
+					    <group col="4" attrs="{'invisible':[('c_rta_case3','=',False)]}">
+					    	<field name="c_reject_reason" attrs="{'required': [('c_rta_case3','!=',False)]}"/>
+					    	<field name="c_other_reject" attrs="{'required': [('c_reject_reason', '=', 'Others')],'invisible': [('c_reject_reason', '!=', 'Others')]}"/>
+					    </group>
+					    <group col="4" attrs="{'invisible':[('c_rta_case3','=',False)]}">
+                            <field name="c_bank_account" attrs="{'readonly':[('c_verification_call_status','=',True)], 'required':[('c_rta_case3','=',True)]}"/>
+                            <field name="c_bank_ifsc" attrs="{'readonly':[('c_verification_call_status','=',True)], 'required':[('c_rta_case3','=',True)]}"/>
+                            <field name="c_bank_id" attrs="{'readonly':[('c_verification_call_status','=',True)], 'required':[('c_rta_case3','=',True)]}"/>
+                            <field name="c_bank_account_holder" attrs="{'readonly':[('c_verification_call_status','=',True)], 'required':[('c_rta_case3','=',True)]}"/>
+                        </group>
+					    <button name="action_esclation" type="object" string="Escalate to Sales team" class="oe_highlight" attrs="{'invisible': ['|', ('c_rta_case2', '=', False), ('c_verification_call_status','=',True)]}"/>
+						<button name="action_rta_cancel" type="object" string="Ready To Cancel" class="oe_highlight" attrs="{'invisible': ['|', ('c_rta_case3', '=', False), ('c_verification_call_status','=',True)]}"/>
+						<group col="3" colspan="2" attrs="{'invisible':['|',('is_la_case', '=', True), ('c_rta_case1', '=', False)]}">
+							<label for="c_vc_cl1"/>
+							<div>
+								<field name="c_vc_cl1" class="oe_inline" attrs="{'readonly':[('c_verification_call_status','=',True)]}"/>
+							</div>
+                        </group>
+						<group col="3" colspan="2" attrs="{'invisible':['|',('is_la_case', '=', True), ('c_rta_case1', '=', False)]}">
+							<label for="c_vc_cl2"/>
+							<div>
+								<field name="c_vc_cl2" class="oe_inline" attrs="{'readonly':[('c_verification_call_status','=',True)]}"/>
+							</div>
+                        </group>
+						<group col="3" colspan="2" attrs="{'invisible':['|',('is_la_case', '=', True), ('c_rta_case1', '=', False)]}">
+							<label for="c_vc_cl3"/>
+							<div>
+								<field name="c_vc_cl3" class="oe_inline" attrs="{'readonly':[('c_verification_call_status','=',True)]}"/>
+							</div>
+                        </group>
+						<group col="3" colspan="2" attrs="{'invisible':['|',('is_la_case', '=', True), ('c_rta_case1', '=', False)]}">
+							<label for="c_vc_cl4"/>
+							<div>
+								<field name="c_vc_cl4" class="oe_inline" attrs="{'readonly':[('c_verification_call_status','=',True)]}"/>
+							</div>
+                        </group>
+						<group col="3" colspan="2" attrs="{'invisible':['|',('is_la_case', '=', True), ('c_rta_case1', '=', False)]}">
+							<label for="c_vc_cl5"/>
+							<div>
+								<field name="c_vc_cl5" class="oe_inline" attrs="{'readonly':[('c_verification_call_status','=',True)]}"/>
+							</div>
+                        </group>
+                        <group col="3" colspan="2" attrs="{'invisible':['|', '|', '|', '|', ('c_vc_cl1','=',False), ('c_vc_cl2','=',False), ('c_vc_cl3','=',False), ('c_vc_cl4','=',False), ('c_vc_cl5','=',False)], 'readonly':[('c_verification_call_status','=',True)]}">
+							<label for="c_rta_case0" attrs="{'invisible': [('c_rta_case1', '=', False)]}"/>
+							<div>
+								<field name="c_rta_case0" readonly="1" attrs="{'invisible': [('c_rta_case1', '=', False)]}"/>
+                        	</div>
+                        </group>
+						<button name="action_verification_done" type="object" string="Complete Verification Call, Activate Package and recognie Revenue" class="oe_highlight" attrs="{'invisible': ['|', '|', ('c_auto_create_fptag','=',True), ('c_rta_case0', '=', False), ('c_verification_call_status','=',True)]}"/>
+						<button name="action_mlc_verification_done" type="object" string="Submit" class="oe_highlight" attrs="{'invisible': ['|', '|', ('c_auto_create_fptag','=',False), ('c_rta_case0', '=', False), ('c_verification_call_status','=',True)]}"/>
+					</page>
+
+					<page string="MLC Onboarding" attrs="{'invisible': [('c_verification_call_status', '=', False)]}" groups="ouc_sales.group_mlc">
+						    <group col="8" string="MLC Case:" attrs="{'invisible': ['|',('c_auto_create_fptag', '=', False),('is_corporate_website','=',True)]}">
+                        	<field name="c_case_lh_mlc"/>
+                        	<field name="c_case_mlc_mlc"/>
+                        	<field name="c_case_new_mlc"/>
+                        	<field name="c_case_renew_mlc"/>
+                        </group>
+                        <group col="4" attrs="{'invisible': [('c_auto_create_fptag', '=', False)]}">
+							<field name="c_username" attrs="{'required': [('c_auto_create_fptag', '=', True ),('c_rta_sent_status', '=', True), ('c_verification_call_status', '=', True),('is_corporate_website','!=',True)]}"/>
+                        	<field name="c_primary_fp" attrs="{'invisible': [('c_case_lh_mlc', '=', False)], 'required': [('c_case_lh_mlc', '=', True)]}"/>
+                        </group>
+						<group>
+							<group>
+							  <label for="cfc_mlc_contract_id"/>
+							  <div>
+						         <field name="cfc_mlc_contract_id" domain="[('type', '=', 'MLC')]" options="{'no_create':True, 'no_edit':True, 'no_open':True}"/>
+							  </div>
+							 </group>
+							 <group>
+							 </group>
+						</group>
+						<button name="action_verification_done" type="object" string="Complete Verification Call, Activate Package and recognie Revenue" class="oe_highlight" attrs="{'invisible': ['|', '|', ('c_auto_create_fptag','=', False), ('c_verification_call_status','=', False)]}"/>
+					</page>
+
+					<!--    Payment Related Information   -->
+					<page string="Payment Related Information">
+						<field name="c_account_payment_ids" attrs="{'readonly': [('c_rta_sent_status','=', True)]}">
+							<tree>
+								<field name="journal_id"/>
+								<field name="payment_date"/>
+								<field name="communication"/>
+								<field name="name" string="Reciept Vouchor #"/>
+								<field name="c_sale_order_id"/>
+								<field name="c_type_of_pay"/>
+								<field name="amount"/>
+							</tree>
+						</field>
+						<group col="4">
+							<field name="c_amount_to_be_paid"/>
+							<br></br>
+							<br></br>
+							<br></br>
+						</group>
+						<group col="4" colspan="4">
+							<div style="color:red;">
+								<p><u>To be Filled Separately by Account Person Only , for Package activation</u></p>
+							</div>
+						</group>
+						<group col="2">
+							<field name="c_tds_amount" class="oe_left"/>
+						</group>
+					</page>
+
+	                    <!--    Received Payment Details     -->
+
+                    <page string="Received Payment Details">
+                        <field name="c_add_payment_details" nolabel="1" colspan="4">
+                            <tree editable="bottom">
+                            	<field name="sale_order_id" string="Order No." options="{'no_create_edit':True, 'no_create':True}"/>
+                                <field name="downpay_type" invisible="1"/>
+								<field name="cms_slip_num"/>
+                                <field name="payment_method"/>
+                                <field name="bifurcation"/>
+                                <field name="cheque_pic_name" invisible="1"/>
+								<field name="cheque_pic" filename="cheque_pic_name"/>
+                                <field name="cheque_number"/>
+                                <field name="cheque_date"/>
+                                <field name="bank_id" options="{'no_create_edit': True}"/>
+                                <field name="transfer_ref_number"/>
+                                <field name="receipt_number"/>
+								<field name="receipt_pic_name" invisible="1"/>
+								<field name="receipt_pic" filename="receipt_pic_name"/>
+								<field name="mismatch_decl_name" invisible="1"/>
+								<field name="mismatch_declaration" filename="mismatch_decl_name"/>
+                                <field name="amount" required="1"/>
+                                <field name="payment_configaration_status" invisible="1"/>
+                                <field name="payment_status" invisible="1"/>
+                                <field name="entry_date" invisible="1"/>
+                            </tree>
+                            <form>
+                            	<group col="4">
+									<field name="cms_slip_num"/>
+	                                <field name="payment_method"/>
+	                                <field name="bifurcation"/>
+	                            </group>
+	                            <group col="4">
+	                                <field name="cheque_pic" filename="cheque_pic_name"/>
+	                                <field name="cheque_pic_name" widget="url"/>
+	                                <field name="cheque_number"/>
+	                                <field name="cheque_date"/>
+	                                <field name="bank_id" options="{'no_create_edit':True,'no_create': True}"/>
+	                            </group>
+	                            <group col="4">
+	                                <field name="transfer_ref_number"/>
+	                                <field name="receipt_number"/>
+	                                <field name="receipt_pic" filename="receipt_pic_name"/>
+	                                <field name="receipt_pic_name" widget="url"/>
+	                                <field name="mismatch_declaration" filename="mismatch_decl_name"/>
+	                                <field name="mismatch_decl_name" widget="url"/>
+	                            </group>
+	                            <group col="4">
+	                                <field name="amount"/>
+	                                <field name="payment_configaration_status" invisible="1"/>
+	                            </group>
+	                            <group>
+	                                <field name="entry_date" invisible="1"/>
+	                                <field name="payment_status" string="Payment Sent?" attrs="{'invisible':[('payment_status', '=', False)]}" readonly="1"/>
+	                        		<field name="downpay_type" invisible="1"/>
+								</group>
+	                        </form>
+                        </field>
+                    </page>
+					           <!--    Reject and Return Payment    -->
+
+					<page string="Reject &amp; Return Payment">
+		                 <field name="c_bank_details" nolabel="1">
+							 <tree create="false">
+								 <!--<field name="bankdetails_id"/> -->
+								 <field name="bankaccountnumber" readonly="1"/>
+								 <field name="bank_id" readonly="1"/>
+								 <field name="ifsccode" readonly="1"/>
+								 <field name="accountholder" readonly="1"/>
+								 <field name="reason_to_reject" readonly="1"/>
+							 </tree>
+						 </field>
+					</page>
+					<page string="Welcome Call">
+						<group>
+							<field name="welcome_call" widget="url"/>
+						</group>
+					</page>
+                </notebook>
+				             <!--   Customised standard fields in notebook   -->
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='actual_quantity']" position="attributes">
+		        	<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='sold_quantity']" position="attributes">
+		        	<attribute name="invisible">1</attribute>
+				</xpath>
+				<!-- <xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='price_subtotal']" position="after">
+					<field name="c_activation_id" readonly="1"/>
+				</xpath> -->
+            </field>
+        </record>
+
+		           <!--  Sale Subscription Form view  
+		<record id="c_sale_subscription_form_view3" model="ir.ui.view">
+            <field name="name">sale.subscription.form</field>
+            <field name="model">sale.subscription</field>
+            <field name="inherit_id" ref="sale_contract_asset.sale_subscription_view_form_inherit_sale_contract_asset"/>
+            <field name="arch" type="xml">
+			<xpath expr="//field[@name='asset_category_id']" position="attributes">
+				<attribute name="options">{'no_open': True,'no_create': True}</attribute>
+			</xpath>
+			</field>
+		</record>-->
+
+			         <!--  sale subscription tree view    -->
+
+		<record id="c_sale_subscription_tree_view" model="ir.ui.view">
+            <field name="name">sale.subscription.tree</field>
+            <field name="model">sale.subscription</field>
+            <field name="inherit_id" ref="sale_contract.sale_subscription_view_list"/>
+            <field name="arch" type="xml">
+            	<tree position="attributes">
+				    <attribute name="colors">green:c_invoice_status=='no'; blue:c_invoice_status=='MIB Done'; red:c_invoice_status=='yes'</attribute>
+				</tree>
+				<xpath expr="field[@name='code']" position="replace">
+				</xpath>
+				<xpath expr="field[@name='partner_id']" position="replace">
+					<field name="display_name" string="Contract Name"/>
+					<field name="c_sales_order_id" string="Latest Sale Order"/>
+					<field name="c_sale_confirm_date" string="Sale Date"/>
+					<!--<field name="c_is_invoiced"/>-->
+				</xpath>
+				
+				<xpath expr="field[@name='recurring_total']" position="replace">
+					<field name="c_auto_create_fptag" string="MLC Case" />
+				</xpath>
+				<xpath expr="field[@name='user_id']" position="replace">
+					<field name="user_id" String="Salesperson"/>
+				</xpath>
+				
+				<xpath expr="field[@name='recurring_next_date']" position="replace">
+				</xpath>
+				<xpath expr="field[@name='state']" position="before">
+					<field name="c_invoice_status"/>
+					<field name="c_rta_sent_status"/>
+					<field name="c_rta_hold_issue"/>
+					<field name="c_verification_call_status"/>
+					<field name="c_verification_status"/>
+					<field name="recurring_total"/>
+					
+                </xpath>
+			</field>
+		</record>
+
+		               <!-- sale contract tree view -->
+
+		<record id="c_sale_contract_tree_view" model="ir.ui.view">
+            <field name="name">sale.subscription.tree</field>
+            <field name="model">sale.subscription</field>
+			<field name="view_id" ref="c_sale_subscription_tree_view"/>
+            <field name="arch" type="xml">
+				<tree string= "Subscriptions" editable="false" create="false" unlink="false" edit ="false" open="false" delete="false" colors="green:c_invoice_status=='no'; blue:c_invoice_status=='MIB Done'; red:c_invoice_status=='yes'">
+                    <field name="display_name" string="Contract Name"/>
+                    <field name="c_sales_order_id" string="Sale Order"/>
+					<!--<field name="c_is_invoiced"/>-->
+                    <field name="c_sale_confirm_date" string="Sale Date"/>
+					<field name="user_id" string="Salesperson"/>
+					<field name="c_invoice_status"/>
+					<field name="c_rta_done_date" string="MIB Date"/>
+					<field name="c_rta_sent_status"/>
+					<field name="c_rta_hold_issue"/>
+					<field name="c_verification_call_status"/>
+					<field name="c_verification_status"/>
+					<field name="recurring_total"/>
+				</tree>
+			</field>
+		</record>
+
+		            <!--   sale subscription tree view  action  -->
+
+		<record id="sale_contract.sale_subscription_action" model="ir.actions.act_window">
+	        <field name="name">Contracts</field>
+	        <field name="res_model">sale.subscription</field>
+	        <field name="view_type">form</field>
+			<field name="view_id" ref="c_sale_subscription_tree_view"/>
+	        <field name="view_mode">tree,form,pivot,graph</field>
+	        <field name="context">{}</field>
+	        <field name="domain">[]</field>
+	        <field name="search_view_id" eval='False'/>
+	        <field name="help" type="html">
+	            <p class="oe_view_nocontent_create">
+	                Click to create a new contract.
+	            </p><p>
+	                Use contracts to follow tasks, issues, timesheets or invoicing based on
+	                work done, expenses and/or sales orders. Odoo will automatically manage
+	                the alerts for the renewal of the contracts to the right salesperson.
+	            </p>
+	        </field>
+    	</record>
+
+			     <!--  sale contract tree view action  -->
+
+           <record id="sale_contract.sale_contracts_action1" model="ir.actions.act_window">
+	        <field name="name">Contracts</field>
+	        <field name="res_model">sale.subscription</field>
+	        <field name="view_type">form</field>
+			   <field name="view_mode">tree</field>
+				<field name="view_id" ref="c_sale_contract_tree_view"/>
+	        <field name="help" type="html">
+	            <p class="oe_view_nocontent_create">
+	                Click to create a new contract.
+	            </p><p>
+	                Use contracts to follow tasks, issues, timesheets or invoicing based on
+	                work done, expenses and/or sales orders. Odoo will automatically manage
+	                the alerts for the renewal of the contracts to the right salesperson.
+	            </p>
+	        </field>
+    	    </record>
+
+
+            <!--  filtering the product_id in subscription template   -->
+
+        <record id="checking_product_id_in_subscription_template" model="ir.ui.view">
+            <field name="name">sale.subscription.template</field>
+            <field name="model">sale.subscription.template</field>
+            <field name="inherit_id" ref="sale_contract.sale_subscription_template_view_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="//group[@name='website_contract']" position="inside">
+					<field name="c_type"/>
+					<field name="c_auto_create_fptag" />
+					<field name="presale"/>
+					<field name="single_store"/>
+				</xpath>
+				<xpath expr="//field[@name='subscription_template_line_ids']/tree/field[@name='name']" position="after">
+                	<field name="c_product_template_id" invisible="1"/>
+		        	<field name="c_default_discount"/>
+                	<field name="c_max_discount"/>
+					<field name="c_default_quantity"/>
+					<field name="c_maximum_quantity"/>
+		        </xpath>
+				<xpath expr="//field[@name='subscription_template_line_ids']/tree/field[@name='quantity']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+            </field>
+        </record>
+
+                <!--  Subscription Template Search view   -->
+        <record id="sale_contract.sale_subscription_template_view_search" model="ir.ui.view">
+        <field name="name">sale.subscription.template.search</field>
+        <field name="model">sale.subscription.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', ('name','ilike',self),('code','ilike',self)]" string="Template"/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+        </record>
+                <!--  Subscription Search view   -->
+        <record id="sale_contract.sale_subscription_view_search" model="ir.ui.view">
+        <field name="name">sale.subscription.search</field>
+        <field name="model">sale.subscription</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', '|', '|', ('recurring_invoice_line_ids.c_sale_order_id','ilike', self), ('recurring_invoice_line_ids.c_invoice_id','ilike', self), ('name','ilike',self),('code','ilike',self)]" string="Template"/>
+                <field name="date"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="user_id"/>
+                <field name="template_id"/>
+                <field name="code"/>
+                <filter name="new" string="New" domain="[('state','=','draft')]" help="New Contracts"/>
+                <filter name="open" string="In Progress" domain="[('state','=','open')]" help="Contracts in progress"/>
+                <filter name="pending" string="To Renew" domain="[('state','=','pending')]" help="Pending contracts"/>
+                <filter name="closed" string="Closed" domain="[('state','=','close')]" help="Closed contracts"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state','=','cancelled')]" help="Cancelled contracts"/>
+                <separator/>
+                <filter
+                    string="Expired"
+                    domain="[('state','in',('open','draft','pending')), '|', ('date', '!=', False), ('date', '&lt;=', time.strftime('%%Y-%%m-%%d'))]"
+                    help="End date passed" />
+                <filter
+                    string="Expiring soon"
+                    domain="[('date', '!=', False), ('date', '&lt;=', (context_today() + datetime.timedelta(30)).strftime('%%Y-%%m-%%d') )]"
+                    help="End date is in the next month" />
+                <separator/>
+                <filter string="Contracts not assigned" help="Contracts that are not assigned to an account manager." domain="[('user_id', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" domain="[]" context="{'group_by':'state'}"/>
+                    <filter string="Account Manager" domain="[]" context="{'group_by':'user_id'}"/>
+                    <filter string="Partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Template" domain="[]" context="{'group_by':'template_id'}"/>
+                    <filter string="Start Month" domain="[]" context="{'group_by' : 'date_start'}" />
+                    <filter string="End Month" domain="[]" context="{'group_by' : 'date'}" />
+                    <filter string="Pricelist" domain="[]" context="{'group_by' : 'pricelist_id'}" />
+                </group>
+            </search>
+        </field>
+        </record>
+
+		         <!--   sale contract menuitem   -->
+		<menuitem id="sales_team.menu_contracts1"
+				  name="Contracts"
+				  parent="sales_team.menu_base_partner"
+				  action="sale_contract.sale_contracts_action1"/>
+
+		        <!--  changing menu name subscription to contract   -->
+		<menuitem  id="sale_contract.menu_sale_subscription_action"
+				   sequence="1"
+				   name="Contracts"
+				   parent="sale_contract.menu_sale_subscription"
+				   action="sale_contract.sale_subscription_action"/>
+
+
+		<!-- ================CFC Contract=============================-->
+
+   <record model="ir.ui.view" id="cfc_contract_view_form">
+	        <field name="name">CFC Contract</field>
+	        <field name="model">cfc.contract</field>
+	        <field name="arch" type="xml">
+	        	<form string="CFC Contract Form">
+	        	<sheet>
+				  <group col="4">
+			        <field name="name"/>
+				    <field name="account_assigned_count"/>
+				    <field name="contract_id" />
+					<field name="active" readonly="1"/>
+					<field name="type"/>
+				  </group>
+                 </sheet>
+	        	</form>
+	        </field>
+	    </record>
+
+		 <record model="ir.ui.view" id="cfc_contract_view_tree">
+	        <field name="name">CFC Contract Tree</field>
+	        <field name="model">cfc.contract</field>
+	        <field name="arch" type="xml">
+	        	<tree string="CFC Contract">
+	        		<field name="name"/>
+				    <field name="contract_id" />
+					<field name="account_assigned_count"/>
+					<field name="type"/>
+	        	</tree>
+	        </field>
+	    </record>
+
+
+	    <record id="action_cfc_contract" model="ir.actions.act_window">
+	        <field name="name">CFC Contract</field>
+	        <field name="res_model">cfc.contract</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	    </record>
+
+     <menuitem
+        id="menu_cfc_contract"
+        name="CFC Contract"
+        parent="sale.menu_sales_config"
+        action="action_cfc_contract"
+         />
+
+	     <record model="ir.ui.view" id="nf_contract_lines_view_form">
+	        <field name="name">Contract Lines</field>
+	        <field name="model">sale.subscription.line</field>
+	        <field name="arch" type="xml">
+	        	<form string="Contract Lines">
+	        	<sheet>
+				  <group col="4">
+			        <field name="product_id" context="{'default_recurring_invoice': True}"/>
+	                <field name="name"/>
+	                <field name="c_product_template_id"/>
+					<field name="c_validity"/>
+	                <field name="quantity" groups="base.group_no_one"/>
+	                <field name="actual_quantity"/>
+	                <field name="sold_quantity"/>
+	                <field name="uom_id" groups="product.group_uom"/>
+	                <field name="price_unit"/>
+	                <field name="discount" groups="sale.group_discount_per_so_line"/>
+	                <field name="price_subtotal"/>
+	                <field name="amount_in_inr"/>
+	                <field name="c_price_total"/>
+	                <field name="c_price_tax"/>
+	                <field name="c_sale_order_id"/>
+	                <field name="analytic_account_id"/>
+					<field name="c_sale_date"/>
+					<field name="c_invoice_id"/>
+					<field name="c_invoice_date"/>
+					<field name="c_status"/>
+					<field name="c_auto_create_fptag"/>
+					<field name="c_fptags_id" domain="[('customer_id','=', parent.partner_id)]" options="{'no_create_edit':True,'no_create': True}"/>
+					<field name="c_inv_cancel_date"/>
+					<field name="c_sales_person_id"/>
+					<field name="c_cost_center" string="Cost Centre"/>
+					<field name="c_sp_branch"/>
+					<field name="c_team_id"/>
+					<field name="c_activation_id"/>
+					<field name="c_default_discount"/>
+				  </group>
+				  <group>
+				  	<field name="c_tax_ids"/>
+				  </group>
+	             </sheet>
+	        	</form>
+	        </field>
+	    </record>
+
+		 <record model="ir.ui.view" id="nf_contract_lines_view_tree">
+	        <field name="name">Contract Lines</field>
+	        <field name="model">sale.subscription.line</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Contract Lines">
+	        		<field name="c_sale_order_id"/>
+				    <field name="c_sale_date"/>
+				    <field name="c_invoice_id"/>
+					<field name="c_invoice_date"/>
+					<field name="c_product_template_id"/>
+					<field name="c_status"/>
+					<field name="c_fptags_id" domain="[('customer_id','=', parent.partner_id)]" options="{'no_create_edit':True,'no_create': True}"/>
+					<field name="c_validity"/>
+					<field name="c_inv_cancel_date"/>
+					<field name="c_sales_person_id"/>
+					<field name="c_cost_center" string="Cost Centre"/>
+					<field name="c_sp_branch"/>
+					<field name="quantity" groups="base.group_no_one"/>
+					<field name="price_unit"/>
+	                <field name="discount" groups="sale.group_discount_per_so_line"/>
+	                <field name="price_subtotal"/>
+	        	</tree>
+	        </field>
+	    </record>
+
+	    <record id="nf_contract_lines_view_search" model="ir.ui.view">
+	        <field name="name">Contract Lines</field>
+	        <field name="model">sale.subscription.line</field>
+	        <field name="arch" type="xml">
+	            <search>
+	                <field name="c_sale_order_id"/>
+	                <field name="c_sales_person_id"/>
+					<field name="c_cost_center" string="Cost Centre"/>
+					<field name="c_sp_branch"/>
+					<field name="c_status"/>
+					<field name="c_invoice_id"/>
+					<field name="c_fptags_id"/>
+	            </search>
+	        </field>
+	    </record>
+
+	    <record id="action_nf_contract_lines" model="ir.actions.act_window">
+	        <field name="name">Contract Lines</field>
+	        <field name="res_model">sale.subscription.line</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	    </record>
+
+     	<menuitem
+	        id="menu_nf_contract_lines"
+	        name="Contract Lines"
+	        parent="sale_contract.menu_sale_subscription_config"
+	        action="action_nf_contract_lines" sequence="20" groups="base.group_erp_manager"
+         />
+
+	</data>
+</openerp>

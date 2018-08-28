@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_designation_lines,access_designation_lines,model_designation_lines,,1,1,1,0
+access_inter_designation_lines,access_inter_designation_lines,model_inter_designation_lines,,1,1,1,0
+access_states_lines,access_states_lines,model_states_lines,,1,1,1,0
+access_department_lines,access_department_lines,model_department_lines,,1,1,1,0
+access_employee_revision,access_employee_revision,model_employee_revision,,1,1,1,0
+access_branch_lines,access_branch_lines,model_branch_lines,,1,1,1,0
+access_grade_line,access_grade_line,model_grade_line,,1,1,1,0
+access_level_line,access_level_line,model_level_line,,1,1,1,0
+access_reporting_head_line,access_reporting_head_line,model_reporting_head_line,,1,1,1,0

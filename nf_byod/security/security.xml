@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<openerp>
+	<data noupdate="1">
+        
+        <record id="group_byod" model="res.groups">
+            <field name="name">BYOD</field>
+        </record>
+        
+    </data>
+</openerp>
+		

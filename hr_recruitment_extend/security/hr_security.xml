@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		
+	<record id="base.group_hr" model="res.groups">
+        <field name="name">H.R. </field>
+    </record>
+    
+    <record id="base.group_ta" model="res.groups">
+        <field name="name">T.A. Approval</field>
+    </record>
+ 
+     <record id="base.group_interviewer" model="res.groups">
+        <field name="name">Interviewer </field>
+    </record>
+       
+   <record id="recruitment_by_employee_id" model="ir.rule">
+	    <field name="name">Interviewer can see only own application</field>
+	    <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+	    <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="0"/>
+	    <field name="perm_unlink" eval="0" />
+	    <field name="domain_force">[('interviewer_id','=',user.id)]</field>
+	</record>
+	
+	<record id="recruitment_by_officer" model="ir.rule">
+	    <field name="name">HR Team can see own created application</field>
+	    <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+	    <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="1" />
+	    <field name="domain_force">['|','|',('interviewer_id','=',user.id),('user_id','=',user.id),('create_uid','=',user.id)]</field>
+	</record>
+	
+	<record id="recruitment_by_manager" model="ir.rule">
+	    <field name="name">Recruitment Manager can see all application</field>
+	    <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+	    <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_manager'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="1" />
+	    <field name="domain_force">[(1,'=',1)]</field>
+	</record> 
+	
+	
+	
+    
+    <record id="ta_only" model="ir.rule">
+	    <field name="name">Only TA will see</field>
+	    <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+	    <field name="groups" eval="[(4, ref('base.group_ta'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="1" />
+	    <field name="domain_force">[('user_id','=',user.id)]</field>
+	</record>
+	
+	<record id="hr_only" model="ir.rule">
+	    <field name="name">Only HR will see</field>
+	    <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+	    <field name="groups" eval="[(4, ref('base.group_hr'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="1" />
+	    <field name="domain_force">[('allocat_hr','=',user.id)]</field>
+	</record>
+	
+	<record id="interviewer_only" model="ir.rule">
+	    <field name="name">Only Interviewer will see</field>
+	    <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+	    <field name="groups" eval="[(4, ref('base.group_interviewer'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="1" />
+	    <field name="domain_force">[('interviewer_id','=',user.id)]</field>
+	</record>
+
+	<record id="employee_referral" model="ir.rule">
+	    <field name="name">Employee Referral</field>
+	    <field name="model_id" ref="hr_recruitment_extend.model_hr_employee_referral"/>
+	    <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="0" />
+	    <field name="domain_force">[('referred_by.user_id','=',user.id)]</field>
+	</record>
+
+	<record id="recruitment_officer_referral" model="ir.rule">
+	    <field name="name">Recruitment Officer Referral</field>
+	    <field name="model_id" ref="hr_recruitment_extend.model_hr_employee_referral"/>
+	    <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="0" />
+	    <field name="domain_force">[('assign_to.user_id','=',user.id)]</field>
+	</record>
+
+	<record id="recruitment_manager_referral" model="ir.rule">
+	    <field name="name">Recruitment Manager Referral</field>
+	    <field name="model_id" ref="hr_recruitment_extend.model_hr_employee_referral"/>
+	    <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_manager'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="0" />
+	    <field name="domain_force">[(1,'=',1)]</field>
+	</record>
+
+	<record id="candidate_joining_recruiter" model="ir.rule">
+	    <field name="name">Candidate Joining Recruiter</field>
+	    <field name="model_id" ref="hr_recruitment_extend.model_nf_joining_candidate"/>
+	    <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="0" />
+	    <field name="domain_force">[('recruiter_name.user_id','=',user.id)]</field>
+	</record>
+
+	<record id="candidate_joining_manager" model="ir.rule">
+	    <field name="name">Candidate Joining Manager</field>
+	    <field name="model_id" ref="hr_recruitment_extend.model_nf_joining_candidate"/>
+	    <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_manager')),(4, ref('hr.group_hr_user'))]"/>
+	    <field name="perm_read" eval="1"/>
+	    <field name="perm_write" eval="1"/>
+	    <field name="perm_create" eval="1"/>
+	    <field name="perm_unlink" eval="0" />
+	    <field name="domain_force">[(1,'=',1)]</field>
+	</record>
+    
+   
+</data>
+
+
+</openerp>

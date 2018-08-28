@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	
+        <!-- Payroll Leave View -->
+
+        <record id="view_hr_payleave_list_view" model="ir.ui.view">
+            <field name="name">hr.payleave.tree</field>
+            <field name="model">hr.payleave</field>
+            <field name="arch" type="xml">
+                <tree string="PayLeave">
+                    <field name="employee_id"/>
+                    <field name="employee_no" invisible='1'/>
+                    <field name="leave_type"/>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
+                    <field name="reason"/>
+                    <field name="approving_authority"/>
+                     <field name="remarks"/>
+                    <field name="contact_address"/>
+                    <field name="no_of_days"/>
+                    <field name="txn_type"/>
+                    <field name="previous_balance"/>
+                    <field name="new_balance"/>
+                    <field name="record_type"/>
+                    <field name="payroll_month"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_hr_payleave_form_view" model="ir.ui.view">
+            <field name="name">hr.payleave.form</field>
+            <field name="model">hr.payleave</field>
+            <field name="arch" type="xml">
+                <form string="Leave">
+                	<group>
+                	<group>
+                    <field name="employee_id" required='1'/>
+                    <field name="employee_no" invisible='1'/>
+                    <field name="leave_type" required='1'/>
+                    <field name="from_date" required='1'/>
+                    <field name="to_date" required='1'/>
+                    </group>
+                    <group>
+                    <field name="reason"/>
+                    <field name="approving_authority" required='1'/>
+                     <field name="remarks"/>
+                    <field name="contact_address"/>
+                    <field name="no_of_days" required='1'/>
+                    </group>
+                    <group>
+                    <field name="txn_type" required='1'/>
+                    <field name="previous_balance" required='1'/>
+                    <field name="new_balance" required='1'/>
+                    <field name="record_type" required='1'/>
+                    <field name="payroll_month"/>
+                    </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_hr_payleave_filter" model="ir.ui.view">
+            <field name="name">hr.payleave.filter</field>
+            <field name="model">hr.payleave</field>
+            <field name="arch" type="xml">
+                <search string="Payroll Leave">
+                    <field name="employee_no" string="Employee No"/>
+                    <field name="leave_type" string="Leave Type"/>
+                    <field name="from_date" string="From Date"/>
+                    
+                </search>
+             </field>
+        </record>
+
+
+        <record id="action_view_hr_payleave" model="ir.actions.act_window">
+            <field name="name">Payroll Leave</field>
+            <field name="res_model">hr.payleave</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="view_hr_payleave_list_view"/>
+        </record>
+
+       <menuitem
+            id="menu_hr_payleave_view"
+            action="action_view_hr_payleave"
+            parent="hr_holidays.menu_hr_holidays_root"
+            sequence="41"
+        />
+       
+       
+       <!-- Hr Leave Credit View -->
+
+        <record id="view_hr_leave_credit_list_view" model="ir.ui.view">
+            <field name="name">hr.leave.credit.tree</field>
+            <field name="model">hr.leave.credit</field>
+            <field name="arch" type="xml">
+                <tree string="Leave Credit">
+                    <field name="filter"/>
+                    <field name="region_id"/>
+                    <field name="employee_id"/>
+                    <field name="leave_type"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    
+                </tree>
+            </field>
+        </record>
+        <record id="view_hr_leave_credit_form_view" model="ir.ui.view">
+            <field name="name">hr.leave.credit.form</field>
+            <field name="model">hr.leave.credit</field>
+            <field name="arch" type="xml">
+                <form string="Leave Credit">
+                	<group>
+                	<group>
+                    <field name="filter" widget="radio" attrs="{'readonly':[('data_generated','=',True)]}"/>
+                    <field name="data_generated" readonly='1'/>
+                    <field name="leave_credited" readonly='1'/>
+                    </group>
+                    <group>
+                     <field name="region_id" attrs="{'invisible': [('filter', 'not in', ('R',))],'readonly':[('data_generated','=',True)],'required': [('filter', 'not in', ('E',))]}"  placeholder="Select Region"/>
+                    <field name="employee_id" attrs="{'invisible': [('filter', 'not in', ('E',))],'readonly':[('data_generated','=',True)],'required': [('filter', 'not in', ('R',))]}" placeholder="Select Employee"/>
+                    <field name="leave_type" required='1' attrs="{'readonly':[('data_generated','=',True)]}"/>
+                    <field name="start_date" required='1' attrs="{'readonly':[('data_generated','=',True)]}"/>
+                    <field name="end_date" required='1' attrs="{'readonly':[('data_generated','=',True)]}"/>
+                    <field name="user" invisible='1'/>
+                    
+                    </group>
+                    <group>
+                    	<group>
+                            <button string="Generate Data" name="generate_data" type="object" class="oe_highlight" attrs="{'invisible':[('data_generated','=',True)]}"/>
+                            <button string="Credit Leave" name="credit_leave" type="object" class="oe_highlight" attrs="{'invisible':[('leave_credited','=',True)]}"/>
+                 
+                        </group>
+                    </group>
+                    </group>
+                  <notebook>
+                  <page string="Credit Lines">
+                    <field name="credit_line" attrs="{'readonly':[('leave_credited','=',True)]}">
+                        <tree string="Leave Credit Lines">
+                        <field name="employee_id"/>
+						<field name="leave_type"/>
+                        <field name="prev_bal"/>
+						<field name="credit_days"/> 
+						<field name="new_bal"/>
+
+          	            </tree>
+                  	  </field>   
+                  </page>
+                    </notebook>
+                    
+                </form>
+            </field>
+        </record>
+        
+        
+
+
+        <record id="action_view_hr_leave_credit" model="ir.actions.act_window">
+            <field name="name">Perform Leave Credit</field>
+            <field name="res_model">hr.leave.credit</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="view_hr_leave_credit_list_view"/>
+        </record>
+
+        <!-- <menuitem
+            id="menu_hr_leave_credit_view"
+            action="action_view_hr_leave_credit"
+            parent="hr_holidays.menu_hr_holidays_root"
+            sequence="46"
+        /> -->
+       
+       
+       
+         <!--  Leave Encashment View -->
+
+       <record id="view_hr_payleave_encash_form" model="ir.ui.view">
+            <field name="name">hr.payleave.encash.form</field>
+            <field name="model">hr.payleave.encash</field>
+            <field name="arch" type="xml">
+            <form>
+                
+             <sheet>
+                    <group>
+                        <group>
+                         <field name="employee_id" required='True' attrs="{'readonly':[('done','=',True)]}"/>
+                         <field name="encashment_days" required='True' attrs="{'readonly':[('done','=',True)]}"/>
+                         <field name="done" readonly='True'/>
+                        </group>
+                        <group>
+                         <field name="tax_exempted" attrs="{'readonly':[('done','=',True)]}"/>
+                         <field name="remarks" attrs="{'readonly':[('done','=',True)]}"/>
+                        </group>
+
+                        <group>
+                            <button string="Encash Leave" name="encash_leave" type="object" class="oe_highlight" attrs="{'invisible':[('done','=',True)]}"/>
+                        </group>
+                    </group>
+                     
+              </sheet>
+            </form>
+        </field>
+        </record>
+        <record id="view_hr_payleave_encash_tree" model="ir.ui.view">
+            <field name="name">hr.payleave.encash.tree</field>
+            <field name="model">hr.payleave.encash</field>
+            <field name="arch" type="xml">
+            <tree>
+                
+                         <field name="employee_id" required='True'/>
+                         <field name="encashment_days" required='True'/>
+                         <field name="done" readonly='True'/>
+               </tree>
+        </field>
+        </record>
+
+
+        <record id="action_view_hr_payleave_encash" model="ir.actions.act_window">
+            <field name="name">Payroll Leave Encashment</field>
+            <field name="res_model">hr.payleave.encash</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_payleave_encash_tree"/>
+        </record>
+
+       <!-- <menuitem
+            id="menu_hr_payleave_encash_view"
+            action="action_view_hr_payleave_encash"
+            parent="hr_holidays.menu_hr_holidays_root"
+            sequence="42"
+        /> -->
+        
+        <!-- Leave Balance Data Entry -->
+        
+        <record id="view_hr_leave_balance_entry_list_view" model="ir.ui.view">
+            <field name="name">hr.leave.balance.entry.tree</field>
+            <field name="model">hr.leave.balance.entry</field>
+            <field name="arch" type="xml">
+                <tree string="Leave Balance Data Entry">
+                    <field name="employee_id"/>
+                    <field name="leave_type"/>
+                     <field name="remarks"/>
+                    <field name="current_balance"/>
+                    <field name="new_balance"/>
+                    <field name="done" readonly='True'/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_hr_leave_balance_entry_form_view" model="ir.ui.view">
+            <field name="name">hr.leave.balance.entry.form</field>
+            <field name="model">hr.leave.balance.entry</field>
+            <field name="arch" type="xml">
+                <form string="Leave Balance Data Entry">
+                	<group>
+                	<group>
+                    <field name="employee_id" required='1' attrs="{'readonly':[('done','=',True)]}"/>
+                    <field name="leave_type" required='1' attrs="{'readonly':[('done','=',True)]}"/>
+                    <field name="done" readonly='True' attrs="{'readonly':[('done','=',True)]}"/>
+                    </group>
+                    <group>
+                    <field name="remarks" required='1' attrs="{'readonly':[('done','=',True)]}"/>
+                    <field name="current_balance" readonly='1'/>
+                     <field name="new_balance" required='1' attrs="{'readonly':[('done','=',True)]}"/>
+                    
+                    </group>
+                    <group>
+                    	<group>
+                            <button string="Get Balance" name="get_balance" type="object" class="oe_highlight" attrs="{'invisible':[('done','=',True)]}"/>
+                           <button string="Update Balance" name="update_balance" type="object" class="oe_highlight" attrs="{'invisible':[('done','=',True)]}"/>
+                 
+                        </group>
+                    </group>
+                   
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_view_hr_leave_balance_data_entry" model="ir.actions.act_window">
+            <field name="name">Leave Balance Data Entry</field>
+            <field name="res_model">hr.leave.balance.entry</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="view_hr_leave_balance_entry_list_view"/>
+        </record>
+
+       <!-- <menuitem
+            id="menu_hr_leave_balance_data_entry_view"
+            action="action_view_hr_leave_balance_data_entry"
+            parent="hr_holidays.menu_hr_holidays_root"
+            sequence="45"
+        /> -->
+
+        <record id="hr_holidays_form_inherit" model="ir.ui.view">
+            <field name="name">hr.holidays.form</field>
+            <field name="model">hr.holidays</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_approve']" position="replace">
+                    <button string="Approve" name="action_approve" states="confirm" type="object" class="oe_highlight"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_refuse']" position="replace">
+                    <button string="Refuse" name="action_refuse" states="confirm,validate1" type="object" />
+                    <button string="Refuse" name="action_refuse" states="validate" type="object" groups="hr_holidays.group_hr_holidays_user"/>
+                </xpath>
+
+                <xpath expr="//field[@name='holiday_status_id']" position="after">
+                    <field name="day_type" required="1"/>
+                </xpath>
+
+                <xpath expr="//field[@name='report_note']/parent::div" position="replace">
+                    <div attrs="{'invisible':[('type','=','add')]}">
+                        <separator string="Comment by Manager"/>
+                       <field name="report_note" placeholder="e.g. Report to the next month..."/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="nf_view_employee_filter" model="ir.ui.view">
+            <field name="name">hr.holidays.search</field>
+            <field name="model">hr.holidays</field>
+            <field name="inherit_id" ref="hr_holidays.view_hr_holidays_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_team_leaves']" position="replace">
+                    <filter name="my_team_leaves" string="My Team Leaves" domain="['|',('employee_id.parent_id.user_id', '=', uid),('employee_id.coach_id.user_id', '=', uid)]"/>
+                </xpath>
+                <xpath expr="//filter[@name='my_leaves']" position="replace">
+                    <filter string="My Requests" name="my_leaves" domain="[('employee_id.user_id', '=', uid)]"/>
+                </xpath>
+                
+                <xpath expr="//filter[@name='year']" position="replace">
+                    <filter name="year" string="Active"
+                        domain="[('holiday_status_id.active', '=', True)]" help="Active Leaves and Allocations"/>
+                    <filter name="current_year" string="Current Year" domain="['|',('date_to','&gt;=',time.strftime('%Y-01-01 00:00:01')),('date_to','=',False)]"/>
+                </xpath>
+            </field>
+        </record>
+       
+</data>
+</openerp>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Reject by Finance -->
+    <record id="nf_payroll_finance_reject_view_form" model="ir.ui.view">
+        <field name="name">nf.payroll.finance.reject.form</field>
+        <field name="model">nf.payroll.finance.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reasons to Reject By Finance">
+                <group class="oe_title">
+                    <field name="finance_reject_reason" string="Reason to Reject by Finance" required="1" />
+                    <!-- <field name="final_remarks" string="Final Remarks" /> -->
+                </group>
+                <footer>
+                    <button name="set_close_cancel" string="Update" type="object" class="btn btn-sm btn-primary"/>
+                    <button string="Cancel" class="btn btn-sm btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action Reject with Finance Remarks -->
+    <record id="nf_payroll_finance_reject_reason_wizard_action" model="ir.actions.act_window">
+        <field name="name">Reject Reason</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">nf.payroll.finance.reject.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="nf_payroll_finance_reject_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+
+<!-- BULK APPROVE BY FINANCE -->
+    <record id="payroll_finance_approve_view" model="ir.ui.view">
+            <field name="name">Approve (Finance)</field>
+            <field name="model">payroll.finance.approve</field>
+            <field name="arch" type="xml">
+                <form string="Approve Payroll Finance">
+                    <label string="Are you sure you want to approve all the payroll components for the selected employees?"/>
+                    <footer>
+                        <button string="Approve Payroll Finance" name="bulk_approve_by_finance" type="object" default_focus="1" class="btn-primary" groups="account.group_account_manager" />
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_payroll_finance_approve" model="ir.actions.act_window">
+            <field name="name">Approve (Finance) </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">payroll.finance.approve</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="payroll_finance_approve_view"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+            <field name="help">This wizard will Approve all the selected Payroll Finance.</field>
+        </record>
+
+        <record model="ir.values" id="payroll_finance_approve_values">
+            <field name="model_id" ref="hr_tds_saving.model_nf_payslip_components" />
+            <field name="name">Approve (Finance)</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_payroll_finance_approve'))" />
+            <field name="key">action</field>
+            <field name="model">nf.payslip.components</field>
+        </record>
+
+</odoo>

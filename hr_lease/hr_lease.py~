@@ -1,0 +1,21 @@
+from openerp.osv import fields, osv
+
+class hr_lease(osv.Model):
+    _name = 'hr.lease'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'employee_no':fields.char('Employee No.'),
+                'employee_name':fields.char('Employee Name'),
+                'lease_type' : fields.selection([('1','Individual'),('2','Company'),('3','Partnership')],'Landlord Type'),
+                'owner' : fields.selection([('N','Self Lease'),('NR','Near Relative'),('C','Company Accomodation'),('Y','Company 	Lease')],'Ownership Type'),
+                'area':fields.float('Flat Area'),
+                'address':fields.char('Address'),
+                'rent':fields.float('Actual Rent Amount'),
+                'special_lease_amount':fields.float('Special Lease Amount'),
+                'from_date':fields.date('Lease Start Date'),
+                'to_date':fields.date('Lease End Date'),
+                'lease_share':fields.float('Lease Share'),
+                'lease_notes':fields.text('Notes'),
+                'brokerage_charge':fields.float('Brokerage Charge')
+                }

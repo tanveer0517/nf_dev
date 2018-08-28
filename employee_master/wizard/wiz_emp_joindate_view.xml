@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+        <record id="wiz_emp_join_date_form" model="ir.ui.view">
+            <field name="name">Employee Joining Date</field>
+            <field name="model">wiz.emp.join</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Employee Joining Date">
+                    <sheet>
+                        <group>
+                            <field name="join_date"/>
+                        </group>
+                        <footer>
+                            <button name="update_join_date" string="Update" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-default" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wiz_emp_join_date_action" model="ir.actions.act_window">
+            <field name="name">Employee Joining Date</field>
+            <field name="res_model">wiz.emp.join</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

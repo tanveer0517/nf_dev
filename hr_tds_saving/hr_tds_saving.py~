@@ -1,0 +1,189 @@
+import math
+import time
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from dateutil import relativedelta
+import os
+from openerp import api, tools
+from openerp.osv import fields, osv
+from openerp.tools.translate import _
+import openerp.addons.decimal_precision as dp
+
+from openerp.tools.safe_eval import safe_eval as eval
+
+
+class employee_saving(osv.Model):
+    _name = 'employee.saving'
+    
+    def onchange_employee_id(self, cr, uid, ids, employee_id, context=None):
+        employee = self.pool.get('employee.saving').search(cr, uid, [('employee_id', '=', employee_id)], context=context)
+        if employee:
+            raise osv.except_osv(_('Warning'), _('Employee saving record already exists! Please update the existing record.'))
+        return True
+
+    
+    def _get_amount(self, cr, uid, ids, fields, args , context=None):
+        res={}
+        
+        for each in ids:
+            total =0.0
+            for line in self.browse(cr,uid,each).saving_line_ids:
+                total += line.amount
+            res[each] = total    
+        return res 
+    def _get_amount_receipt(self, cr, uid, ids, fields, args , context=None):
+        res={}
+        
+        print ids
+        for each in ids:
+            total =0.0
+            for line in self.browse(cr,uid,each).medical_line_ids:
+                total += line.amount
+            res[each] = total    
+        return res 
+    def _get_amount_receipt_hra(self, cr, uid, ids, fields, args , context=None):
+        res={}
+        
+        print ids
+        for each in ids:
+            total =0.0
+            for line in self.browse(cr,uid,each).hra_line_ids:
+                total += line.amount
+            res[each] = total    
+        return res 
+    def _get_amount_other(self, cr, uid, ids, fields, args , context=None):
+        res={}
+        
+        print ids
+        for each in ids:
+            total =0.0
+            for line in self.browse(cr,uid,each).other_income_ids:
+                total += line.amount
+            res[each] = total    
+        return res 
+    
+    _columns = { 
+                'name':fields.char('Name'),
+                'fin_year_id':fields.many2one('fin.year.mst','Financial Year'),
+                'company_id':fields.many2one('res.company','Zone'),
+                'employee_id':fields.many2one('hr.employee','Employee Name'),
+                'proposed_amount':fields.function(_get_amount, string='Saving Amount',type='float',digits_compute=dp.get_precision('Account')),
+                'saving_line_ids':fields.one2many('saving.line','saving_id','Saving Line'),
+                'medical_line_ids':fields.one2many('medical.bill.line','bill_id','Medical Bill'),
+                'hra_line_ids':fields.one2many('hra.receipt.line','hra_receipt_id','HRA Receipt'),
+                'other_income_ids':fields.one2many('other.source.income','income_id','Other Income'),                                                                
+                'bill_amount':fields.function(_get_amount_receipt, string='Medical Bill Amount',type='float',digits_compute=dp.get_precision('Account')),
+                'hra_receipt_amount':fields.function(_get_amount_receipt_hra, string='HRA Receipt Amount',type='float',digits_compute=dp.get_precision('Account')),
+                'other_income_amount':fields.function(_get_amount_other, string='Other Source Amount',type='float',digits_compute=dp.get_precision('Account')),
+
+                'gross_income_previous':fields.float('Gross Income'),
+                'professional_tax_previous':fields.float('Professional Tax'),
+                'ded_previous_emp':fields.float('Deduction Made By Previous Employer'),
+                'income_tax_paid':fields.float('Income Tax Paid'),
+                
+                'car_perks':fields.float('Car Perks'),
+                'lease_perks':fields.float('Lease Perks'),
+                'hard_furnishing_perks':fields.float('Hard Furnishing Perks'),
+                'other_perks':fields.float('Other Perks'),
+                'entertainment_allowance':fields.float('Entertainment Allowance'),
+                'lease_exemption':fields.float('Lease Exemption'),
+                'furniture_rent_recovery':fields.float('Furniture Rent Recovery'),
+                'actual_lease_rent_paid':fields.float('Actual Lease Rent Paid'),
+                'furnishing_allowance':fields.float('Furnishing Allowance'),
+                'conveyance_recovery':fields.float('Trans Monthly Exempt'),
+                'date':fields.date('Date'),
+                
+                'medical_exp_reimbursement':fields.float('Medical Expense Reimbursement'),
+                'prp_amount':fields.float('PRP Amount'),
+                'preconstruction_interest':fields.float('Preconstruction Interest'),
+                'prof_updation_exempt':fields.float('Professional Updation Exempt'),
+            	'uniform_fitment_exempt':fields.float('Uniform Fitment Exempt'),
+            	'property_type':fields.selection([('S','Self Occupied'),('R','Rent Out')],"Property Type"),
+            	'house_income_sl':fields.float('HP Income (Self Lease)',readonly=True),
+                'uniform_amount':fields.float('Uniform Fitment Amount'),
+                }
+    _defaults = {
+                'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'hr.misc.payment', context=c),
+                'date': lambda *a: time.strftime('%Y-%m-%d'),
+                }
+    
+class saving_line(osv.Model):
+    _name = 'saving.line'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'saving_id':fields.many2one('employee.saving','Saving Id'),
+                'salary_rule_id':fields.many2one('hr.salary.rule','Saving Name'),
+                'type': fields.selection([('P', 'Proposed'),('C', 'Confirmed')], "Saving Type"),
+		'prop_type': fields.selection([('S', 'Self Occupied'),('R', 'Rented Out')], "Property Type"),
+                'amount':fields.float('Amount'),
+                'saving_no':fields.char('Saving Number'),
+                #'fin_year_id':fields.many2one('fin.year.mst','Financial Year'),
+                }
+class medical_bill_line(osv.Model):
+    _name = 'medical.bill.line'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'bill_id':fields.many2one('employee.saving','Bill Id'),
+                'amount':fields.float('Amount'),
+                'date':fields.date('Date'),
+                'type': fields.selection([('P', 'Proposed'),('C', 'Confirmed')], "Type"),
+                'reference':fields.char('Reference'),
+                #'fin_year_id':fields.many2one('fin.year.mst','Financial Year'),
+                }
+class hra_receipt_line(osv.Model):
+    _name = 'hra.receipt.line'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'hra_receipt_id':fields.many2one('employee.saving','HRA Receipt Id'),
+                'amount':fields.float('Amount'),
+                'date':fields.date('Date'),
+                'type': fields.selection([('P', 'Proposed'),('C', 'Confirmed')], "Type"),
+                'reference':fields.char('Reference'),
+                #'fin_year_id':fields.many2one('fin.year.mst','Financial Year'),
+                }
+class other_source_income(osv.Model):
+    _name = 'other.source.income'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'income_source':fields.selection([('1','Income From House Property'),('2','Interest On FD'),('4','Saving Interest Income'),('3','Other')],'Income Source',required='True'),
+                'income_id':fields.many2one('employee.saving','Income Id'),
+                'amount':fields.float('Amount'),
+                'date':fields.date('Date'),
+                'reference':fields.char('Reference'),
+                #SS'fin_year_id':fields.many2one('fin.year.mst','Financial Year'),
+                }
+    
+class employee__internal_saving(osv.Model):
+    _name = 'employee.internal.saving'
+    
+    
+    
+    _columns = { 
+                'name':fields.char('Name'),
+                'employee_id':fields.many2one('hr.employee','Employee Name'),
+                'salary_rule_id':fields.many2one('hr.salary.rule','Saving Name'),
+                'amount':fields.float('Amount'),
+                'saving_no':fields.char('Saving Number'),
+		              'date_to':fields.date('End Date'),
+                'company_id':fields.many2one('res.company','Zone'),
+                'date':fields.date('Date'),
+                }
+    _defaults = {
+                'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'hr.misc.payment', context=c),
+                'date': lambda *a: time.strftime('%Y-%m-%d'),
+                }
+    
+
+class saving_category(osv.Model):
+    _name = 'saving.category'
+    
+    _columns = {
+                'name':fields.char('Name'),
+                'exempted_amount':fields.float('Exempted Amount'),
+                }
+

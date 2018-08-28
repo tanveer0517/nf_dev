@@ -1,0 +1,1088 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+   	<data>
+		
+		<record model="ir.ui.view" id="hr_budget_view_form">
+	        <field name="name">HR Budget Form</field>
+	        <field name="model">hr.budget</field>
+	        <field name="arch" type="xml">
+	        	<form string="HR Budget Form">
+	        		<header>
+	        			<button name="confirm_budget" string="CONFIRM" type="object" class="oe_highlight" states='draft'/>
+	        			<button name="approve_budget" string="APPROVE" type="object" class="oe_highlight" states='confirm'/>
+						<button name="revise_budget" string="SEND FOR REVISION" type="object"/>
+					
+						<!--This will create the statusbar, thanks to the widget. -->
+					    <field name="state" widget="statusbar"/>
+					
+					</header>
+	        		<sheet>
+	        		 <h1>
+                       <field name="name" class="oe_inline" readonly="1"/>
+                     </h1> 
+		        		<group>	
+		        			<group>
+					        	<field name="dept" options="{'no_create': True}" domain="[('parent_id','!=',False)]" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+					        	<field name="manager" attrs="{'readonly': [('state','!=','draft')]}" options="{'no_create': True, 'no_create_edit': True,'no_open':True}" domain="[('manager','=',True)]"/>
+					        	<field name="budget_year" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+					        </group>
+					        
+					        <group>
+					        	<field name="branch_id" options="{'no_create': True}" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+					        	<field name="send_to" attrs="{'readonly': [('state','!=','draft')]}"/>
+					        	<field name="review_by" attrs="{'readonly': [('state','!=','draft')]}"/>
+					            <field name="date" attrs="{'readonly': [('state','!=','draft')]}"/>
+					            <field name="user_id" invisible="1"/>            
+					        </group>
+					    </group>
+				        <notebook>
+				        	<page string="Budget Lines">
+				        		<field name="budget_lines" attrs="{'readonly': [('state','!=','draft')]}" nolable="1" context="{'default_user_id':user_id,'default_manager_id':manager,'budget_year':budget_year}">
+						        	<tree>
+							        	<field name="job_id" domain="[('parent','=',True)]"/> 
+							        	<field name="emp_total"/>
+							        	<field name="budget_headcount"/>
+							        	<field name="new_res" invisible="1"/>
+							        	<field name="manager_id" invisible="1"/>
+							        	<field name="user_id" invisible="1"/>
+						        	</tree>
+						        	
+						        	<form>
+						        	<group col="4" colspan="6">
+							        	<field name="job_id" domain="[('parent','=',True)]" options="{'no_create': True, 'no_create_edit': True,'no_open':True}" required="1"/>
+							        	<field name="emp_total"/>
+							        	<field name="new_res" invisible="1"/>
+							        	<field name="avg_cost" invisible="1"/>
+							        	<field name="level" invisible="1"/>
+							        	<field name="budget_headcount"/>
+							        	<field name="total_cost" invisible="1"/>
+							        	<field name="manager_id" invisible="1"/>
+							        	<field name="user_id" invisible="1"/>
+							        </group> 	
+							        <notebook>
+				        	            <page string="Monthly Budget">	
+							        	   <field name="monthly_budget_line_ids" nolabel="1" colspan="4">
+						        	        <tree editable="top">
+						        	         <field name="date" required="1"/>
+						        	         <field name="headcount"/>
+						        	         <field name="budget_line_id" invisible="1"/>
+						        	        </tree>
+						        	        
+						        	        <form>
+						        	         <group>
+						        	          <field name="date" required="1"/>
+						        	          <field name="headcount"/>
+						        	          <field name="budget_line_id" invisible="1"/>
+						        	         </group> 
+						        	        </form>
+						        	       </field>
+						        	     </page>
+						        	 </notebook>        
+						        	</form>
+					        	</field>
+				        	</page>
+				        	
+				        </notebook>
+					    <group class="oe_subtotal_footer oe_right"> 
+		        			<field name="sub_total" class="oe_subtotal_footer_separator"/>
+		        		</group>
+		        		<group>
+		        			<field name="comments" placeholder="Additional notes..."/>
+		        		</group>
+	        		</sheet>
+	        		<div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+	        	</form>
+	        </field>
+	    </record>
+	    
+	    <record model="ir.ui.view" id="hr_budget_view_tree">
+	        <field name="name">HR Budget Tree</field>
+	        <field name="model">hr.budget</field>
+	        <field name="arch" type="xml">
+	        	<tree string="HR Budget Tree">
+	        	 <field name="name"/>
+	        	 <field name="dept"/>
+	        	 <field name="branch_id"/>
+	        	 <field name="manager"/>
+	        	 <field name="budget_year"/>
+	        	 <field name="state"/>
+	        	</tree>
+	        </field>
+	     </record>   	
+	
+				  
+	    <record id="hr_budget_action" model="ir.actions.act_window">
+	        <field name="name">Budget Forms</field>
+	        <field name="res_model">hr.budget</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new HR Budget Data. 
+	          </p>
+	        </field>
+	    </record>
+	    
+    <menuitem
+        sequence="0"
+        id="menu_hr_budget_form"
+        name="Budget"
+        parent="hr.menu_hr_root"
+        web_icon="hr_budget,static/description/icon.png" groups="hr.group_hr_manager"/>
+       
+   <menuitem
+        sequence="0"
+        id="menu_hr_budget_form_child"
+        name="Budget"
+        parent="menu_hr_budget_form"
+        action="hr_budget_action" groups="hr.group_hr_manager"/>
+        
+        
+        
+        <!-- HR Budget Close -->
+        
+        
+	  	    
+	<record model="ir.ui.view" id="hr_requisition_view_form">
+	        <field name="name">HR Requisition Form</field>
+	        <field name="model">hr.requisition</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Requisition Form">
+	        		<header>
+	        			<button name="confirm_requisition" string="CONFIRM" type="object" states='draft'/>
+	        			<button name="approve_requisition" string="APPROVE" type="object" states='confirm'/>
+	        			<button name="revise_requisition" string="SEND FOR REVISION" type="object"/>
+	        			<field name="state" widget="statusbar"/>
+	        		</header>
+	        		<sheet>
+	        		<h1>
+                      <field name="name" class="oe_inline" readonly="1"/>
+                    </h1> 
+	        			<group>
+	        				<group>
+			        			<field name="department" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+						        <field name="branch_id" required="1" attrs="{'readonly': [('state','!=','draft')]}" />
+						        <field name="requested_to" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        			<field name="requested_by" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        			<field name="allocated_to" attrs="{'readonly': [('state','!=','draft')]}" />
+			        			<field name="user_id" invisible="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        			<field name="manager" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        		</group>  
+			        			
+			        			<group>
+			        				<field name="date" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        				<label for="month"/>
+		                            <div name="month" class="o_row">
+			        				  <field name="month" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        				  <field name="year" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        				</div>
+			        				<field name="replacement" attrs="{'readonly': [('state','!=','draft')]}"/>
+			        				<field name="replace_of" attrs="{'invisible': [('replacement','!=','yes')]}"/>
+			        			</group>
+			        		  </group>
+			        			<notebook>
+					        		<page string="Requisition Lines">
+					        			<field name="requisition_line" attrs="{'readonly': [('state','!=','draft')]}" nolable="1" context="{'default_user_id':user_id,'default_manager_id':manager,'default_requested_by':requested_by}">
+						        			<tree editable="top">
+							        			<field name="job_id"/>
+							        			<field name="job_desc"/>
+							        			<field name="emp_total"/>
+							        			<field name="salary_range"/>
+							        			<field name="existing"/>
+							        			<field name="avail_budget"/>
+							        			<field name="user_id" invisible="1"/>
+							        			<field name="requisition_id" invisible="1"/>
+							        			<field name="manager_id" invisible="1"/>
+							        			<field name="requested_by" invisible="1"/>
+						        			</tree>
+					        			</field>
+					        		</page>
+					        	</notebook>
+			        			
+			        			
+			        			<group class="oe_subtotal_footer oe_right"> 
+				        			<field name="total_avail_budget" class="oe_subtotal_footer_separator"/>
+				        		</group>
+			        			<group>
+			        			<field name="comments" placeholder="Additional notes..."/>
+			        			</group>
+			        			
+			        	
+	        		</sheet>
+	        		<div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+	        	</form>
+	        </field>
+	    </record>
+	    
+	    <record id="hr_requisition_action" model="ir.actions.act_window">
+	        <field name="name">Requisition Forms</field>
+	        <field name="res_model">hr.requisition</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new HR Requisition Data. 
+	          </p>
+	        </field>
+	    </record>
+	    
+   <!-- <menuitem
+        sequence="2"
+        id="menu_hr_requisition_form_child"
+        name="Requisition"
+        parent="menu_hr_budget_form"
+        action="hr_requisition_action"/> -->
+        
+	    
+	    	    <!--  Requisition Data Close -->	
+		
+	    <record model="ir.ui.view" id="upload_docs_view_form">
+	        <field name="name">Upload Docs Form</field>
+	        <field name="model">upload.docs</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Upload Docs Form">
+	        		<header>
+	        		<button name="send_inbox_message" string="Expiry Alert" type="object"/>
+	        		</header>
+	        		<sheet>
+	        			<group>
+	        				<group>
+	        					<field name="name"/>
+	        				</group>
+	        				<group>
+	        					<field name="intimate_to"/>
+	        				</group>
+	        			</group>
+	        			<notebook>
+	        				<page string="Documents Details">	
+		        				<field name="docs_lines" nolable="1" context="{'default_emp_name':name}">
+			        				<tree editable="top" colors="red:alert_check==True;grey:alert_check ==False ">
+				        				<field name="emp_name"/>
+				        				<field name="code"/>
+				        				<field name="description"/>
+				        				<field name="doc_no"/>
+				        				<field name="issue_date"/>
+			        					<field name="expiry_date"/>
+				        				<field name="issue_phase"/>
+				        				<field name="status"/>
+				        				<field name="alert_before" invisible="0"/>
+				        				<field name="alert_check" invisible="0"/>
+				        				<field name="alert_date" invisible="0"/>
+				        				<field name="attach"/>
+			        				</tree>
+		        				</field>
+			        		</page>
+			        	</notebook>
+	        		</sheet>
+	        	</form>
+	        </field>
+	    </record>
+	    
+	    <record id="upload_docs_action" model="ir.actions.act_window">
+	        <field name="name">Employee Document</field>
+	        <field name="res_model">upload.docs</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Upload Documents Data. 
+	          </p>
+	        </field>
+	    </record>
+	    
+   <menuitem
+        sequence="4"
+        id="menu_upload_docs_form_child"
+        name="Documents"
+        parent="hr.menu_hr_root"
+       />
+        
+   <menuitem
+        sequence="1"
+        id="menu_upload_docs_form"
+        name="Documents Upload"
+        parent="menu_upload_docs_form_child"
+        action="upload_docs_action"/>
+        
+        
+    <record model="ir.ui.view" id="document_expire_tree_view">
+	        <field name="name">Documents Expire</field>
+	        <field name="model">docs.lines</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Documents Expire" colors="red:alert_check==True;grey:alert_check ==False ">
+	        			<field name="emp_name"/>
+        				<field name="code"/>
+        				<field name="description"/>
+        				<field name="doc_no"/>
+        				<field name="issue_date"/>
+    					<field name="expiry_date"/>
+        				<field name="issue_phase" invisible="1"/>
+        				<field name="status" invisible="1"/>
+        				<field name="alert_before" invisible="1"/>
+        				<field name="alert_check" select="1" invisible="1"/>
+        				<field name="alert_date"/>
+        				<field name="attach" invisible="1"/>
+	        	</tree>
+	        </field>
+	    </record>
+	    
+	    <record id="document_expire_action" model="ir.actions.act_window">
+	        <field name="name">Employee Documents</field>
+	        <field name="res_model">docs.lines</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="domain">[('alert_check','=',True)]</field>
+	        <field name="view_id" ref="document_expire_tree_view"/>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Upload Documents Data. 
+	          </p>
+	        </field>
+	    </record>
+	    
+   <menuitem
+        sequence="2"
+        id="menu_document_expire"
+        name="Documents Expire"
+        parent="menu_upload_docs_form_child"
+        action="document_expire_action"/>
+        
+	    
+	    	    <!--  Upload Documents Data Close -->	
+		
+	    <record model="ir.ui.view" id="resign_view_form">
+	        <field name="name">Resign Form</field>
+	        <field name="model">resign</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Resign Form">
+					<header>
+					   <button name="confirm" string="Confirm" type="object" attrs="{'invisible':['|',('state','!=','Draft'),('check_access','not in',['Man','ManHR'])]}"/>
+					   <button name="approve" states="Confirm" string="Approve" type="object" groups="hr.group_hr_manager"/>
+						<button name="%(wiz_resign_action)d" states="Approve" string="Update Last Working Date" type="action" groups="hr.group_hr_manager"/>
+						<button name="cancel" states="Draft,Confirm" string="Cancel" type="object" class="oe_stat_button"/>
+					   <button name="reset_to_draft" states="Cancel" string="Reset to Draft" type="object" groups="hr.group_hr_manager"/>
+					   <field name="state" widget="statusbar"/>
+				  	</header>
+          			<sheet>
+          				<div style="color:green;text-align:center;" attrs="{'invisible':[('nodues_status','!=','Done')]}">
+	                        <p><strong>NoDues Done.</strong></p>
+	                    </div>
+	                    <div style="color:red;text-align:center;" attrs="{'invisible':['|',('nodues_status','=','Done'),('state','!=','Approve')]}">
+	                        <p><strong>NoDues Pending.</strong></p>
+	                    </div>
+						<group>
+							<group>
+								<field name="name" required="1" options="{'no_create': True}" attrs="{'readonly':[('state','!=',False)]}"/>
+								<field name="emp_id" readonly="1"/>
+								<field name="branch_id" options="{'no_create': True}" readonly="1"/>
+								<field name="reason_for_leaving" required="1" attrs="{'readonly':[('state','in',['Confirm','Approve','Cancel'])]}"/>
+								<field name="work_mobile" readonly="1"/>
+								<field name="date_resign" readonly="1"/>
+								<field name="confirm_date" readonly="1" attrs="{'invisible':[('state','not in',['Confirm','Approve'])]}"/>
+								<field name="approve_date" readonly="1" attrs="{'invisible':[('state','!=','Approve')]}"/>
+								<field name="cancel_date" readonly="1" attrs="{'invisible':[('state','!=','Cancel')]}"/>
+							</group>
+              				<group>
+								<field name="doj" readonly="1"/>
+								<field name="designation" readonly="1"/>
+								<field name="date_of_leaving" required="1" attrs="{'readonly':[('state','in',['Confirm','Approve','Cancel'])]}"/>
+								<field name="check_access" invisible="1"/>
+								<field name="c_user_id" invisible="1"/>
+								<field name="c_man_user_id" readonly="1"/>
+								<field name="c_rep_mngr_user" readonly="1"/>
+								<field name="three_months_revenue" invisible="1"/>
+							</group>
+						</group>
+						<group string="Last 3 Months Net Revenue">
+							<group>
+								<field name="first_month_revenue" readonly="1"/>
+								<field name="second_month_revenue" readonly="1"/>
+								<field name="third_month_revenue" readonly="1"/>
+							</group>
+						</group>
+						<notebook>
+							<page string="Manager Feedback Details" attrs="{'invisible':[('check_access','not in',['Man','ManHR','HR','ManPET','PET'])]}">
+								<group>
+								<field name="man_last_work_date" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="man_rehire_eligibility" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="man_reason_rehire" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="man_notice_served" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="man_np_waived" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="man_process_fnf" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="man_reason_fnf" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								<field name="notes" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								</group>
+							</page>
+							<page string="HR Feedback Details" attrs="{'invisible':[('check_access','not in',['ManHR','HR','ManPET','PET'])]}">
+								<group>
+								<field name="hr_last_work_date"/>
+								<field name="hr_rehire_eligibility"/>
+								<field name="hr_reason_rehire"/>
+								<field name="hr_notice_served"/>
+								<field name="hr_np_waived"/>
+								<field name="mail_approve"/>
+								<field name="c_hr_comments"/>
+								</group>
+							</page>
+							<page string="Nodues Details" attrs="{'invisible':[('check_access','not in',['ManHR','HR'])]}">
+								<group>
+								  <group string="Administration">
+								  	<field name="nodues_status" invisible="1"/>
+					                <field name="uber_ola_deactivate"/>
+					                <field name="laptop_submit"/>
+					                <field name="laptop_login"/>
+					                <field name="software_check"/>
+					              </group>
+					              <group string="Finance">
+					                <field name="income_tax"/>
+					                <field name="advances"/>
+					                <field name="happay_card_deactivate"/>
+					              </group>
+					              <group string="Sales Operation">
+					                <field name="cheque_bounce"/>
+					                <field name="incentives"/>
+					                <field name="previous_cases"/>
+					              </group>
+					              <group string="Manager">
+					                <field name="knowledge_transfer"/>
+					                <field name="data_collection"/>
+					              </group>
+					              <group string="Human Resource">
+					                <field name="id_card"/>
+									<field name="c_email_deactive"/>
+									<field name="c_app_deactive"/>
+					                <field name="visiting_card"/>
+					                <button name="confirm_nodues" type="object" string="Confirm NoDues" attrs="{'invisible':[('nodues_status','=','Done')]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+					              </group>
+					              <group>
+					              	<field name="nodues_date" readonly="1" attrs="{'invisible':[('nodues_status','!=','Done')]}"/>
+									<field name="nodues_by" readonly="1" attrs="{'invisible':[('nodues_status','!=','Done')]}"/>
+								  </group>
+					            </group>
+							</page>
+							<page string="Exit Formalities" attrs="{'invisible':[('check_access','not in',['ManHR','HR'])]}">
+								<group>
+									<group string="F&amp;F Process">
+										<field name="exit_status" invisible="1"/>
+										<field name="hr_process_fnf"/>
+										<field name="fnf_date"/>
+										<field name="hr_reason_fnf"/>
+									</group>
+									<group string="Relieving Letter">
+										<field name="relieving_letter"/>
+										<field name="rl_date"/>
+										<field name="rl_comment"/>
+									</group>
+									<group>
+										<field name="c_emp_replacer"/>
+										<field name="exit_done_date" readonly="1" attrs="{'invisible':[('exit_status','!=','Done')]}"/>
+										<field name="exit_done_by" readonly="1" attrs="{'invisible':[('exit_status','!=','Done')]}"/>
+										<field name="email_link" widget="url"/>
+									</group>
+								</group>
+								<button name="confirm_exit" type="object" string="Confirm Exit" attrs="{'invisible':[('exit_status','=','Done')]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+							</page>
+						</notebook>
+          			</sheet>
+				<div class="oe_chatter">
+					<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+					<field name="message_ids" widget="mail_thread"/>
+				</div>
+			</form>
+	        </field>
+	    </record>
+
+	    <record model="ir.ui.view" id="resign_view_tree">
+	        <field name="name">Resignation</field>
+	        <field name="model">resign</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Resignation" colors="green:nodues_status=='Done';red:nodues_status!='Done' and state=='Approve'">
+        			<field name="name"/>
+    				<field name="emp_id"/>
+    				<field name="designation"/>
+    				<field name="branch_id"/>
+    				<field name="date_resign"/>
+    				<field name="state"/>
+    				<field name="nodues_status" invisible="1"/>
+	        	</tree>
+	        </field>
+	    </record>
+
+	    <record id="resign_action" model="ir.actions.act_window">
+	        <field name="name">Resignation Form</field>
+	        <field name="res_model">resign</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="view_id" ref="resign_view_tree"/>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Resignation Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        sequence="4"
+        id="menu_resign_form"
+        name="Exit"
+        parent="hr.menu_hr_root"
+        action="resign_action"/>
+
+        <menuitem
+        sequence="1"
+        id="menu_resign_form_child"
+        name="Request for Resignation"
+        parent="menu_resign_form"
+        action="resign_action"/>
+
+
+
+	    	    <!--  Resignation Data Close -->
+
+	    <record model="ir.ui.view" id="termination_reason_view_form">
+	        <field name="name">Absconding Reason Form</field>
+	        <field name="model">termination.reason</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Absconding Reason">
+          			<sheet>
+						<group>
+							<field name="name" required="1"/>
+						</group>
+					</sheet>		
+	        	</form>
+	        </field>
+	    </record>
+
+	    <record id="termination_reason_action" model="ir.actions.act_window">
+	        <field name="name">Absconding Reason Forms</field>
+	        <field name="res_model">termination.reason</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Absconding Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        sequence="10"
+        id="menu_termination_reason"
+        name="Absconding Reason"
+        parent="menu_resign_form"
+        action="termination_reason_action" groups="hr.group_hr_manager"/>
+
+	    <record model="ir.ui.view" id="termination_view_form">
+	        <field name="name">Absconding Form</field>
+	        <field name="model">termination</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Absconding Form">
+	        		<header>
+					   <button name="confirm" string="Confirm" type="object" attrs="{'invisible':['|',('state','!=','Draft'),('check_access','not in',['Man','ManHR'])]}"/>
+					   <button name="approve" states="Confirm" string="Approve" type="object" groups="hr.group_hr_manager"/>
+						<button name="%(wiz_termination_action)d" states="Approve" string="Update Last Working Date" type="action" groups="hr.group_hr_manager"/>
+						<button name="cancel" states="Draft,Confirm,Approve" string="Cancel" type="object" class="oe_stat_button"/>
+					   <button name="reset_to_draft" states="Cancel" string="Reset to Draft" type="object" groups="hr.group_hr_manager"/>
+					   <field name="state" widget="statusbar"/>
+				  	</header>
+          			<sheet>
+          				<div style="color:green;text-align:center;" attrs="{'invisible':[('nodues_status','!=','Done')]}">
+	                        <p><strong>NoDues Done.</strong></p>
+	                    </div>
+	                    <div style="color:red;text-align:center;" attrs="{'invisible':['|',('nodues_status','=','Done'),('state','!=','Approve')]}">
+	                        <p><strong>NoDues Pending.</strong></p>
+	                    </div>
+						<group>
+							<group>
+								<field name="name" required="1" options="{'no_create': True}" attrs="{'readonly':[('state','!=',False)]}"/>
+								<field name="emp_id" readonly="1"/>
+								<field name="branch_id" options="{'no_create': True}" readonly="1"/>
+								<field name="reason_id" required="1" options="{'no_create': True}" attrs="{'readonly':[('state','in',['Confirm','Approve','Cancel'])]}"/>
+								<field name="work_mobile" readonly="1"/>
+								<field name="terminate_date" readonly="1"/>
+								<field name="confirm_date" readonly="1" attrs="{'invisible':[('state','not in',['Confirm','Approve'])]}"/>
+								<field name="approve_date" readonly="1" attrs="{'invisible':[('state','!=','Approve')]}"/>
+								<field name="cancel_date" readonly="1" attrs="{'invisible':[('state','!=','Cancel')]}"/>
+							</group>
+              				<group>
+								<field name="doj" readonly="1"/>
+								<field name="designation" readonly="1"/>
+								<field name="absconding_date" required="1" attrs="{'readonly':[('state','in',['Confirm','Approve','Cancel'])]}"/>
+								<field name="three_months_revenue" invisible="1"/>
+								<field name="date_of_leaving" readonly="1"/>
+								<field name="check_access" invisible="1"/>
+								<field name="c_user_id" invisible="1"/>
+								<field name="c_man_user_id" readonly="1"/>
+								<field name="c_rep_mngr_user" readonly="1"/>
+							</group>
+						</group>
+						<group string="Last 3 Months Net Revenue">
+							<group>
+								<field name="first_month_revenue" readonly="1"/>
+								<field name="second_month_revenue" readonly="1"/>
+								<field name="third_month_revenue" readonly="1"/>
+							</group>
+						</group>
+						<notebook>
+							<page string="Manager Feedback Details" attrs="{'invisible':[('check_access','not in',['Man','ManHR','HR','ManPET','PET'])]}">
+								<group>
+								<field name="notes" attrs="{'readonly':['|',('state','not in',['Draft']),('check_access','not in',['Man','ManHR'])]}"/>
+								</group>
+							</page>
+							<page string="HR Feedback Details" attrs="{'invisible':[('check_access','not in',['ManHR','HR','ManPET','PET'])]}">
+								<group>
+									<field name="c_hr_comments" attrs="{'readonly':['|',('state','not in',['Draft','Confirm']),('check_access','not in',['HR','ManHR'])]}"/>
+								</group>
+							</page>
+							<page string="Nodues Details" attrs="{'invisible':[('check_access','not in',['ManHR','HR'])]}">
+								<group>
+								  <group string="Administration">
+								  	<field name="nodues_status" invisible="1"/>
+					                <field name="uber_ola_deactivate" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="laptop_submit" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="laptop_login" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="software_check" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					              </group>
+					              <group string="Finance">
+					                <field name="income_tax" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="advances" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="happay_card_deactivate" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					              </group>
+					              <group string="Sales Operation">
+					                <field name="cheque_bounce" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="incentives" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="previous_cases" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					              </group>
+					              <group string="Manager">
+					                <field name="knowledge_transfer" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="data_collection" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					              </group>
+					              <group string="Human Resource">
+					                <field name="id_card" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+									<field name="c_email_deactive" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+									<field name="c_app_deactive" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <field name="visiting_card" attrs="{'readonly':['|','|',('state','not in',['Draft','Confirm','Approve']),('nodues_status','=','Done'),('check_access','not in',['HR','ManHR'])]}"/>
+					                <button name="confirm_nodues" type="object" string="Confirm NoDues" attrs="{'invisible':[('nodues_status','=','Done')]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+					              </group>
+					              <group>
+					              	<field name="nodues_date" readonly="1" attrs="{'invisible':[('nodues_status','!=','Done')]}"/>
+									<field name="nodues_by" readonly="1" attrs="{'invisible':[('nodues_status','!=','Done')]}"/>
+								  </group>
+					            </group>
+							</page>
+							<page string="Exit Formalities" attrs="{'invisible':[('check_access','not in',['ManHR','HR'])]}">
+								<group>
+									<group>
+										<field name="exit_status" invisible="1"/>
+										<field name="c_emp_replacer"/>
+										<field name="email_link"/>
+										<field name="exit_done_date" readonly="1" attrs="{'invisible':[('exit_status','!=','Done')]}"/>
+										<field name="exit_done_by" readonly="1" attrs="{'invisible':[('exit_status','!=','Done')]}"/>
+									</group>
+								</group>
+								<button name="confirm_exit" type="object" string="Confirm Exit" attrs="{'invisible':[('exit_status','=','Done')]}" class="oe_highlight" groups="hr.group_hr_manager"/>
+							</page>
+						</notebook>
+          			</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+	        	</form>
+	        </field>
+	    </record>
+
+	    <record model="ir.ui.view" id="termination_view_tree">
+	        <field name="name">Absconding</field>
+	        <field name="model">termination</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Absconding" colors="green:nodues_status=='Done';red:nodues_status!='Done' and state=='Approve'">
+        			<field name="name"/>
+    				<field name="emp_id"/>
+    				<field name="designation"/>
+    				<field name="branch_id"/>
+    				<field name="terminate_date"/>
+    				<field name="state"/>
+    				<field name="nodues_status" invisible="1"/>
+	        	</tree>
+	        </field>
+	    </record>
+
+	    <record id="termination_action" model="ir.actions.act_window">
+	        <field name="name">Absconding Forms</field>
+	        <field name="res_model">termination</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="view_id" ref="termination_view_tree"/>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Absconding Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        sequence="5"
+        id="menu_termination_form_child"
+        name="Request for Absconding"
+        parent="menu_resign_form"
+        action="termination_action"/>
+
+
+
+	    	    <!--  Absconding Data Close -->
+
+		<record model="ir.ui.view" id="travel_details_view_form">
+	        <field name="name">Travel Details Form</field>
+	        <field name="model">travel.details</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Travel Details Form">
+	        		<sheet>
+	        			<group>
+	        					<separator string="Personal Information" />
+	        					<br/>
+	        					<group>
+	        					<field name="name"/>
+	        					<field name="emp_name"/>
+	        					<field name="designation"/>
+	        					<field name="emp_id"/>
+	        					<field name="dob"/>
+	        					</group>
+
+	        					<group>
+	        					<field name="contact_no"/>
+	        					<field name="off_email"/>
+	        					</group>
+
+	        					<separator string="Travel Details"/>
+	        					<br/>
+	        					<group>
+	        					<field name="travel_req_date"/>
+	        					<field name="id_proof"/>
+	        					<field name="travel_from"/>
+	        					<field name="travel_to"/>
+	        					<field name="return_to"/>
+	        					<field name="mode"/>
+	        					<field name="preffered_time" widget="float_time"/>
+	        					<field name="preffered_return_time" widget="float_time"/>
+	        					</group>
+
+	        					<group>
+	        					<field name="date_travel"/>
+	        					<field name="reason_for_travel"/>
+	        					</group>
+
+
+			        	</group>
+
+	        				<group colspan="4" col="4">
+
+	        					<group colspan="2">
+	        					<separator string="Domestic / International Travel"/>
+	        					<newline/>
+	        					<field name="nf_dept"/>
+	        					<field name="nf_state"/>
+	        					<field name="financial_approval"/>
+	        					</group>
+
+	        					<group >
+	        					<separator colspan="2" string="Accommodation Required"/>
+	        					<newline/>
+	        					<field name="accommodation_req"/>
+	        					</group>
+
+	        				</group>
+
+
+
+	        		</sheet>
+	        	</form>
+	        </field>
+	    </record>
+
+	    <record id="travel_details_action" model="ir.actions.act_window">
+	        <field name="name">Travel Details Forms</field>
+	        <field name="res_model">travel.details</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Travel Details Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        sequence="6"
+        id="menu_travel_details_form_child"
+        name="Travel Details"
+        parent="menu_hr_budget_form"
+        action="travel_details_action"/>
+
+
+
+	    	    <!--  Travel Data Close -->
+
+
+	    	    <!-- MEDICAL INSURANCE -->
+
+	    <record model="ir.ui.view" id="medical_insurance_view_form">
+	        <field name="name">Medical Insurance Form</field>
+	        <field name="model">medical.insurance</field>
+	        <field name="arch" type="xml">
+	        	<form string="Medical Insurance Form">
+	        		<header>
+        				<field name="state" widget="statusbar"/>
+        			</header>
+	        		<sheet>
+	        			<group col="2">
+                            <field name="name" readonly="1"/>
+                        </group>
+	        			<group>
+	        				<group>
+		        				<field name="employee_id" required="1" options="{'no_create': True, 'no_create_edit': True}" attrs="{'readonly':[('state','=','Closed')]}"/>
+		        				<field name="doj" readonly="1"/>
+		        				<field name="work_location" readonly="1"/>
+		        				<field name="gender" />
+		        				<field name="plan" readonly="1" attrs="{'invisible':[('opt_out','=',True)]}"/>
+		        				<field name="opt_out" attrs="{'readonly':[('state','=','Closed')]}"/>
+	        				</group>
+	        				<group>
+		        				<field name="emp_id" readonly="1"/>
+		        				<field name="dob" />
+		        				<field name="work_mobile" />
+		        				<field name="marital" />
+		        				<field name="sum_assured" readonly="1" attrs="{'invisible':[('opt_out','=',True)]}"/>
+		        				<field name="filename" invisible="1"/>
+		        				<field name="attachment" filename="filename" attrs="{'invisible':[('opt_out','!=',True)], 'readonly':[('state','=','Closed')],'required':[('opt_out','=',True)]}"/>
+	        				</group>
+	        			</group>
+	        			<separator string="Family Floater"/>
+        				<div>
+	        				<field name="family_detail_lines" nolabel="1" attrs="{'readonly':[('state','=','Closed')]}">
+		        				<tree editable="bottom">
+			        				<field name="name" required="1"/>
+			        				<field name="relation" required="1" />
+			        				<field name="gender" required="1" />
+			        				<field name="dob" required="1" />
+	        					</tree>
+	        				</field>
+	        			</div>
+	        		</sheet>
+	        		<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>s
+	        	</form>
+	        </field>
+	    </record>
+
+	    <record model="ir.ui.view" id="medical_insurance_view_tree">
+	        <field name="name">Medical Insurance</field>
+	        <field name="model">medical.insurance</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Medical Insurance">
+        			<field name="name"/>
+        			<field name="employee_id"/>
+    				<field name="emp_id"/>
+    				<field name="work_location"/>
+    				<field name="work_mobile"/>
+    				<field name="gender"/>
+    				<field name="marital"/>
+    				<field name="doj"/>
+	        	</tree>
+	        </field>
+	    </record>
+
+	    <record id="medical_insurance_action" model="ir.actions.act_window">
+	        <field name="name">Medical Insurance</field>
+	        <field name="res_model">medical.insurance</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="view_id" ref="medical_insurance_view_tree"/>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Medical Insurance Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        id="menu_medical_insurance_form1"
+        name="Medical Insurance"
+        parent="hr.menu_hr_main"
+        action="medical_insurance_action" sequence="110"/>
+
+
+	    	    <!--  Medical Insurance Data Close -->
+
+	    	    <!-- MEDICAL INSURANCE FOR PARENTS START -->
+
+
+	    <record model="ir.ui.view" id="medical_insurance_parents_view_form">
+	        <field name="name">Medical Insurance for Parents Form</field>
+	        <field name="model">medical.insurance.parents</field>
+	        <field name="arch" type="xml">
+	        	<form string="Medical Insurance for Parents Form">
+	        		<header>
+        				<field name="state" widget="statusbar"/>
+        			</header>
+	        		<sheet>
+	        			<group col="2">
+                            <field name="name" readonly="1"/>
+                        </group>
+	        			<group>
+	        				<group>
+		        				<field name="employee_id" required="1" options="{'no_create': True, 'no_create_edit': True}" attrs="{'readonly':[('state','=','Closed')]}"/>
+		        				<field name="doj" readonly="1"/>
+		        				<field name="work_location" readonly="1"/>
+		        				<field name="gender" />
+		        				<field name="plan" readonly="1" attrs="{'invisible':[('opt_in','!=',True)]}"/>
+		        				<field name="opt_in" attrs="{'readonly':[('state','=','Closed')]}"/>
+	        				</group>
+	        				<group>
+		        				<field name="emp_id" readonly="1"/>
+		        				<field name="dob" />
+		        				<field name="work_mobile" />
+		        				<field name="marital" />
+		        				<field name="sum_assured" readonly="1" attrs="{'invisible':[('opt_in','!=',True)]}"/>
+	        				</group>
+	        			</group>
+	        			<separator string="Parents Details"/>
+        				<div>
+	        				<field name="family_detail_lines" nolabel="1" attrs="{'readonly':[('state','=','Closed')]}" required="1">
+		        				<tree editable="bottom">
+			        				<field name="name" required="1"/>
+			        				<field name="relation" required="1" />
+			        				<field name="gender" required="1" />
+			        				<field name="dob" required="1" />
+	        					</tree>
+	        				</field>
+	        			</div>
+	        		</sheet>
+	        		<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>s
+	        	</form>
+	        </field>
+	    </record>
+
+	    <record model="ir.ui.view" id="medical_insurance_parents_view_tree">
+	        <field name="name">Medical Insurance for Parents</field>
+	        <field name="model">medical.insurance.parents</field>
+	        <field name="arch" type="xml">
+	        	<tree string="Medical Insurance for Parents">
+        			<field name="name"/>
+        			<field name="employee_id"/>
+    				<field name="emp_id"/>
+    				<field name="work_location"/>
+    				<field name="work_mobile"/>
+    				<field name="gender"/>
+    				<field name="marital"/>
+    				<field name="doj"/>
+	        	</tree>
+	        </field>
+	    </record>
+
+	    <record id="medical_insurance_parents_action" model="ir.actions.act_window">
+	        <field name="name">Medical Insurance for Parents</field>
+	        <field name="res_model">medical.insurance.parents</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="view_id" ref="medical_insurance_parents_view_tree"/>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Medical Insurance Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        id="menu_medical_insurance_parents_form"
+        name="Medical Insurance for Parents"
+        parent="hr.menu_hr_main"
+        action="medical_insurance_parents_action" sequence="111"/>
+
+	    	    <!-- MEDICAL INSURANCE FOR PARENTS CLOSE -->
+
+	   <record model="ir.ui.view" id="purchase_request_view_form">
+	        <field name="name">Purchase Request Form</field>
+	        <field name="model">purchase.request</field>
+	        <field name="arch" type="xml">
+	        	<form string=" Purchase Request Form">
+	        		<sheet>
+	        		<group>
+	        				<group>
+	        				<field name="ref_no"/>
+	        				<field name="name"/>
+	        				<field name="des_of_purchase"/>
+	        				<field name="expenditure"/>
+	        				</group>
+
+	        				<group>
+	        				<field name="outline_purchase"/>
+	        				<field name="references"/>
+	        				</group>
+
+
+	        				<group>
+	        				<field name="attachment">
+	        				<tree editable="top">
+	        				<field name="name"/>
+	        				<field name="attach"/>
+	        				</tree>
+	        				</field>
+	        				</group>
+
+	        		</group>
+
+	        		</sheet>
+	        	</form>
+	        </field>
+	    </record>
+
+	    <record id="purchase_request_action" model="ir.actions.act_window">
+	        <field name="name">Purchase Request Forms</field>
+	        <field name="res_model">purchase.request</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to setup a new Purchase Request Data.
+	          </p>
+	        </field>
+	    </record>
+
+	<menuitem
+        sequence="7"
+        id="menu_purchase_request_form_child"
+        name="Purchase Request"
+        parent="menu_hr_budget_form"
+        action="purchase_request_action"/>
+
+
+
+	    	    <!--  Purchase Request Data Close -->
+
+
+    <record id="view_hr_nodues_form" model="ir.ui.view">
+        <field name="name">hr.employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='nodues_filename']" position="after" >
+            <field name="resignation_id" readonly="1" attrs="{'invisible':[('resignation_id','=',False)]}"/>
+            <field name="termination_id" readonly="1" attrs="{'invisible':[('termination_id','=',False)]}"/>
+          </xpath>
+        </field>
+      </record>
+
+</data>
+</openerp>

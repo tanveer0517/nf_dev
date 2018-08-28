@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nf_employee_assessment,access_nf_employee_assessment,model_nf_employee_assessment,,1,1,1,0
+access_nf_manager_assessment,access_nf_manager_assessment,model_nf_manager_assessment,,1,1,1,0
+access_nf_reporting_manager_assessment,access_nf_reporting_manager_assessment,model_nf_reporting_manager_assessment,,1,1,1,0
+access_nf_appraisal_question,access_nf_appraisal_question,model_nf_appraisal_question,,1,1,1,0
+access_nf_employee_rating_criteria,access_nf_employee_rating_criteria,model_nf_employee_rating_criteria,,1,1,1,0
+access_nf_appraisal_rating_criteria,access_nf_appraisal_rating_criteria,model_nf_appraisal_rating_criteria,,1,1,1,0
+access_nf_hr_assessment,access_nf_hr_assessment,model_nf_hr_assessment,,1,1,1,0

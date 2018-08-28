@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!---      Quotation/ Sales Order Inherited Form view         -->
+        
+        <record id="inherited_sale_order_form_id" model="ir.ui.view">
+            <field name="name">sale_order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="replace">
+                    <header>
+                        <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                        type="action" class="btn-primary"
+                        attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                        <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                        type="action" context="{'default_advance_payment_method': 'percentage'}"
+                        attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'sale')]}"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" class="btn-primary" attrs="{'invisible':['|', ('state', 'not in', ('draft')), ('presale', '=', True)]}"/>
+
+                        <button name="rqst_for_price_update" string="Request for Approval" type="object" class="btn-primary" attrs="{'invisible':['|', ('presale', '!=', True), ('presale_rqst_sent', '=', True)]}"/>
+                        <button name="print_quotation" string="Print" type="object" states="draft" class="btn-primary"/>
+                        <button name="action_confirm" states="sent" string="Confirm Sale" class="btn-primary o_sale_confirm" type="object"/>
+                        <button name="print_quotation" string="Print" type="object" states="sent,sale"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object" states="sent,sale"/>
+                        <button name="action_cancel" states="draft,sent,sale" type="object" string="Cancel"/>
+                        <button name="action_draft" states="cancel" type="object" string="Set to Quotation"/>
+                        <button name="action_done" type="object" string="Lock" states="sale"
+                        help="If the sale is locked, you can not modify it anymore. However, you will still be able to invoice or deliver."/>
+                        <button name="%(action_wiz_presale)d" type="action" string="Presale" class="oe_highlight" attrs="{'invisible':['|', ('state', 'not in', ('draft')), ('presale', '!=', True)]}" groups="ouc_sales.group_presale"/>
+                        <button name="create_mlc_onboarding" string='MLC Onboarding Form' type="object" class="btn-primary" attrs="{'invisible':['|','|', ('onboarding_done','=',True),('is_kitsune', '=', True),('c_auto_create_fptag','!=',True)]}"/>
+                        <button name="cancel_sale_order" type="object" string="Cancel S.O. and Deactivate Package" states="done" groups="ouc_sales.group_cancel_sales_order" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale"/>
+                    </header>
+                </xpath>
+                
+                <!-- Create Invoice Button Invisible  -->
+                <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm']" position="attributes">
+                    <attribute name="invisible">[('state','!=','accept')]</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm']" position="replace">
+                    <button name="action_accept_and_confirm" states="sent" string="Confirm Sale - Log Sales Order" class="btn-primary o_sale_confirm" type="object" confirm="This Quotation is not yet been accepted by the customer. Do you still want to go ahead and log your Sales Order?"/>
+                    <button name="action_confirm" states="accept" string="Confirm Sale - Log Sales Order" class="btn-primary o_sale_confirm" type="object"/>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="replace">
+                    <!-- <button name="action_accepted" states='draft,sent' string="Mark Accepted" class="btn-primary o_sale_confirm" type="object" /> -->
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,accept,sale"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="domain">[('is_company','=',True)]</attribute>
+                    <attribute name="attrs">{'readonly': ['|',('c_quotation_type', '!=', 'new'),('state', 'not in', ('draft'))]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="c_company_name" string="Company Name" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                    <field name="c_ex_website" string="Existing Website" placeholder="Non NF Website" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                    <field name="c_is_pkg_extension_req" invisible="1"/>
+                    <field name="c_auto_create_fp" invisible="1"/>
+                    <field name="presale" invisible="1"/>
+                    <field name="presale_status" invisible="1"/>
+                    <field name="presale_rqst_sent" invisible="1"/>
+                    <field name="c_quotation_type" readonly="1"/>
+                    <field name="c_mangers_hierarchy" invisible="1"/>
+                    <field name="c_tc_manager_hierarchy" invisible="1"/>
+                    <field name="is_corporate_website" invisible="1"/>
+                    <field name="is_kitsune" invisible="1"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="after">
+                    <div style="color:blue;" attrs="{'invisible':['|', ('presale_status', '!=', True), ('state', 'not in', ('sent'))]}">
+                        <p>Quotation approved &amp; sent to customer</p>
+                    </div>
+                    <div style="color:orange;" attrs="{'invisible':[('state','!=','accept')]}">
+                        <p>This Quotation has been <b>accepted</b> by the customer. Click on <b>"Confirm Sale"</b> to log your Sales Order.</p>
+                    </div>
+                    <div style="color:orange;" attrs="{'invisible':[('state','!=','sent')]}">
+                        <p>This Quotation is not yet been accepted by the customer. You can still log your Sales Order by clicking on <b>"Confirm Sale"</b>. However we advise you to have the Quotation accepted by customer.</p>
+                    </div>
+                    <div style="color:red;" attrs="{'invisible':[('c_sales_support_id','=',False)]}">
+                        <p>Discount can only be requested by Sales Support person in Rocket Singh.</p>
+                    </div>
+                    <div style="color:blue;" attrs="{'invisible':['|', ('presale', '!=', True), ('presale_rqst_sent', '!=', True)]}">
+                        <p>The Quotation has been submitted for approval to the presales team</p>
+                    </div>
+                    <div style="color:blue;" attrs="{'invisible':['|', ('presale_rqst_sent', '!=', True), ('presale_status', '=', True)]}">
+                        <p>Quotation is pending for approval</p>
+                    </div>
+                    <div style="color:blue;" attrs="{'invisible':['|', ('presale_status', '!=', True), ('state', 'not in', ('draft'))]}">
+                        <p>Quotation approved. Please send it to customer by clicking "SEND BY EMAIL"</p>
+                    </div>
+
+                </xpath>
+                <!--<xpath expr="//field[@name='template_id']" position="attributes">-->
+                <!--<attribute name="placeholder">Select your product plan here</attribute>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//field[@name='contract_template']" position="attributes">-->
+                <!--<attribute name="invisible">True</attribute>-->
+                <!--</xpath>-->
+<!--                 <xpath expr="//field[@name='validity_date']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath> -->
+                <xpath expr="//field[@name='pricelist_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="groups">sale_contract.group_sale_contract_manager</attribute>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="replace">
+                    <field name="c_comp_taxable" attrs="{'readonly': [('state', 'not in', ('draft','sent'))]}"/>
+                    <field name="c_gstin_reg" required="1" attrs="{'readonly': [('state', 'not in', ('draft','sent'))]}"/>
+                    <field name="x_gstin" placeholder="Please enter GSTIN number" attrs="{'invisible': [('c_gstin_reg', '!=', 'Yes')],'required': [('c_gstin_reg', '=', 'Yes')],'readonly': [('state', 'not in', ('draft','sent'))]}"/>
+                    <field name="c_gstin_link" readonly="1" widget="url" attrs="{'invisible': [('c_gstin_reg', '!=', 'Yes')]}"/>
+                    <field name="is_gstin_verified" attrs="{'invisible': [('c_gstin_reg', '!=', 'Yes')],'required': [('c_gstin_reg', '=', 'Yes')],'readonly': [('state', 'not in', ('draft','sent'))]}"/>
+                    <field name="c_auto_create_fptag" invisible="1" />
+                    <field name="is_la_case" readonly="1" invisible="1" />
+                </xpath>
+                
+                <!--      Inherited  Orderline  fields -->                
+                <xpath expr="//page/field[@name='order_line']" position="replace">
+                    <field name="order_line" mode="tree,kanban"
+                        attrs="{'readonly': [('state', 'in', ('done','cancel'))]}" create="false">
+                        
+                        <form string="Sales Order Lines">
+                            <group>
+                                <group>
+                                    <field name="product_id"
+                                    context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                                    readonly="1" option="{'no_create_edit':True,'no_create': True,'no_open':True}"
+                                    />
+                                    <field name="c_status" required="1" readonly="1"/>
+                                    <field name="name"/>
+                                    <field name="c_pkg_validity" readonly="1"/>
+                                    <field name="c_fptag_not_required" invisible="1"/>
+                                    <field name="is_la_case" invisible="1"/>
+                                    <field name="c_fptags_id" domain="[('customer_id','=', parent.partner_id)]" attrs="{'readonly':[('c_fptag_not_required','=',True)],'required': ['&amp;', ('c_fptag_not_required', '=', False), ('is_la_case', '=', False)]}" options="{'no_create_edit':True,'no_create': True,'no_open':True}"/>
+                                    <field name="price_unit" readonly="1"/>
+                                    <field name="c_product_template_id" invisible="1"/>
+                                    <field name="c_discount_value" invisible="1"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="discount"/>
+		                            <field name="c_max_discount" string="Maximum Discount" groups="ouc_sales.group_ops_discount"/>
+                                    <field name="tax_id" readonly="1"/>
+                                    <field name="price_tax" readonly="1" string="Tax Amount"/>
+                                    <field name="price_total" readonly="1"/>
+                                </group>
+                            </group>
+                        </form>
+                        <tree string="Sales Order Lines" create="false" delete="false" editable="bottom" decoration-info="invoice_status=='to invoice'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="product_id" options="{'no_create_edit': True, 'no_create': True}" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}" readonly="1"/>
+                            <field name="c_status" required="1" readonly="1"/>
+                            <field name="name"/>
+                            <field name="c_pkg_validity" readonly="1"/>
+                            <field name="c_fptag_not_required" invisible="1"/>
+                            <field name="is_la_case" invisible="1"/>
+                            <field name="c_fptags_id" domain="[('customer_id','=', parent.partner_id)]" attrs="{'readonly':[('c_fptag_not_required','=',True)],'required': ['&amp;', ('c_fptag_not_required', '=', False), ('is_la_case', '=', False)]}" options="{'no_create_edit':True,'no_create': True,'no_open':True}"/>
+                            <field name="c_product_template_id" invisible="1"/>
+                            <field name="c_discount_value" invisible="1"/>
+                            <field name="c_emi_option" invisible="1"/>
+                            <field name="price_unit" readonly="1"/>
+                            <field name="product_uom_qty"/>
+                            <field name="discount" groups="sale.group_discount_per_so_line"/>
+                            <field name="c_default_discount" invisible="1"/>
+		                    <field name="c_max_discount" string="Maximum Discount" groups="ouc_sales.group_ops_discount"/>
+                            <field name="c_default_quantity" invisible="1"/>
+                            <field name="c_maximum_quantity" invisible="1"/>
+                            <field name="price_subtotal"/>
+                            <field name="tax_id" widget="many2many_tags" readonly="1"/>
+                            <field name="price_tax" string="Tax Amount"/>
+                            <field name="price_total" widget="monetary" />
+                            <field name="qty_delivered_updateable" invisible="1"/>
+                            <field name="procurement_ids" invisible="1"/>
+                            <field name="state" invisible="1"/>
+                            <field name="invoice_status" invisible="1"/>
+                            <field name="customer_lead" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                    
+                    
+                </xpath>
+                <xpath expr="//page[2]" position="replace">
+                    <page string="Other Information">
+                        <group>
+                            <group string="Sales Information" name="sales_person">
+                                <field name="user_id" options="{'no_create_edit':True ,'no_create': True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                                <field name="c_cost_center" readonly="1" domain="[('parent_id', '!=', False)]" options="{'no_create_edit':True,'no_create': True}" invisible="1"/>
+                                <field name="c_sp_dep" invisible="1"/>
+                                <field name="c_sp_branch" invisible="1"/>
+                                <field name="c_telecaller" invisible="1"/>
+                                <field name="client_order_ref" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                                <field name="c_sales_support_id" options="{'no_create_edit':True,'no_create':True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                                <field name="project_id" attrs="{'invisible':[('state','=','sale')]}" context="{'default_partner_id':partner_invoice_id, 'default_name':name}" groups="analytic.group_analytic_accounting" options="{'no_create_edit':True ,'no_create': True}"/>
+                                <field name="onboarding_done" invisible="1"/>
+                                <field name="mlc_onboarding_form" readonly="1" attrs="{'invisible':[('c_auto_create_fptag','!=',True)]}"/>
+                                <field name="related_project_id"
+                                       attrs="{'readonly': ['|',('project_id','!=',False),('invoice_count','!=',0),('state','=','sale')],'invisible':[('state','!=','sale')]}"
+                                       context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                                       groups="analytic.group_analytic_accounting"/>
+                                <field name="disc_approval_status" attrs="{'readonly': [('state', 'not in', ('draft','sent','accept'))]}" groups="ouc_sales.group_ops_discount"/>
+                                <field name="c_discount_coupon_code" readonly="1" />
+                                <field name="c_dicsount_coupon_validity" readonly="1" />
+                                <field name="mib_action_date" readonly="1"/>
+                                <field name="claim_id" groups="base.group_erp_manager"/>
+                                <field name="sales_assist_id" readonly="1" attrs="{'invisible': [('claim_id', '=', False)]}"/>
+                                <field name="sales_assist_branch_id" readonly="1" attrs="{'invisible': [('claim_id', '=', False)]}"/>
+                                <field name="fptag_city" readonly="1" attrs="{'invisible': [('claim_id', '=', False)]}"/>
+                                <field name="fptag_branch_id" readonly="1" attrs="{'invisible': [('claim_id', '=', False)]}"/>
+                            </group>
+                            <group name="sale_pay" string="Invoicing">
+                                <field name="fiscal_position_id" options="{'no_create_edit':True,'no_create': True}" attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                                <field name="invoice_status"
+                                    attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                            </group>
+                            <group string="Lead Information" colspan="2">
+                                <field name="c_lead_source_id" readonly="1" options="{'no_create_edit':True,'no_create': True}"/>
+                                <field name="c_lead_creator_id" readonly="1" options="{'no_create_edit':True,'no_create': True}"/>
+                                <field name="c_partner_ref_id" readonly="1" options="{'no_create_edit':True,'no_create': True}"/>
+                            </group>
+                            <group string="Reporting" name="technical" groups="base.group_no_one">
+                                <field groups="base.group_no_one" name="origin"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+                <notebook position="inside">
+                    
+                    <!--   Other Information Inside Fields   -->
+                    <xpath expr="//field[@name='picking_policy']" position="after">
+                        <field name="c_picking_policy" required="1"/>
+                        <field name="c_order_policy" required="1"/>
+                    </xpath>
+                    <!-- <xpath expr="//field[@name='fiscal_position_id']" position="replace">
+                        <group colspan="2">
+                            <field name="fiscal_position_id" options="{'no_create_edit':True,'no_create': True}"/>
+                        </group>
+                        <group string="Lead Information" colspan="2">
+                            <field name="c_lead_source_id" readonly="1" options="{'no_create_edit':True,'no_create': True}"/>
+                            <field name="c_lead_creator_id" readonly="1" options="{'no_create_edit':True,'no_create': True}"/>
+                            <field name="c_partner_ref_id" readonly="1" options="{'no_create_edit':True,'no_create': True}"/>
+                        </group>
+                    </xpath> -->
+                    <!-- <xpath expr="//field[@name='user_id']" position="attributes">
+                        <attribute name="options">{'no_create_edit':True ,'no_create': True}</attribute>
+                    </xpath>
+                    <xpath expr="//field[@name='user_id']" position="after">
+                        <field name="c_cost_center" readonly="1" domain="[('parent_id', '!=', False)]" options="{'no_create_edit':True,'no_create': True}"/>
+                        <field name="c_sp_dep"/>
+                        <field name="c_sp_branch"/>
+                        <field name="c_telecaller"/>
+                    </xpath> -->
+                    <!-- <xpath expr="//field[@name='project_id']" position="before">
+                        <field name="c_sales_support_id" options="{'no_create_edit':True,'no_create':True}" />
+                    </xpath>
+                    <xpath expr="//field[@name='project_id']" position="attributes">
+                        <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    </xpath>
+                    <xpath expr="//page/group/group/field[@name='team_id']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath> -->
+                    
+                    <!-- Received Payment Details -->
+                    <page string="Received Payment Details">
+                        <field name="c_add_payment_details" nolabel="1" colspan="4">
+                            <form string="Payment Details">
+                            	<group col="4">
+                                    <field name="cms_slip_num"/>
+	                                <field name="payment_method" required="1"/>
+	                                <field name="bifurcation"/>
+	                            </group>
+	                            <group col="4">
+	                                <field name="cheque_pic" filename="cheque_pic_name" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+	                                <field name="cheque_number" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+	                                <field name="cheque_date" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+	                                <field name="bank_id" options="{'no_create_edit':True,'no_create': True}" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+	                                <field name="cheque_pic_name" widget="url" readonly="1"/>
+	                            </group>
+	                            <group col="4">
+	                                <field name="transfer_ref_number" attrs="{'required':[('payment_method', '=', 'online_transfer')]}"/>
+	                                <field name="receipt_number" attrs="{'required':[('payment_method', '=', 'cash')]}"/>
+	                                <field name="receipt_pic" filename="receipt_pic_name" attrs="{'required':[('payment_method', '=', 'cash')]}"/>
+	                                <field name="mismatch_declaration" filename="mismatch_decl_name"/>
+	                                <field name="receipt_pic_name" widget="url" readonly="1"/>
+	                                <field name="mismatch_decl_name" widget="url" readonly="1"/>
+	                            </group>
+	                            <group col="4">
+	                                <field name="amount" required="1"/>
+	                                <field name="payment_configaration_status" invisible="1"/>
+	                            </group>
+	                            <group>
+	                                <field name="entry_date" invisible="1"/>
+	                                <field name="payment_status" string="Payment Sent?" attrs="{'invisible':[('payment_status', '=', False)]}" readonly="1"/>
+	                        	    <field name="downpay_type" invisible="1"/>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="downpay_type" invisible="1"/>
+                                <field name="cms_slip_num"/>
+                                <field name="payment_method" required="1"/>
+                                <field name="bifurcation"/>
+                                <field name="cheque_pic_name" invisible="1"/>
+                                <field name="cheque_pic" filename="cheque_pic_name" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+                                <field name="cheque_number" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+                                <field name="cheque_date" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+                                <field name="bank_id" options="{'no_create_edit':True,'no_create': True}" attrs="{'required':[('payment_method', '=', 'cheque')]}"/>
+                                <field name="transfer_ref_number" attrs="{'required':[('payment_method', '=', 'online_transfer')]}"/>
+                                <field name="receipt_number" attrs="{'required':[('payment_method', '=', 'cash')]}"/>
+                                <field name="receipt_pic_name" invisible="1"/>
+                                <field name="receipt_pic" filename="receipt_pic_name" attrs="{'required':[('payment_method', '=', 'cash')]}"/>
+                                <field name="mismatch_decl_name" invisible="1"/>
+                                <field name="mismatch_declaration" filename="mismatch_decl_name"/>
+                                <field name="amount" required="1"/>
+                                <field name="payment_configaration_status" invisible="1"/>
+                                <field name="entry_date" invisible="1"/>
+                                <button name="checking_payment_details" string="Payment Details" type="object" icon="fa-arrow-right"
+                                class="oe_highlight" attrs="{'invisible':[('payment_status', '=', True)]}"/>
+                                <field name="payment_status" attrs="{'invisible':[('payment_status', '=', False)]}" readonly="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <!-- escalation details -->
+                    <page string="Escalation Details" attrs="{'invisible':[('c_escalation_status', '=', False)]}">
+                        <group col="4">
+                            <field name="c_escalation_status"/>
+                            <field name="c_escalation_reason"/>
+                            <field name="c_escalation_remarks"/>
+                            <button name="close_escalation" string="Close Escalation" type="object" class="oe_highlight" />
+                        </group>
+                    </page>
+                </notebook>
+                
+                <!-- Online  Voucher Details   -->
+                <xpath expr="//field[@name='note']" position="after">
+                    <group attrs="{'invisible': [('state', '!=', 'sent')]}">
+                        <group col="4">
+                            <field name="c_online_voucher_fptag" readonly="1"/>
+                            <field name="c_coupon_code" readonly="1"/>
+                            <field name="c_online_vocher" invisible="1"/>
+                            <field name="c_online_vocher1" invisible="1"/>
+                            <field name="c_default_fptag" invisible="1"/>
+                            <field name="c_coupon_code_store" invisible="1"/>
+                        </group>
+                        <group col="2">
+                            <field name="c_tds_percent"/>
+                            <field name="c_tds_amount" readonly="1"/>
+                            <field name="c_tan_number" attrs="{'invisible':[('c_tds_amount','==',0.0)],'required':[('c_tds_amount','!=',0.0)]}" />
+                            <field name="c_total_payable_amount" readonly="1"/>
+                        </group>
+                        <group col="4" colspan="2">
+                            <button name="claim_fptag" type="object" string="Claim FPTAG" class="oe_highlight" attrs="{'invisible':[('c_online_vocher1','=',True)]}" invisible="1"/>
+                            <button name="generate_online_vocher" type="object" string="Generate Online Vocher" class="oe_highlight" attrs="{'invisible':[('c_online_vocher','=',False)]}"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="sale_order_view_form_subscription_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_contract.sale_order_view_form_subscription"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='subscription_id']" position="after">
+                <field name="team_id" options="{'no_create_edit':True, 'no_create': True, 'no_open': True}" required="1" attrs="{'readonly': [('state', 'not in', ('draft','sent'))]}"/>
+            </xpath>
+        </field>
+       </record>
+        
+        <!--        Inherited sale_crm  Form View    -->
+        <record id="inherited_sale_order_form_id3" model="ir.ui.view">
+            <field name="name">sale_order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_crm.sale_view_inherit123"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='campaign_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="attrs">{'readonly': [('state', 'not in', ('draft'))]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='medium_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="attrs">{'readonly': [('state', 'not in', ('draft'))]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='source_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="attrs">{'readonly': [('state', 'not in', ('draft'))]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='opportunity_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="attrs">{'readonly': [('state', 'not in', ('draft'))]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                    <attribute name="attrs">{'readonly': [('state', 'not in', ('draft'))]}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+        
+        <!--          Modification in Suggested Products Page   -->
+        <record id="inherited_sale_order_form_id4" model="ir.ui.view">
+            <field name="name">sale_order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="website_quote.sale_order_form_quote"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page/field[@name='options']/tree/field[@name='product_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit':True,'no_create': True}</attribute>
+                </xpath>
+                <xpath expr="//page/field[@name='options']/tree" position="attributes">
+                    <attribute name="create">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='template_id']" position="attributes">
+                    <attribute name="placeholder">Select your product plan here</attribute>
+                    <attribute name="domain">[('single_store','!=',True)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='c_quotation_type']" position="after">
+                    <field name="upgrade_fptag" label="FPTAG to Upgrade" domain="[('customer_id','=', partner_id)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--  Override view of sales  -->
+        <record id="sale.view_order_tree" model="ir.ui.view">
+            <field name="name">sale.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Sales Orders" colors="green:inv_status=='Activation done &amp; Invoice Created'; red:vc_status=='Escalated to Sales';blue:mib_status=='Not Done Yet'; blue:mib_status=='MIB Not Required'; red:mib_status=='Hold'; red:mib_status=='MIB Rejected'; orange:mib_status=='Yes';" decoration-bf="message_needaction==True" decoration-muted="state=='cancel'">
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name" string="Sales Order"/>
+                    <field name="confirmation_date" string="S.O. Confirmation Date"/>
+                    <field name="partner_id" string="Company Name"/>
+                    <field name="user_id"/>
+                    <field name="amount_total" string="Total Price (inc taxes)" sum="Total Tax Included" widget="monetary"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state"/>
+                    <field name="invoice_status" invisible="1"/>
+                    <field name="subscription_id" string="Contract"/>
+                    <button name="open_subscription" type="object" string="Click to open related contract" class="oe_highlight" groups="sales_team.group_sale_salesman_all_leads"/>
+                    <field name="welcome_call_status" groups="sales_team.group_sale_salesman_all_leads"/>
+                    <field name="mib_status" />
+                    <field name="mib_hold_issue" />
+                    <field name="vc_status" groups="sales_team.group_sale_salesman_all_leads"/>
+                    <field name="inv_status"/>
+                    <field name="sub_inv_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="sale.view_quotation_tree" model="ir.ui.view">
+            <field name="name">sale.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Quotation" class="o_sale_order" decoration-bf="message_needaction==True" decoration-muted="state=='cancel'">
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name" string="Quotation Number"/>
+                    <field name="date_order"/>
+                    <field name="partner_id" string="Company Name"/>
+                    <field name="user_id"/>
+                    <field name="amount_total" sum="Total Tax Included" widget="monetary"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!--  Inherited website_contract Form View (For Invisible Contract_template) -->
+        <record id="inherited_sale_order_form_id5" model="ir.ui.view">
+            <field name="name">sale_order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="website_contract.sale_order_form_quote_inherit_website_contract"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='contract_template']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+            </field>
+        </record>
+        
+        <!--   Inherited Quotation Template Form View -->
+        <record id="ouc_sale_qoute_template" model="ir.ui.view">
+            <field name="name">sale.quote.template.view.form</field>
+            <field name="model">sale.quote.template</field>
+            <field name="inherit_id" ref="website_quote.view_sale_quote_template_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='quote_line']/tree/field[@name='name']" position="after">
+                    <field name="c_product_template_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='contract_template']" position="after">
+                    <field name="c_additinal_email"/>
+                    <field name="single_store" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+        <!--  tree,form view -->
+
+         <record id="ouc_fptag_form" model="ir.ui.view">
+            <field name="name">FPTAG form</field>
+			<field name="model">ouc.fptag</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+            	<form string="FPTAGs">
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="customer_id"/>
+                            <field name="lead_id"/>
+                            <field name="state"/>
+                            <field name="claimed" readonly="1"/>
+                            <field name="fp_creation_date" readonly="1"/>
+                            <field name="is_corporate_website" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="ouc_fptag_tree" model="ir.ui.view">
+            <field name="name">Fptag tree</field>
+			<field name="model">ouc.fptag</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+            	<tree string="FPTAGs">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="lead_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!--           Fptag Action record          -->
+
+     <record id="ouc_fptags" model="ir.actions.act_window">
+            <field name="name">FPTAGs</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ouc.fptag</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="ouc_fptag_tree"/>
+        </record>
+
+
+
+
+
+        <!--          Rename of Quotation to Proforma Invoice at Action Record  -->
+        
+        <record id="sale.action_quotations" model="ir.actions.act_window">
+            <field name="name">Quotations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="sale.view_quotation_tree"/>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="domain">[('state','in',('draft','sent','accept','cancel'))]</field>
+            <field name="context">{'hide_sale': True}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create a Quotation, the first step of a new sale.
+                </p>
+                <p>
+                    Your next actions should flow efficiently: confirm the Quotation
+                    to a Sale Order, then create the Invoice and collect the Payment.
+                </p>
+                <p>
+                    Note that once a Quotation becomes a Sale Order, it will be moved
+                    from the Quotations list to the Sales Order list.
+                </p>
+            </field>
+        </record>
+        
+        <!--     Rename of Quotation to Proforma Invoice in Menuitem  -->
+        <record id="sale.menu_sale_quotations" model="ir.ui.menu">
+            <field name="name">Quotations</field>
+        </record>
+
+        <record id="sale.action_orders" model="ir.actions.act_window">
+            <field name="name">Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>
+            <field name="context">{}</field>
+            <field name="domain">[('state', 'not in', ('draft', 'sent', 'accept', 'cancel'))]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create a Quotation, the first step of a new sale.
+                </p><p>
+                    Once the quotation is confirmed, it becomes a sales order.
+                    You'll be able to invoice it and collect payments.
+                    From the <i>Sales Orders</i> menu, you can track delivery
+                    orders or services.
+                </p>
+            </field>
+        </record>
+        
+        
+        <!--  Fptag Menuitem  -->
+        <menuitem
+        id="ouc_menu_fptag"
+        name="FPTAGs"
+        parent="sale.menu_sales_config"
+        action="ouc_fptags" />
+        
+        <!--    Next Activities menuitem   -->
+        <menuitem
+        id="crm.crm_lead_menu_activities"
+        name="Next Activities"
+        parent="sales_team.menu_sales"
+        sequence="12"
+        action="crm.crm_lead_action_activities"/>
+        
+        <!--  Changing Customers Sequence in Menuitem    -->
+        <menuitem
+        id="sales_team.menu_partner_form1"
+        parent="sale.menu_sales_config"
+        action="base.action_partner_form"
+        sequence="13"/>
+        
+        <!--  Invoicing menuitem made invisible  -->
+        <menuitem
+        name="Invoicing"
+        id="menu_sale_invoicing"
+        parent="sales_team.menu_base_partner"
+        sequence="5"/>
+        <record id="make_invisible" model="res.groups">
+            <field name="name">Invisible</field>
+        </record>
+        <record model="ir.ui.menu" id="sale.menu_sale_invoicing">
+            <field name="groups_id" eval="[(6,0,[ref('make_invisible')])]"/>
+        </record>
+        
+        <!--   Delete Product Menuitem -->
+        <!-- <delete model="ir.ui.menu"
+         id="sale.menu_product_template_action"/>
+         
+         Delete Partners Menuitem
+         <delete model="ir.ui.menu"
+         id="sales_team.menu_partner_form"/> -->
+        
+        <!--  tree,form view -->
+
+         <record id="nf_mlc_onboarding_form" model="ir.ui.view">
+            <field name="name">MLC Onboarding</field>
+            <field name="model">nf.mlc.onboarding</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="MLC Onboarding" create="false" edit="false">
+                    <sheet>
+                        <group col="4">
+                            <field name="name" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="company_name" readonly="1"/>
+                            <field name="partner_email" readonly="1"/>
+                            <field name="partner_contact" readonly="1"/>
+                            <field name="so_id" readonly="1"/>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="sales_person_id" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Locations">
+                                <field name="onboarding_line">
+                                    <tree editable="bottom">
+                                        <field name="country_id" options="{'no_create_edit':True,'no_create': True}"/>
+                                        <field name="city_id" domain="[('country_id','=',country_id)]" options="{'no_create_edit':True,'no_create': True}" invisible="1"/>
+                                        <field name="city"/>
+                                        <field name="address"/>
+                                        <field name="contact_no"/>
+                                        <field name="email_id"/>
+                                        <field name="url"/>
+                                        <field name="location_type"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <group col="4">
+                            <field name="existing_domain" required="1"/>
+                            <field name="domain_url" attrs="{'invisible':[('existing_domain','!=','Yes')]}"/>
+                            <field name="cpanel_user" invisible="1"/>
+                            <field name="cpanel_pwd" invisible="1" password="True"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="nf_mlc_onboarding_tree" model="ir.ui.view">
+            <field name="name">MLC Onboarding</field>
+            <field name="model">nf.mlc.onboarding</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="MLC Onboarding">
+                    <field name="partner_id"/>
+                    <field name="company_name"/>
+                    <field name="so_id"/>
+                    <field name="contract_id"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!--           MLC Onboarding Action record          -->
+
+        <record id="nf_mlc_onboarding_action" model="ir.actions.act_window">
+            <field name="name">MLC Onboarding</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">nf.mlc.onboarding</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="nf_mlc_onboarding_tree"/>
+        </record>
+
+        <menuitem
+        id="nf_mlc_onboarding_menu"
+        name="MLC Onboarding"
+        parent="sales_team.menu_sales"
+        action="nf_mlc_onboarding_action" sequence="15"/>
+        
+    </data>
+</openerp>
